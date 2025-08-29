@@ -58,7 +58,7 @@ const HiringFilters = ({ filters, onFiltersChange }: HiringFiltersProps) => {
         {/* Search Input */}
         <div className="flex-1">
           <div className="relative">
-            <HiMagnifyingGlass className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40" />
+            <HiMagnifyingGlass className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-primary z-10" />
             <input
               type="text"
               placeholder="Search jobs, skills, or keywords..."
@@ -72,7 +72,7 @@ const HiringFilters = ({ filters, onFiltersChange }: HiringFiltersProps) => {
         {/* City Filter */}
         <div className="lg:w-48">
           <div className="relative">
-            <HiMapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40" />
+            <HiMapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 z-10 text-primary" />
             <select
               value={filters.city || ""}
               onChange={(e) => handleCityChange(e.target.value)}
@@ -91,7 +91,10 @@ const HiringFilters = ({ filters, onFiltersChange }: HiringFiltersProps) => {
         {/* Experience Level Filter */}
         <div className="lg:w-56">
           <div className="relative">
-            <HiAcademicCap className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40" />
+            <HiAcademicCap
+              // color="red"
+              className="absolute  left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 z-10 text-primary"
+            />
             <select
               value={filters.experienceLevel || ""}
               onChange={(e) => handleExperienceChange(e.target.value)}
