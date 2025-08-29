@@ -1,10 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getServices, getServiceById } from "@/services/services.service";
 import { getCategories } from "@/services/categories.service";
-import {
-  getHiringData,
-  submitHiringApplication,
-} from "@/services/hiring.service";
 
 // Services hooks
 export const useServices = () => {
@@ -33,20 +29,20 @@ export const useCategories = () => {
 };
 
 // Hiring hooks
-export const useHiring = () => {
-  return useQuery({
-    queryKey: ["hiring"],
-    queryFn: getHiringData,
-  });
-};
+// export const useHiring = () => {
+//   return useQuery({
+//     queryKey: ["hiring"],
+//     queryFn: getHiringData,
+//   });
+// };
 
-export const useSubmitApplication = () => {
-  const queryClient = useQueryClient();
+// export const useSubmitApplication = () => {
+//   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: submitHiringApplication,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["hiring"] });
-    },
-  });
-};
+//   return useMutation({
+//     mutationFn: submitHiringApplication,
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({ queryKey: ["hiring"] });
+//     },
+//   });
+// };

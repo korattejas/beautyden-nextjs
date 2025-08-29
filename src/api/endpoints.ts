@@ -24,4 +24,7 @@ export const endpoints = {
   // Reviews
   REVIEWS: "/V1/reviews",
   CREATE_REVIEW: "/V1/reviews/create",
+
+  // Cities
+  CITIES: "/V1/cities",
 } as const;
