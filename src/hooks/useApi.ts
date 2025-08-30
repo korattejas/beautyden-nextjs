@@ -7,6 +7,7 @@ import {
 import { getServiceCategories } from "@/services/categories.service";
 import { getReviews } from "@/services/reviews.service";
 import { ReviewsFilters } from "@/types/reviews";
+import { getTeamMembers } from "@/services/team.service";
 
 // Services hooks
 export const useServices = (filters: ServicesFilters = {}) => {
@@ -39,6 +40,14 @@ export const useReviews = (filters: ReviewsFilters = {}) => {
     queryKey: ["reviews", filters],
     queryFn: () => getReviews(filters),
     staleTime: 5 * 60 * 1000,
+  });
+};
+
+export const useTeamMembers = () => {
+  return useQuery({
+    queryKey: ["teamMembers"],
+    queryFn: getTeamMembers,
+    staleTime: 30 * 60 * 1000, // 30 minutes
   });
 };
 

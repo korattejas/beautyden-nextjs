@@ -30,4 +30,8 @@ export const endpoints = {
   CITIES: "/V1/cities",
 
   CUSTOMER_REVIEWS: "/V1/customerReview",
+
+  TEAM_MEMBERS: "/V1/teamMember",
+
+  CONTACT_FORM: "/V1/contactFormSubmit",
 } as const;

@@ -1,7 +1,17 @@
-import React from "react";
+import AboutHero from "@/sections/about/AboutHero";
+import AboutMission from "@/sections/about/AboutMission";
+import AboutStats from "@/sections/about/AboutStats";
+import AboutTeam from "@/sections/about/AboutTeam";
+import AboutValues from "@/sections/about/AboutValues";
 
-const page = () => {
-  return <div>Abour Page</div>;
-};
-
-export default page;
+export default function AboutPage() {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+      <AboutHero />
+      <AboutMission />
+      <AboutStats />
+      <AboutTeam />
+      <AboutValues />
+    </div>
+  );
+}
