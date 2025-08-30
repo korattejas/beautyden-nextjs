@@ -28,4 +28,6 @@ export const endpoints = {
 
   // Cities
   CITIES: "/V1/cities",
+
+  CUSTOMER_REVIEWS: "/V1/customerReview",
 } as const;
