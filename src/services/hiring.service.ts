@@ -13,7 +13,7 @@ const buildQueryString = (filters: HiringFilters): string => {
     params.append("city", filters.city);
   }
   if (filters.experienceLevel) {
-    params.append("experienceLevel", filters.experienceLevel);
+    params.append("experience_level", filters.experienceLevel);
   }
 
   return params.toString();
@@ -28,7 +28,7 @@ export const getHiring = async (
       ? `${endpoints.HIRING}?${queryString}`
       : endpoints.HIRING;
 
-    const response = await api.get(url);
+    const response = await api.post(url);
 
     if (typeof response.data === "string" && response.data.includes(":")) {
       const decryptedData = decryptData(response.data);

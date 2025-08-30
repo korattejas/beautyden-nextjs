@@ -4,6 +4,7 @@ export const endpoints = {
   SERVICE_BY_ID: (id: string) => `/V1/services/${id}`,
 
   // Categories
+  SERVICE_CATEGORIES: "/V1/serviceCategory",
   CATEGORIES: "/V1/categories",
   CATEGORY_BY_ID: (id: string) => `/V1/categories/${id}`,
 

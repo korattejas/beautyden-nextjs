@@ -4,8 +4,8 @@ import axios from "axios";
 const isTestEnv = process.env.NEXT_PUBLIC_USE_TEST_API === "true";
 
 const BASE_URL = isTestEnv
-  ? "https://laravel.beautyden.in/api/Test"
-  : "https://laravel.beautyden.in/api";
+  ? "https://laravelappversionone.beautyden.in/api/Test"
+  : "https://laravelappversionone.beautyden.in/api";
 
 const api = axios.create({
   baseURL: BASE_URL,

@@ -1,12 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getServices, getServiceById } from "@/services/services.service";
-import { getCategories } from "@/services/categories.service";
+import {
+  getServices,
+  getServiceById,
+  ServicesFilters,
+} from "@/services/services.service";
+import { getServiceCategories } from "@/services/categories.service";
 
 // Services hooks
-export const useServices = () => {
+export const useServices = (filters: ServicesFilters = {}) => {
   return useQuery({
-    queryKey: ["services"],
-    queryFn: getServices,
+    queryKey: ["services", filters],
+    queryFn: () => getServices(filters),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
@@ -20,11 +24,11 @@ export const useService = (id: string) => {
 };
 
 // Categories hooks
-export const useCategories = () => {
+export const useServiceCategories = () => {
   return useQuery({
-    queryKey: ["categories"],
-    queryFn: getCategories,
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    queryKey: ["serviceCategories"],
+    queryFn: getServiceCategories,
+    staleTime: 30 * 60 * 1000,
   });
 };
 

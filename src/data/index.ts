@@ -15,7 +15,7 @@ export const getServicesByCategory = (categoryId: string) => {
 };
 
 export const getFeaturedServices = (limit: number = 6) => {
-  return services.sort((a, b) => b.rating - a.rating).slice(0, limit);
+  return services?.sort((a, b) => b.rating - a.rating).slice(0, limit);
 };
 
 export const formatPrice = (price: number) => {

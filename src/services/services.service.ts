@@ -25,9 +25,35 @@ export interface ServicesResponse {
   data: Service[];
 }
 
-export const getServices = async (): Promise<ServicesResponse> => {
+export interface ServicesFilters {
+  search?: string;
+  category_id?: string;
+}
+
+const buildQueryString = (filters: ServicesFilters): string => {
+  const params = new URLSearchParams();
+
+  if (filters.search) {
+    params.append("search", filters.search);
+  }
+  if (filters.category_id && filters.category_id !== "9") {
+    // 9 is "All Services"
+    params.append("category_id", filters.category_id);
+  }
+
+  return params.toString();
+};
+
+export const getServices = async (
+  filters: ServicesFilters = {}
+): Promise<ServicesResponse> => {
   try {
-    const response = await api.get(endpoints.SERVICES);
+    const queryString = buildQueryString(filters);
+    const url = queryString
+      ? `${endpoints.SERVICES}?${queryString}`
+      : endpoints.SERVICES;
+
+    const response = await api.post(url);
     console.log("response: ", response);
 
     // Check if response is encrypted (production)
@@ -44,7 +70,6 @@ export const getServices = async (): Promise<ServicesResponse> => {
     throw error;
   }
 };
-
 export const getServiceById = async (id: string): Promise<Service> => {
   try {
     const response = await api.get(endpoints.SERVICE_BY_ID(id));

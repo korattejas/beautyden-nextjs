@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useServices } from "@/hooks/useApi";
+import { useDebounce } from "@/hooks/useDebounce";
 
 import Container from "@/components/ui/Container";
 import ServiceHero from "@/sections/services/ServiceHero";
@@ -13,15 +14,24 @@ import ServiceGridSkeleton from "@/components/loading/ServiceGridSkeleton";
 import ServiceFilterSkeleton from "@/components/loading/ServiceFilterSkeleton";
 
 export default function ServicesPage() {
-  const [activeCategory, setActiveCategory] = useState("all");
+  const [activeCategory, setActiveCategory] = useState("9"); // Default to "All Services"
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const { data, error, isLoading } = useServices();
+  // Debounce search to avoid too many API calls
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
+
+  // Fetch services with filters
+  const { data, error, isLoading } = useServices({
+    search: debouncedSearchQuery,
+    category_id: activeCategory,
+  });
 
   const services = data?.data ?? [];
-  const filteredServices =
-    activeCategory === "all"
-      ? services
-      : services.filter((s) => s.category_name === activeCategory);
+
+  const clearAllFilters = () => {
+    setActiveCategory("9");
+    setSearchQuery("");
+  };
 
   if (error) {
     return (
@@ -56,7 +66,9 @@ export default function ServicesPage() {
           ) : (
             <ServiceFilter
               activeCategory={activeCategory}
+              searchQuery={searchQuery}
               onCategoryChange={setActiveCategory}
+              onSearchChange={setSearchQuery}
             />
           )}
         </Container>
@@ -65,7 +77,31 @@ export default function ServicesPage() {
       {isLoading ? (
         <ServiceGridSkeleton />
       ) : (
-        <ServiceGrid services={filteredServices} />
+        <>
+          {services.length === 0 ? (
+            <section className="pb-20">
+              <Container>
+                <div className="text-center py-16">
+                  <div className="text-6xl mb-4">🔍</div>
+                  <h3 className="text-2xl font-bold text-foreground mb-2">
+                    No services found
+                  </h3>
+                  <p className="text-foreground/60 mb-6">
+                    Try adjusting your search or category filters.
+                  </p>
+                  <button
+                    onClick={clearAllFilters}
+                    className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300"
+                  >
+                    Clear All Filters
+                  </button>
+                </div>
+              </Container>
+            </section>
+          ) : (
+            <ServiceGrid services={services} />
+          )}
+        </>
       )}
     </div>
   );
