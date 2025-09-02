@@ -109,7 +109,7 @@ const CustomerInformation = ({
               First Name *
             </label>
             <div className="relative">
-              <HiUser className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40" />
+              <HiUser className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40 z-10" />
               <input
                 {...register("firstName")}
                 type="text"
@@ -134,7 +134,7 @@ const CustomerInformation = ({
               Last Name *
             </label>
             <div className="relative">
-              <HiUser className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40" />
+              <HiUser className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40 z-10" />
               <input
                 {...register("lastName")}
                 type="text"
@@ -162,7 +162,7 @@ const CustomerInformation = ({
               Email Address *
             </label>
             <div className="relative">
-              <HiEnvelope className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40" />
+              <HiEnvelope className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40 z-10" />
               <input
                 {...register("email")}
                 type="email"
@@ -187,7 +187,7 @@ const CustomerInformation = ({
               Phone Number *
             </label>
             <div className="relative">
-              <HiPhone className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40" />
+              <HiPhone className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40 z-10" />
               <input
                 {...register("phone")}
                 type="tel"
@@ -214,7 +214,7 @@ const CustomerInformation = ({
             Service Address *
           </label>
           <div className="relative">
-            <HiMapPin className="absolute left-4 top-4 w-5 h-5 text-foreground/40" />
+            <HiMapPin className="absolute left-4 top-4 w-5 h-5 text-foreground/40 z-10" />
             <textarea
               {...register("address")}
               rows={3}
@@ -240,7 +240,7 @@ const CustomerInformation = ({
             Special Notes (Optional)
           </label>
           <div className="relative">
-            <HiChatBubbleBottomCenterText className="absolute left-4 top-4 w-5 h-5 text-foreground/40" />
+            <HiChatBubbleBottomCenterText className="absolute left-4 top-4 w-5 h-5 text-foreground/40 z-10" />
             <textarea
               {...register("specialNotes")}
               rows={3}

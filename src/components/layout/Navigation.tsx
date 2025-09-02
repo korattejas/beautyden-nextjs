@@ -175,7 +175,7 @@ const Navigation = () => {
                 className="ml-8"
               >
                 <Button
-                  href="/services"
+                  href="/book"
                   className="relative overflow-hidden bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-2xl group"
                 >
                   <span className="relative z-10">Book Now</span>
