@@ -9,9 +9,9 @@ export default function ContactPage() {
 
       <section className="py-20">
         <Container>
-          <div className="max-w-2xl mx-auto">
-            <ContactForm />
-          </div>
+          {/* <div className="max-w-2xl mx-auto"> */}
+          <ContactForm />
+          {/* </div> */}
         </Container>
       </section>
     </div>
