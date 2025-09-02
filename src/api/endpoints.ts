@@ -34,4 +34,10 @@ export const endpoints = {
   TEAM_MEMBERS: "/V1/teamMember",
 
   CONTACT_FORM: "/V1/contactFormSubmit",
+
+  BLOG_CATEGORIES: "/V1/blogCategory",
+  BLOGS: "/V1/blogs",
+  BLOG_VIEW: "/V1/blogView",
+  FAQS: "/V1/faqs",
+  POLICIES: "/V1/policies",
 } as const;

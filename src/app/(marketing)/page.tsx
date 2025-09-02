@@ -1,4 +1,5 @@
 import CTASection from "@/components/CTASection";
+import CategoryServices from "@/sections/home/CategoryServices";
 import HeroSection from "@/sections/home/HeroSection";
 import HowItWorksSection from "@/sections/home/HowItWorksSection";
 import PopularServicesSection from "@/sections/home/PopularServicesSection";
@@ -12,6 +13,7 @@ export default function HomePage() {
   return (
     <>
       <HeroSection />
+      <CategoryServices />
       <WhyChooseUsSection />
       <PopularServicesSection />
       <HowItWorksSection />

@@ -86,3 +86,98 @@ html {
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
+
+/* Policy */
+
+/* Policy Content Styles */
+.policy-content {
+  color: #374151;
+  line-height: 1.75;
+}
+
+.policy-content h1,
+.policy-content h2 {
+  color: #1f2937;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.policy-content h1 {
+  font-size: 2.25rem;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0.75rem;
+}
+
+.policy-content h2 {
+  font-size: 1.875rem;
+}
+
+.policy-content h3 {
+  color: #374151;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 1.75rem;
+  margin-bottom: 1rem;
+}
+
+.policy-content h4 {
+  color: #4b5563;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.policy-content p {
+  margin-bottom: 1.25rem;
+  color: #4b5563;
+}
+
+.policy-content ul,
+.policy-content ol {
+  margin: 1.25rem 0;
+  padding-left: 2rem;
+  color: #4b5563;
+}
+
+.policy-content li {
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+
+.policy-content strong {
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.policy-content a {
+  color: #3b82f6;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.policy-content a:hover {
+  color: #1d4ed8;
+  text-decoration: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .policy-content h1 {
+    font-size: 1.875rem;
+  }
+
+  .policy-content h2 {
+    font-size: 1.5rem;
+  }
+
+  .policy-content h3 {
+    font-size: 1.25rem;
+  }
+
+  .policy-content ul,
+  .policy-content ol {
+    padding-left: 1.5rem;
+  }
+}

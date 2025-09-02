@@ -13,6 +13,7 @@ interface ServiceCardProps {
 }
 
 const ServiceCard = ({ service, index }: ServiceCardProps) => {
+  console.log("service: ", service);
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -82,7 +83,6 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
 
 // Default fallback images based on category, adjust paths accordingly
 function defaultImageForCategory(category: string) {
-  console.log("category: ", category);
   const map: Record<string, string> = {
     hair: "/images/services/hair-default.jpg",
     face: "/images/services/face-default.jpg",

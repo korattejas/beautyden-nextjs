@@ -3,6 +3,7 @@ import { endpoints } from "@/api/endpoints";
 import { decryptData } from "@/utils/encryption";
 
 export interface Service {
+  thumbnail: any;
   id: string;
   category_id: string;
   category_name: string;

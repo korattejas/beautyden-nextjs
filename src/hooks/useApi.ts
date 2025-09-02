@@ -8,6 +8,15 @@ import { getServiceCategories } from "@/services/categories.service";
 import { getReviews } from "@/services/reviews.service";
 import { ReviewsFilters } from "@/types/reviews";
 import { getTeamMembers } from "@/services/team.service";
+import {
+  getBlogById,
+  getBlogCategories,
+  getBlogs,
+} from "@/services/blog.service";
+import { BlogFilters } from "@/types/blog";
+import { getFAQs } from "@/services/faq.service";
+import { getPolicies } from "@/services/policy.service";
+import { PolicyType } from "@/types/policy";
 
 // Services hooks
 export const useServices = (filters: ServicesFilters = {}) => {
@@ -69,3 +78,48 @@ export const useTeamMembers = () => {
 //     },
 //   });
 // };
+
+export const useBlogCategories = () => {
+  return useQuery({
+    queryKey: ["blogCategories"],
+    queryFn: getBlogCategories,
+    staleTime: 30 * 60 * 1000,
+  });
+};
+
+export const useBlogs = (filters: BlogFilters = {}) => {
+  return useQuery({
+    queryKey: ["blogs", filters],
+    queryFn: () => getBlogs(filters),
+    staleTime: 5 * 60 * 1000,
+    // cacheTime: 10 * 60 * 1000,
+  });
+};
+
+export const useBlog = (id: string) => {
+  return useQuery({
+    queryKey: ["blog", id],
+    queryFn: () => getBlogById(id),
+    staleTime: 10 * 60 * 1000,
+    // cacheTime: 30 * 60 * 1000,
+    enabled: !!id,
+  });
+};
+
+export const useFAQs = () => {
+  return useQuery({
+    queryKey: ["faqs"],
+    queryFn: getFAQs,
+    staleTime: 30 * 60 * 1000, // 30 minutes
+    // cacheTime: 60 * 60 * 1000, // 1 hour
+  });
+};
+
+export const usePolicy = (type: PolicyType) => {
+  return useQuery({
+    queryKey: ["policy", type],
+    queryFn: () => getPolicies(type),
+    staleTime: 60 * 60 * 1000, // 1 hour
+    // cacheTime: 2 * 60 * 60 * 1000, // 2 hours
+  });
+};
