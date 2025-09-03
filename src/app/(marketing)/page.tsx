@@ -3,7 +3,7 @@ import CategoryServices from "@/sections/home/CategoryServices";
 import ComingSoonCities from "@/sections/home/ComingSoonCities";
 import HeroSection from "@/sections/home/HeroSection";
 import HowItWorksSection from "@/sections/home/HowItWorksSection";
-import PopularServicesSection from "@/sections/home/PopularServicesSection";
+// import PopularServicesSection from "@/sections/home/PopularServicesSection";
 import ServiceAreaSection from "@/sections/home/ServiceAreaSection";
 import TestimonialsSection from "@/sections/home/TestimonialsSection";
 import WhyChooseUsSection from "@/sections/home/WhyChooseUsSection";
@@ -16,7 +16,7 @@ export default function HomePage() {
       <HeroSection />
       <CategoryServices />
       <WhyChooseUsSection />
-      <PopularServicesSection />
+      {/* <PopularServicesSection /> */}
       <HowItWorksSection />
       <TestimonialsSection />
       <ServiceAreaSection />

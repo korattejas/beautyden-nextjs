@@ -40,4 +40,6 @@ export const endpoints = {
   BLOG_VIEW: "/V1/blogView",
   FAQS: "/V1/faqs",
   POLICIES: "/V1/policies",
+
+  SETTINGS: "/V1/settings",
 } as const;

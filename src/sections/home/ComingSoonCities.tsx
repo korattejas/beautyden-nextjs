@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import {
   HiEnvelope,
   HiChatBubbleLeftRight,
@@ -11,19 +12,14 @@ import {
 import { FaWhatsapp } from "react-icons/fa";
 import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
-
-import Image from "next/image";
 import { useCities } from "@/hooks/useHiring";
 
 const ComingSoonCities = () => {
   const { data: citiesData, isLoading, error } = useCities();
-  //   console.log("citiesData: ", citiesData);
   const cities = citiesData?.data ?? [];
-  console.log("cities: ", cities);
 
-  // Filter cities to show upcoming launches (you can modify this logic)
+  // Filter cities with launch_quarter for upcoming display
   const upcomingCities = cities.filter((city) => city.launch_quarter);
-  const popularCities = cities.filter((city) => city.is_popular === "1");
 
   if (isLoading) {
     return (
@@ -40,8 +36,8 @@ const ComingSoonCities = () => {
     );
   }
 
-  if (error || cities.length === 0) {
-    return null; // Don't show section if no cities
+  if (error || cities.length === 0 || upcomingCities.length === 0) {
+    return null;
   }
 
   return (
@@ -65,7 +61,7 @@ const ComingSoonCities = () => {
           </div>
 
           <h2 className="font-heading text-4xl md:text-5xl font-bold mb-6">
-            <span className="text-foreground">🚀 Coming Soon in</span>
+            <span className="text-foreground">Coming Soon in</span>
             <br />
             <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               These Cities
@@ -78,104 +74,80 @@ const ComingSoonCities = () => {
           </p>
         </motion.div>
 
-        {/* Popular Cities Grid */}
-        {popularCities.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="mb-16"
-          >
-            <h3 className="text-2xl font-bold text-foreground mb-8 text-center">
-              🌟 Popular Upcoming Locations
-            </h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {popularCities.slice(0, 6).map((city, index) => (
-                <motion.div
-                  key={city.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                  className="bg-white/80 backdrop-blur-md rounded-3xl p-6 border border-primary/10 shadow-lg hover:shadow-xl transition-all duration-300 group"
-                >
-                  <div className="flex items-center gap-4 mb-4">
-                    {city.icon && (
-                      <div className="w-12 h-12 rounded-2xl overflow-hidden bg-primary/10 flex items-center justify-center">
-                        <Image
-                          src={city.icon}
-                          alt={city.name}
-                          width={32}
-                          height={32}
-                          className="object-cover"
-                          unoptimized
-                        />
+        {/* Cities Grid */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          viewport={{ once: true }}
+          className="mb-16"
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            {upcomingCities.map((city, index) => (
+              <motion.div
+                key={city.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, delay: index * 0.05 }}
+                viewport={{ once: true }}
+                whileHover={{ y: -8 }}
+                className="group cursor-pointer"
+              >
+                <div className="bg-white/80 backdrop-blur-md rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-500 border border-primary/10 group-hover:border-primary/30">
+                  {/* City Image Container */}
+                  <div className="relative h-48 overflow-hidden">
+                    {city.icon ? (
+                      <Image
+                        src={city.icon}
+                        alt={city.name}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-700"
+                        sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
+                        <HiMapPin className="w-12 h-12 text-primary/40" />
                       </div>
                     )}
-                    <div className="flex-1">
-                      <h4 className="font-heading text-lg font-bold text-foreground group-hover:text-primary transition-colors">
-                        {city.name}
-                      </h4>
-                      <p className="text-sm text-foreground/60">
-                        {city.area}, {city.state}
+
+                    {/* Coming Soon Badge */}
+                    <div className="absolute top-4 right-4 bg-gradient-to-r from-primary to-secondary text-white px-3 py-2 rounded-full text-sm font-bold shadow-lg">
+                      <span className="flex items-center gap-1">
+                        <HiSparkles className="w-3 h-3" />
+                        Coming Soon
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* City Information - Below Image */}
+                  <div className="p-5">
+                    <h4 className="text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-1">
+                      {city.name}
+                    </h4>
+
+                    <div className="flex items-center gap-2 text-foreground/60 mb-3">
+                      <HiMapPin className="w-4 h-4 flex-shrink-0" />
+                      <p className="text-sm line-clamp-1">
+                        {city.area && `${city.area}, `}
+                        {city.state}
                       </p>
                     </div>
+
+                    {city.launch_quarter && (
+                      <div className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-2 rounded-full text-sm font-medium">
+                        <HiClock className="w-4 h-4" />
+                        <span className="text-xs">
+                          Expected: {city.launch_quarter}
+                        </span>
+                      </div>
+                    )}
                   </div>
-
-                  {city.launch_quarter && (
-                    <div className="flex items-center gap-2 text-sm text-primary bg-primary/10 px-3 py-2 rounded-full">
-                      <HiClock className="w-4 h-4" />
-                      Expected: {city.launch_quarter}
-                    </div>
-                  )}
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {/* All Upcoming Cities */}
-        {cities.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            viewport={{ once: true }}
-            className="mb-16"
-          >
-            <h3 className="text-2xl font-bold text-foreground mb-8 text-center">
-              📍 All Upcoming Cities
-            </h3>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {cities.map((city, index) => (
-                <motion.div
-                  key={city.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.4, delay: index * 0.05 }}
-                  viewport={{ once: true }}
-                  className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-primary/10 text-center hover:bg-white/80 hover:shadow-md transition-all duration-300"
-                >
-                  <div className="flex items-center justify-center mb-2">
-                    <HiMapPin className="w-5 h-5 text-primary" />
-                  </div>
-                  <h5 className="font-semibold text-foreground text-sm mb-1">
-                    {city.name}
-                  </h5>
-                  <p className="text-xs text-foreground/60">{city.state}</p>
-                  {city.launch_quarter && (
-                    <p className="text-xs text-primary font-medium mt-1">
-                      {city.launch_quarter}
-                    </p>
-                  )}
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
 
         {/* CTA Section */}
         <motion.div
@@ -207,7 +179,6 @@ const ComingSoonCities = () => {
 
               <Button
                 href="https://wa.me/919876543210?text=Hi%20BeautyDen!%20I%20want%20BeautyDen%20services%20in%20my%20city.%20Please%20let%20me%20know%20when%20you'll%20be%20expanding%20to%20my%20area."
-                // target="_blank"
                 variant="outline"
                 className="border-2 border-green-500 text-green-600 hover:bg-green-50 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 inline-flex items-center gap-3"
               >

@@ -17,6 +17,7 @@ import { BlogFilters } from "@/types/blog";
 import { getFAQs } from "@/services/faq.service";
 import { getPolicies } from "@/services/policy.service";
 import { PolicyType } from "@/types/policy";
+import { getSettings } from "@/services/settings.service";
 
 // Services hooks
 export const useServices = (filters: ServicesFilters = {}) => {
@@ -119,6 +120,15 @@ export const usePolicy = (type: PolicyType) => {
   return useQuery({
     queryKey: ["policy", type],
     queryFn: () => getPolicies(type),
+    staleTime: 60 * 60 * 1000, // 1 hour
+    // cacheTime: 2 * 60 * 60 * 1000, // 2 hours
+  });
+};
+
+export const useSettings = () => {
+  return useQuery({
+    queryKey: ["settings"],
+    queryFn: getSettings,
     staleTime: 60 * 60 * 1000, // 1 hour
     // cacheTime: 2 * 60 * 60 * 1000, // 2 hours
   });
