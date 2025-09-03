@@ -20,7 +20,7 @@ const ReviewCard = ({ review, index }: ReviewCardProps) => {
   const hasMedia = review.photos.length > 0 || review.video;
 
   // Show only first 3 photos as thumbnails
-  const thumbnails = review.photos.slice(0, 3);
+  const thumbnails = review.photos.slice(0, 2);
 
   const handlePhotoClick = (index: number, event: React.MouseEvent) => {
     event.stopPropagation();
@@ -149,7 +149,7 @@ const ReviewCard = ({ review, index }: ReviewCardProps) => {
         )}
 
         {/* Video Thumbnail */}
-        {review.video && (
+        {/* {review.video && (
           <div className="mb-4">
             <div
               className="relative aspect-video rounded-lg overflow-hidden bg-gray-100 cursor-pointer group"
@@ -158,7 +158,7 @@ const ReviewCard = ({ review, index }: ReviewCardProps) => {
               <video className="w-full h-full object-cover" muted>
                 <source src={review.video} type="video/mp4" />
               </video>
-              {/* Play button overlay */}
+
               <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/40 transition-all duration-300">
                 <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center">
                   <HiVideoCamera className="w-8 h-8 text-gray-800 ml-1" />
@@ -166,7 +166,7 @@ const ReviewCard = ({ review, index }: ReviewCardProps) => {
               </div>
             </div>
           </div>
-        )}
+        )} */}
 
         {/* Footer */}
         {/* <div className="flex items-center justify-between pt-4 border-t border-primary/10">
