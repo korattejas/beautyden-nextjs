@@ -60,7 +60,8 @@ export const getBlogs = async (
 
 export const getBlogById = async (id: string): Promise<BlogViewResponse> => {
   try {
-    const response = await api.post(`${endpoints.BLOG_VIEW}?id=${id}`);
+    const response = await api.post(`${endpoints.BLOG_VIEW}?slug=${id}`);
+    console.log("response: ", response);
 
     if (typeof response.data === "string" && response.data.includes(":")) {
       return decryptData(response.data);

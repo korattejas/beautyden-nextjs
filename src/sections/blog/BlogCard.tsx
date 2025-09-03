@@ -109,7 +109,7 @@ const BlogCard = ({ blog, index }: BlogCardProps) => {
               {blog.tags.slice(0, 3).map((tag, idx) => (
                 <span
                   key={idx}
-                  className="inline-flex items-center gap-1 text-xs bg-accent/10 text-accent px-2 py-1 rounded-full"
+                  className="inline-flex items-center gap-1 text-xs bg-primary text-accent px-2 py-1 rounded-full"
                 >
                   <HiTag className="w-2 h-2" />
                   {tag}
