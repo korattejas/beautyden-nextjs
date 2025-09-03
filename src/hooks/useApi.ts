@@ -18,6 +18,7 @@ import { getFAQs } from "@/services/faq.service";
 import { getPolicies } from "@/services/policy.service";
 import { PolicyType } from "@/types/policy";
 import { getSettings } from "@/services/settings.service";
+import { getHomeCounters } from "@/services/homeCounter.service";
 
 // Services hooks
 export const useServices = (filters: ServicesFilters = {}) => {
@@ -93,7 +94,6 @@ export const useBlogs = (filters: BlogFilters = {}) => {
     queryKey: ["blogs", filters],
     queryFn: () => getBlogs(filters),
     staleTime: 5 * 60 * 1000,
-    // cacheTime: 10 * 60 * 1000,
   });
 };
 
@@ -102,7 +102,6 @@ export const useBlog = (id: string) => {
     queryKey: ["blog", id],
     queryFn: () => getBlogById(id),
     staleTime: 10 * 60 * 1000,
-    // cacheTime: 30 * 60 * 1000,
     enabled: !!id,
   });
 };
@@ -111,8 +110,7 @@ export const useFAQs = () => {
   return useQuery({
     queryKey: ["faqs"],
     queryFn: getFAQs,
-    staleTime: 30 * 60 * 1000, // 30 minutes
-    // cacheTime: 60 * 60 * 1000, // 1 hour
+    staleTime: 30 * 60 * 1000,
   });
 };
 
@@ -121,7 +119,6 @@ export const usePolicy = (type: PolicyType) => {
     queryKey: ["policy", type],
     queryFn: () => getPolicies(type),
     staleTime: 60 * 60 * 1000, // 1 hour
-    // cacheTime: 2 * 60 * 60 * 1000, // 2 hours
   });
 };
 
@@ -130,6 +127,13 @@ export const useSettings = () => {
     queryKey: ["settings"],
     queryFn: getSettings,
     staleTime: 60 * 60 * 1000, // 1 hour
-    // cacheTime: 2 * 60 * 60 * 1000, // 2 hours
+  });
+};
+
+export const useHomeCounters = () => {
+  return useQuery({
+    queryKey: ["homeCounters"],
+    queryFn: getHomeCounters,
+    staleTime: 60 * 60 * 1000, // 1 hour
   });
 };
