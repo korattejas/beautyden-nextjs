@@ -169,7 +169,7 @@ const ReviewCard = ({ review, index }: ReviewCardProps) => {
         )}
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-4 border-t border-primary/10">
+        {/* <div className="flex items-center justify-between pt-4 border-t border-primary/10">
           <div className="text-sm text-foreground/60">
             {review.service_name && `Service: ${review.service_name}`}
           </div>
@@ -177,7 +177,7 @@ const ReviewCard = ({ review, index }: ReviewCardProps) => {
             <HiHeart className="w-4 h-4" />
             Helpful ({review.helpful_count})
           </button>
-        </div>
+        </div> */}
       </motion.div>
 
       {/* Media Modal */}
