@@ -16,7 +16,7 @@ export interface Service {
   description: string;
   includes: string[];
   icon: string;
-  is_popular: string;
+  is_popular: number;
 }
 
 export interface ServicesResponse {
