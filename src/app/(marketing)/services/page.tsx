@@ -8,6 +8,7 @@ import Container from "@/components/ui/Container";
 import ServiceHero from "@/sections/services/ServiceHero";
 import ServiceFilter from "@/sections/services/ServiceFilter";
 import ServiceGrid from "@/sections/services/ServiceGrid";
+import Pagination from "@/components/ui/Pagination";
 
 // Loading components
 import ServiceGridSkeleton from "@/components/loading/ServiceGridSkeleton";
@@ -16,6 +17,7 @@ import ServiceFilterSkeleton from "@/components/loading/ServiceFilterSkeleton";
 export default function ServicesPage() {
   const [activeCategory, setActiveCategory] = useState("9"); // Default to "All Services"
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Debounce search to avoid too many API calls
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
@@ -24,13 +26,32 @@ export default function ServicesPage() {
   const { data, error, isLoading } = useServices({
     search: debouncedSearchQuery,
     category_id: activeCategory,
+    page: currentPage,
   });
 
-  const services = data?.data ?? [];
+  const services = data?.data?.data ?? [];
+  const paginationData = data?.data;
 
   const clearAllFilters = () => {
     setActiveCategory("9");
     setSearchQuery("");
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Smooth scroll to top when changing pages
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleCategoryChange = (categoryId: string) => {
+    setActiveCategory(categoryId);
+    setCurrentPage(1); // Reset to first page when changing category
+  };
+
+  const handleSearchChange = (search: string) => {
+    setSearchQuery(search);
+    setCurrentPage(1); // Reset to first page when searching
   };
 
   if (error) {
@@ -46,7 +67,7 @@ export default function ServicesPage() {
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300"
+            className="bg-primary text-white px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-all duration-300"
           >
             Try Again
           </button>
@@ -56,7 +77,7 @@ export default function ServicesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+    <div className="min-h-screen bg-background">
       <ServiceHero />
 
       <section className="pb-16">
@@ -67,8 +88,8 @@ export default function ServicesPage() {
             <ServiceFilter
               activeCategory={activeCategory}
               searchQuery={searchQuery}
-              onCategoryChange={setActiveCategory}
-              onSearchChange={setSearchQuery}
+              onCategoryChange={handleCategoryChange}
+              onSearchChange={handleSearchChange}
             />
           )}
         </Container>
@@ -91,7 +112,7 @@ export default function ServicesPage() {
                   </p>
                   <button
                     onClick={clearAllFilters}
-                    className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300"
+                    className="bg-primary text-white px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-all duration-300"
                   >
                     Clear All Filters
                   </button>
@@ -99,7 +120,26 @@ export default function ServicesPage() {
               </Container>
             </section>
           ) : (
-            <ServiceGrid services={services} />
+            <>
+              <ServiceGrid services={services} />
+
+              {/* Pagination Component */}
+              {paginationData && paginationData.last_page > 1 && (
+                <section className="pb-20">
+                  <Container>
+                    <Pagination
+                      currentPage={paginationData.current_page}
+                      totalPages={paginationData.last_page}
+                      onPageChange={handlePageChange}
+                      totalItems={paginationData.total}
+                      itemsPerPage={paginationData.per_page}
+                      showingFrom={paginationData.from}
+                      showingTo={paginationData.to}
+                    />
+                  </Container>
+                </section>
+              )}
+            </>
           )}
         </>
       )}

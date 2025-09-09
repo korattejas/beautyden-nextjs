@@ -18,11 +18,12 @@ interface ReviewsFilterProps {
 
 const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
   const { data: servicesData } = useServices();
-  const services = servicesData?.data ?? [];
+
+  // Fix: Access the nested data structure correctly
+  const services = servicesData?.data?.data ?? [];
 
   // Rating options with star icons
   const ratingOptions: SelectOption[] = [
-    // { value: "", label: "All Ratings" },
     { value: "5", label: "5 Stars Only" },
     { value: "4", label: "4+ Stars" },
     { value: "3", label: "3+ Stars" },
@@ -30,9 +31,8 @@ const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
     { value: "1", label: "1+ Stars" },
   ];
 
-  // Service options
+  // Service options - Fixed: Now services is properly an array
   const serviceOptions: SelectOption[] = [
-    // { value: "", label: "All Services" },
     ...services.map((service) => ({
       value: service.id.toString(),
       label: service.name,
@@ -54,7 +54,7 @@ const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-lg border border-primary/10 mb-8"
+      className="bg-card backdrop-blur-md rounded-3xl p-6 shadow-lg border border-border mb-8"
     >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Search Input */}
@@ -66,7 +66,7 @@ const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
               placeholder="Search reviews by customer name or content..."
               value={filters.search || ""}
               onChange={(e) => handleFilterChange("search", e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-white/60 backdrop-blur-sm border border-primary/20 rounded-full focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 placeholder:text-foreground/40"
+              className="w-full pl-12 pr-4 py-3 bg-background border border-border rounded-full focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 placeholder:text-foreground/40"
             />
             {filters.search && (
               <button
@@ -120,7 +120,7 @@ const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
             className={`flex items-center gap-2 px-4 py-3 rounded-full transition-all duration-200 font-medium ${
               filters.with_photos === "1"
                 ? "bg-primary text-white shadow-md shadow-primary/25"
-                : "bg-white/60 text-foreground/70 hover:bg-primary/5 border border-primary/10"
+                : "bg-background text-foreground/70 hover:bg-primary/5 border border-border"
             }`}
           >
             <HiPhoto className="w-4 h-4" />
@@ -139,7 +139,7 @@ const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
             className={`flex items-center gap-2 px-4 py-3 rounded-full transition-all duration-200 font-medium ${
               filters.with_video === "1"
                 ? "bg-primary text-white shadow-md shadow-primary/25"
-                : "bg-white/60 text-foreground/70 hover:bg-primary/5 border border-primary/10"
+                : "bg-background text-foreground/70 hover:bg-primary/5 border border-border"
             }`}
           >
             <HiVideoCamera className="w-4 h-4" />
@@ -154,7 +154,7 @@ const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
-          className="flex flex-wrap gap-2 mt-6 pt-4 border-t border-primary/10"
+          className="flex flex-wrap gap-2 mt-6 pt-4 border-t border-border"
         >
           <div className="flex items-center gap-2 text-sm text-foreground/60 font-medium">
             Active filters:
@@ -201,7 +201,7 @@ const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
             <motion.span
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="inline-flex items-center gap-2 bg-yellow-100 text-yellow-700 px-3 py-1.5 rounded-full text-sm font-medium"
+              className="inline-flex items-center gap-2 bg-warning/10 text-warning px-3 py-1.5 rounded-full text-sm font-medium"
             >
               {Array.from(
                 { length: parseInt(filters.rating) },
@@ -210,7 +210,7 @@ const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
               {filters.rating}+ Stars
               <button
                 onClick={() => handleFilterChange("rating", "")}
-                className="hover:bg-yellow-200 rounded-full p-0.5 transition-colors"
+                className="hover:bg-warning/20 rounded-full p-0.5 transition-colors"
               >
                 <HiXMark className="w-3 h-3" />
               </button>
@@ -221,13 +221,13 @@ const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
             <motion.span
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full text-sm font-medium"
+              className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full text-sm font-medium"
             >
               <HiPhoto className="w-3 h-3" />
               With Photos
               <button
                 onClick={() => handleFilterChange("with_photos", "")}
-                className="hover:bg-blue-200 rounded-full p-0.5 transition-colors"
+                className="hover:bg-primary/20 rounded-full p-0.5 transition-colors"
               >
                 <HiXMark className="w-3 h-3" />
               </button>
@@ -238,13 +238,13 @@ const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
             <motion.span
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-3 py-1.5 rounded-full text-sm font-medium"
+              className="inline-flex items-center gap-2 bg-secondary/10 text-secondary px-3 py-1.5 rounded-full text-sm font-medium"
             >
               <HiVideoCamera className="w-3 h-3" />
               With Videos
               <button
                 onClick={() => handleFilterChange("with_video", "")}
-                className="hover:bg-purple-200 rounded-full p-0.5 transition-colors"
+                className="hover:bg-secondary/20 rounded-full p-0.5 transition-colors"
               >
                 <HiXMark className="w-3 h-3" />
               </button>

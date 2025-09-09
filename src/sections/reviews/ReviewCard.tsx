@@ -4,11 +4,12 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { HiStar, HiPhoto, HiVideoCamera, HiHeart } from "react-icons/hi2";
 import Image from "next/image";
-import { CustomerReview } from "@/types/reviews";
+
 import ReviewMediaModal from "./ReviewMediaModal";
+import { Review } from "@/types/reviews";
 
 interface ReviewCardProps {
-  review: CustomerReview;
+  review: Review;
   index: number;
 }
 

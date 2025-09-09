@@ -1,16 +1,18 @@
 @import "tailwindcss";
 
 :root {
-  /* Beauty-inspired light palette */
-  --background: #fff8fc;
-  --foreground: #16141a;
-  --primary: #ef58a6; /* Pink highlight */
-  --secondary: #ac6aff; /* Lavender */
-  --accent: #ffeaf1; /* Pink blush */
-  --muted: #ebdffd; /* Pale lavender */
-  --success: #7adb78; /* Soft green */
-  --warning: #ffc876; /* Peach */
-  --border: #f3e6f2; /* Light pink border */
+  /* Elegant cream & blue/teal palette */
+  --background: #fdfcf8; /* Light cream */
+  --foreground: #2c2a26; /* Rich dark brown */
+  --primary: #1e88e5; /* Your specific teal color */
+  --secondary: #42a5f5; /* Sky blue */
+  --accent: #f0f9ff; /* Light blue accent */
+  --muted: #f1f0ec; /* Soft beige */
+  --success: #059669; /* Green success */
+  --warning: #f59e0b; /* Amber warning */
+  --border: #e7e5e0; /* Light taupe border */
+  --card: #ffffff; /* Pure white for cards */
+  --shadow: rgba(0, 0, 0, 0.08); /* Subtle shadow */
 }
 
 @theme inline {
@@ -23,11 +25,11 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-border: var(--border);
+  --color-card: var(--card);
   --font-sans: var(--font-base);
   --font-serif: var(--font-heading);
 }
-
-/* Base styles */
+/* Rest of your existing CSS remains the same */
 body {
   background: var(--background);
   color: var(--foreground);
@@ -37,32 +39,13 @@ body {
   line-height: 1.6;
 }
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Selection styling */
+/* Updated selection color */
 ::selection {
   background: var(--primary);
   color: white;
 }
 
-/* Focus styles for accessibility */
-*:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--muted);
-}
-
+/* Updated scrollbar */
 ::-webkit-scrollbar-thumb {
   background: var(--primary);
   border-radius: 3px;

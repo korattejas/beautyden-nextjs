@@ -67,8 +67,8 @@ const Navigation = () => {
               className="flex items-center space-x-3"
             >
               <Link href="/" className="flex items-center space-x-3 group">
-                <div className="relative">
-                  {/* Rotating background glow */}
+                {/* <div className="relative">
+      
                   <motion.div
                     animate={{
                       rotate: [0, 360],
@@ -100,7 +100,7 @@ const Navigation = () => {
                       <HiSparkles className="w-6 h-6 text-white" />
                     </motion.div>
                   </div>
-                </div>
+                </div> */}
                 <div className="flex flex-col">
                   <span className="text-2xl font-heading font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent group-hover:from-secondary group-hover:to-primary transition-all duration-300">
                     BeautyDen

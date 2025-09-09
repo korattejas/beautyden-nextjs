@@ -1,3 +1,4 @@
+// src/services/reviews.service.ts
 import api from "@/api/api";
 import { endpoints } from "@/api/endpoints";
 import { decryptData } from "@/utils/encryption";
@@ -20,6 +21,9 @@ const buildQueryString = (filters: ReviewsFilters): string => {
   }
   if (filters.rating) {
     params.append("rating", filters.rating);
+  }
+  if (filters.page && filters.page > 1) {
+    params.append("page", filters.page.toString());
   }
 
   return params.toString();

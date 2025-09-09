@@ -5,6 +5,7 @@ import { useReviews } from "@/hooks/useApi";
 import { useDebounce } from "@/hooks/useDebounce";
 
 import Container from "@/components/ui/Container";
+import Pagination from "@/components/ui/Pagination";
 
 import { ReviewsFilters } from "@/types/reviews";
 import ReviewsHero from "@/sections/reviews/ReviewsHero";
@@ -14,13 +15,34 @@ import ReviewList from "@/sections/reviews/ReviewList";
 
 export default function ReviewsPage() {
   const [filters, setFilters] = useState<ReviewsFilters>({});
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Combine filters with pagination
+  const combinedFilters = { ...filters, page: currentPage };
 
   // Debounce search to avoid too many API calls
-  const debouncedFilters = useDebounce(filters, 500);
+  const debouncedFilters = useDebounce(combinedFilters, 500);
 
   const { data, error, isLoading } = useReviews(debouncedFilters);
 
-  const reviews = data?.data ?? [];
+  const reviews = data?.data?.data ?? [];
+  const paginationData = data?.data;
+
+  const handleFiltersChange = (newFilters: ReviewsFilters) => {
+    setFilters(newFilters);
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Smooth scroll to top when changing pages
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const clearAllFilters = () => {
+    setFilters({});
+    setCurrentPage(1);
+  };
 
   if (error) {
     return (
@@ -36,7 +58,7 @@ export default function ReviewsPage() {
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300"
+            className="bg-primary text-white px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-all duration-300"
           >
             Try Again
           </button>
@@ -46,12 +68,15 @@ export default function ReviewsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+    <div className="min-h-screen bg-background">
       <ReviewsHero />
 
       <section className="py-8">
         <Container>
-          <ReviewsFilter filters={filters} onFiltersChange={setFilters} />
+          <ReviewsFilter
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
+          />
         </Container>
       </section>
 
@@ -79,8 +104,8 @@ export default function ReviewsPage() {
                     Try adjusting your filters to see more reviews.
                   </p>
                   <button
-                    onClick={() => setFilters({})}
-                    className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300"
+                    onClick={clearAllFilters}
+                    className="bg-primary text-white px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-all duration-300"
                   >
                     Clear All Filters
                   </button>
@@ -88,7 +113,26 @@ export default function ReviewsPage() {
               </Container>
             </section>
           ) : (
-            <ReviewList reviews={reviews} />
+            <>
+              <ReviewList reviews={reviews} />
+
+              {/* Pagination Component */}
+              {paginationData && paginationData?.last_page > 1 && (
+                <section className="pb-20">
+                  <Container>
+                    <Pagination
+                      currentPage={paginationData.current_page}
+                      totalPages={paginationData.last_page}
+                      onPageChange={handlePageChange}
+                      totalItems={paginationData.total}
+                      itemsPerPage={paginationData.per_page}
+                      showingFrom={paginationData.from}
+                      showingTo={paginationData.to}
+                    />
+                  </Container>
+                </section>
+              )}
+            </>
           )}
         </>
       )}

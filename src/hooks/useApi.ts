@@ -1,3 +1,4 @@
+// src/hooks/useApi.ts
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getServices,
@@ -26,6 +27,7 @@ export const useServices = (filters: ServicesFilters = {}) => {
     queryKey: ["services", filters],
     queryFn: () => getServices(filters),
     staleTime: 5 * 60 * 1000, // 5 minutes
+    // keepPreviousData: true,
   });
 };
 
@@ -50,7 +52,8 @@ export const useReviews = (filters: ReviewsFilters = {}) => {
   return useQuery({
     queryKey: ["reviews", filters],
     queryFn: () => getReviews(filters),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    // keepPreviousData: true,
   });
 };
 

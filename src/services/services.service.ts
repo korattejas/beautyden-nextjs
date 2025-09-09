@@ -3,7 +3,6 @@ import { endpoints } from "@/api/endpoints";
 import { decryptData } from "@/utils/encryption";
 
 export interface Service {
-  thumbnail: any;
   id: string;
   category_id: string;
   category_name: string;
@@ -12,23 +11,46 @@ export interface Service {
   discount_price: string;
   duration: string;
   rating: string | null;
-  reviews: string | null;
+  reviews: number;
   description: string;
   includes: string[];
-  icon: string;
+  icon: string | null;
   is_popular: number;
+}
+
+export interface PaginationLink {
+  url: string | null;
+  label: string;
+  active: boolean;
+}
+
+export interface PaginatedData {
+  current_page: number;
+  data: Service[];
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  links: PaginationLink[];
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number;
+  total: number;
 }
 
 export interface ServicesResponse {
   code: number;
   status: boolean;
   message: string;
-  data: Service[];
+  data: PaginatedData;
 }
 
 export interface ServicesFilters {
   search?: string;
   category_id?: string;
+  page?: number;
 }
 
 const buildQueryString = (filters: ServicesFilters): string => {
@@ -38,8 +60,10 @@ const buildQueryString = (filters: ServicesFilters): string => {
     params.append("search", filters.search);
   }
   if (filters.category_id && filters.category_id !== "9") {
-    // 9 is "All Services"
     params.append("category_id", filters.category_id);
+  }
+  if (filters.page && filters.page > 1) {
+    params.append("page", filters.page.toString());
   }
 
   return params.toString();
@@ -71,6 +95,7 @@ export const getServices = async (
     throw error;
   }
 };
+
 export const getServiceById = async (id: string): Promise<Service> => {
   try {
     const response = await api.get(endpoints.SERVICE_BY_ID(id));

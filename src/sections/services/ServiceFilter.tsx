@@ -27,19 +27,19 @@ const ServiceFilter = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="space-y-8 mb-12"
+        className="bg-card backdrop-blur-md rounded-3xl p-6 shadow-lg border border-border mb-8"
       >
         {/* Search Skeleton */}
-        <div className="max-w-md mx-auto">
-          <div className="h-14 bg-gradient-to-r from-gray-200 to-gray-300 animate-pulse rounded-full" />
+        <div className="mb-6">
+          <div className="h-12 bg-muted animate-pulse rounded-full" />
         </div>
 
         {/* Category Buttons Skeleton */}
-        <div className="flex flex-wrap justify-center gap-4">
+        <div className="flex flex-wrap gap-3">
           {Array.from({ length: 6 }, (_, index) => (
             <div
               key={index}
-              className="h-16 w-36 bg-gradient-to-r from-gray-200 to-gray-300 animate-pulse rounded-2xl"
+              className="h-12 w-28 bg-muted animate-pulse rounded-full"
             />
           ))}
         </div>
@@ -54,12 +54,16 @@ const ServiceFilter = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="text-center py-8 mb-12"
+        className="bg-card rounded-3xl p-6 shadow-lg border border-border mb-8"
       >
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-6 max-w-md mx-auto">
-          <div className="text-red-600 mb-2">⚠️</div>
-          <p className="text-red-700 font-medium">Unable to load categories</p>
-          <p className="text-red-600 text-sm mt-1">Please try again later</p>
+        <div className="text-center">
+          <div className="text-4xl mb-2">⚠️</div>
+          <p className="text-foreground font-medium">
+            Unable to load categories
+          </p>
+          <p className="text-foreground/60 text-sm mt-1">
+            Please try again later
+          </p>
         </div>
       </motion.div>
     );
@@ -68,156 +72,127 @@ const ServiceFilter = ({
   const categories = categoriesData?.data || [];
   const hasActiveFilters = searchQuery || activeCategory !== "9";
 
+  const clearAllFilters = () => {
+    onSearchChange("");
+    onCategoryChange("9");
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      viewport={{ once: true }}
-      className="space-y-8 mb-12"
+      className="bg-card backdrop-blur-md rounded-3xl p-6 shadow-lg border border-border mb-8"
     >
-      {/* Search Bar */}
-      <div className="max-w-lg mx-auto">
-        <div className="relative group">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
-          <div className="relative bg-white/90 backdrop-blur-md rounded-full border border-primary/20 shadow-lg group-focus-within:border-primary/40 transition-all duration-300">
-            <HiMagnifyingGlass className="absolute left-5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-primary/70 z-10" />
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Search Bar */}
+        <div className="lg:col-span-2">
+          <div className="relative group">
+            <HiMagnifyingGlass className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40 z-10 group-focus-within:text-primary transition-colors" />
             <input
               type="text"
               placeholder="Search services, treatments, or keywords..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full pl-14 pr-14 py-4 bg-transparent border-none rounded-full focus:outline-none text-foreground placeholder:text-foreground/60 font-medium"
+              className="w-full pl-12 pr-4 py-3 bg-background border border-border rounded-full focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 placeholder:text-foreground/40"
             />
             {searchQuery && (
               <button
                 onClick={() => onSearchChange("")}
-                className="absolute right-5 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-foreground/10 hover:bg-foreground/20 rounded-full flex items-center justify-center transition-colors duration-200"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40 hover:text-primary transition-colors"
               >
-                <HiXMark className="w-4 h-4 text-foreground/70" />
+                <HiXMark className="w-full h-full" />
               </button>
             )}
           </div>
         </div>
-      </div>
 
-      {/* Category Filters */}
-      <div className="flex flex-wrap justify-center gap-4 px-4">
-        {categories.map((category, index) => {
-          const categoryId = category.id.toString();
-          const isActive = activeCategory === categoryId;
+        {/* Category Filter */}
+        <div className="lg:col-span-2">
+          <div className="flex flex-wrap gap-2">
+            {categories.map((category, index) => {
+              const categoryId = category.id.toString();
+              const isActive = activeCategory === categoryId;
 
-          return (
-            <motion.button
-              key={category.id}
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => onCategoryChange(categoryId)}
-              className={`group relative overflow-hidden rounded-2xl border-2 transition-all duration-300 ${
-                isActive
-                  ? "bg-gradient-to-br from-primary via-primary to-secondary text-white border-primary/30 shadow-lg shadow-primary/25"
-                  : "bg-white/80 backdrop-blur-md text-foreground/80 border-primary/20 hover:border-primary/40 hover:bg-white/90 shadow-md hover:shadow-lg"
-              }`}
-              title={category.description}
-            >
-              {/* Background Gradient Effect */}
-              {!isActive && (
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              )}
-
-              {/* Content */}
-              <div className="relative flex flex-col items-center gap-3 px-6 py-4">
-                {/* Icon */}
-                <div
-                  className={`relative overflow-hidden rounded-xl shadow-sm ${
+              return (
+                <motion.button
+                  key={category.id}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4, delay: index * 0.05 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => onCategoryChange(categoryId)}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
                     isActive
-                      ? "bg-white/20 shadow-white/25"
-                      : "bg-primary/10 group-hover:bg-primary/15 shadow-primary/10"
-                  } transition-all duration-300`}
+                      ? "bg-primary text-white shadow-md shadow-primary/25"
+                      : "bg-background hover:bg-primary/10 text-foreground/70 hover:text-primary border border-border"
+                  }`}
                 >
-                  {category.icon ? (
-                    <div className="w-14 h-14 p-2">
+                  {/* Category Icon */}
+                  <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center">
+                    {category.icon ? (
                       <Image
                         src={category.icon}
                         alt={`${category.name} icon`}
-                        width={40}
-                        height={40}
-                        className="w-full h-full object-cover rounded-lg"
+                        width={20}
+                        height={20}
+                        className="w-full h-full object-cover"
                         unoptimized
                       />
-                    </div>
-                  ) : (
-                    <div className="w-14 h-14 flex items-center justify-center">
+                    ) : (
                       <HiSparkles
-                        className={`w-8 h-8 ${
+                        className={`w-4 h-4 ${
                           isActive ? "text-white" : "text-primary"
                         }`}
                       />
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
 
-                {/* Text */}
-                <span
-                  className={`font-semibold text-sm text-center leading-tight max-w-full ${
-                    isActive
-                      ? "text-white"
-                      : "text-foreground group-hover:text-primary"
-                  } transition-colors duration-300`}
-                >
-                  {category.name}
-                </span>
-              </div>
-
-              {/* Active indicator */}
-              {isActive && (
-                <motion.div
-                  layoutId="activeIndicator"
-                  className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-2xl"
-                  transition={{ type: "spring", duration: 0.6 }}
-                />
-              )}
-            </motion.button>
-          );
-        })}
+                  <span className="whitespace-nowrap">{category.name}</span>
+                </motion.button>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {/* Active Filters Display */}
       {hasActiveFilters && (
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-wrap justify-center gap-3"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          className="flex flex-wrap gap-2 mt-6 pt-4 border-t border-border"
         >
+          <div className="flex items-center gap-2 text-sm text-foreground/60 font-medium">
+            Active filters:
+          </div>
+
           {searchQuery && (
-            <motion.div
+            <motion.span
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 text-primary px-4 py-2 rounded-full text-sm font-medium shadow-sm"
+              className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full text-sm font-medium"
             >
-              <HiMagnifyingGlass className="w-4 h-4" />
-              <span>&quot;{searchQuery}&quot;</span>
+              <HiMagnifyingGlass className="w-3 h-3" />
+              &quot;{searchQuery}&quot;
               <button
                 onClick={() => onSearchChange("")}
-                className="w-5 h-5 bg-primary/20 hover:bg-primary/30 rounded-full flex items-center justify-center transition-colors duration-200"
+                className="hover:bg-primary/20 rounded-full p-0.5 transition-colors"
               >
                 <HiXMark className="w-3 h-3" />
               </button>
-            </motion.div>
+            </motion.span>
           )}
 
           {activeCategory !== "9" && (
-            <motion.div
+            <motion.span
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="inline-flex items-center gap-3 bg-gradient-to-r from-secondary/15 to-primary/15 border border-secondary/30 text-secondary-800 px-5 py-3 rounded-2xl shadow-md hover:shadow-lg transition-all duration-200"
+              className="inline-flex items-center gap-2 bg-secondary/10 text-secondary px-3 py-1.5 rounded-full text-sm font-medium"
             >
-              {/* Larger Image Container */}
-              <div className="relative w-8 h-8 rounded-full overflow-hidden bg-white/50 shadow-sm">
+              <div className="w-4 h-4 rounded-full overflow-hidden flex items-center justify-center">
                 {categories.find((c) => c.id.toString() === activeCategory)
                   ?.icon ? (
                   <Image
@@ -226,49 +201,34 @@ const ServiceFilter = ({
                         ?.icon || ""
                     }
                     alt="Category"
-                    width={32}
-                    height={32}
+                    width={16}
+                    height={16}
                     className="w-full h-full object-cover"
                     unoptimized
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-secondary/20 to-primary/20 flex items-center justify-center">
-                    <HiSparkles className="w-5 h-5 text-secondary" />
-                  </div>
+                  <HiSparkles className="w-3 h-3 text-secondary" />
                 )}
               </div>
-
-              {/* Category Name */}
-              <span className="text-base font-semibold text-secondary-900">
-                {
-                  categories.find((c) => c.id.toString() === activeCategory)
-                    ?.name
-                }
-              </span>
-
-              {/* Close Button */}
+              {categories.find((c) => c.id.toString() === activeCategory)?.name}
               <button
                 onClick={() => onCategoryChange("9")}
-                className="w-7 h-7 bg-secondary/20 hover:bg-secondary/30 rounded-full flex items-center justify-center transition-colors duration-200 ml-1"
-                aria-label="Clear selected category"
+                className="hover:bg-secondary/20 rounded-full p-0.5 transition-colors"
               >
-                <HiXMark className="w-4 h-4 text-secondary-700" />
+                <HiXMark className="w-3 h-3" />
               </button>
-            </motion.div>
+            </motion.span>
           )}
 
-          {/* Clear All Filters */}
           <motion.button
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            onClick={() => {
-              onSearchChange("");
-              onCategoryChange("9");
-            }}
-            className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 shadow-sm"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={clearAllFilters}
+            className="text-sm text-foreground/60 hover:text-primary transition-colors font-medium underline decoration-dotted underline-offset-2"
           >
-            <HiXMark className="w-4 h-4" />
-            Clear All
+            Clear All Filters
           </motion.button>
         </motion.div>
       )}

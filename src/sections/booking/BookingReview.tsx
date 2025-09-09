@@ -102,7 +102,7 @@ const BookingReview = ({
               ✨ Selected Services
             </h3>
             <div className="space-y-4">
-              {bookingData.services.map((service, index) => (
+              {bookingData?.services.map((service, index) => (
                 <div
                   key={service.id}
                   className="flex items-center justify-between py-3 border-b border-primary/10 last:border-b-0"

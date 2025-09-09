@@ -2,10 +2,10 @@
 
 import Container from "@/components/ui/Container";
 import ReviewCard from "./ReviewCard";
-import { CustomerReview } from "@/types/reviews";
+import { Review } from "@/types/reviews";
 
 interface ReviewListProps {
-  reviews: CustomerReview[];
+  reviews: Review[];
 }
 
 const ReviewList = ({ reviews }: ReviewListProps) => {
