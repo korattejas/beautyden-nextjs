@@ -9,12 +9,14 @@ import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import { useReviews } from "@/hooks/useApi";
-import { CustomerReview } from "@/types/reviews";
+import { Review } from "@/types/reviews";
 
 const TestimonialsSection = () => {
-  const { data: reviewsData, isLoading, error } = useReviews({});
+  // Fetch reviews - limit to first page for testimonials
+  const { data: reviewsData, isLoading, error } = useReviews({ page: 1 });
 
-  const reviews: CustomerReview[] = reviewsData?.data || [];
+  // Fix: Access nested data structure correctly
+  const reviews: Review[] = reviewsData?.data?.data || [];
 
   // Helper function to get customer initials
   const getInitials = (name: string): string => {
@@ -28,15 +30,31 @@ const TestimonialsSection = () => {
 
   // Helper function to render stars
   const renderStars = (rating: string | null) => {
-    const ratingNum = parseInt(rating || "0");
-    return [...Array(ratingNum)].map((_, index) => (
-      <HiStar key={index} className="w-5 h-5 text-yellow-400" />
-    ));
+    const ratingNum = parseFloat(rating || "0");
+    const fullStars = Math.floor(ratingNum);
+    const hasHalfStar = ratingNum % 1 !== 0;
+
+    return (
+      <div className="flex items-center">
+        {[...Array(5)].map((_, index) => (
+          <HiStar
+            key={index}
+            className={`w-5 h-5 ${
+              index < fullStars
+                ? "text-warning fill-current"
+                : index === fullStars && hasHalfStar
+                ? "text-warning/50 fill-current"
+                : "text-muted"
+            }`}
+          />
+        ))}
+      </div>
+    );
   };
 
   if (isLoading) {
     return (
-      <section className="py-16 relative">
+      <section className="py-16 relative bg-background">
         <Container>
           <div className="text-center">
             <div className="inline-flex items-center gap-3 text-primary">
@@ -53,7 +71,7 @@ const TestimonialsSection = () => {
 
   if (error || reviews.length === 0) {
     return (
-      <section className="py-16 relative">
+      <section className="py-16 relative bg-background">
         <Container>
           <div className="text-center">
             <motion.h2
@@ -74,8 +92,16 @@ const TestimonialsSection = () => {
     );
   }
 
+  // Filter and limit reviews for testimonials (only show reviews with text and good ratings)
+  const testimonialReviews = reviews
+    .filter(
+      (review) =>
+        review.review && review.rating && parseFloat(review.rating) >= 4
+    )
+    .slice(0, 9); // Limit to 9 reviews for better performance
+
   return (
-    <section className="py-16 bg-gradient-to-br from-muted/5 to-accent/5 relative">
+    <section className="py-16 bg-muted/20 relative">
       {/* Background Elements */}
       <div className="absolute top-0 left-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl" />
       <div className="absolute bottom-0 right-0 w-40 h-40 bg-secondary/5 rounded-full blur-3xl" />
@@ -88,7 +114,7 @@ const TestimonialsSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-md px-6 py-3 rounded-full text-sm font-medium text-primary mb-6 shadow-lg border border-primary/10"
+            className="inline-flex items-center gap-2 bg-card backdrop-blur-md px-6 py-3 rounded-full text-sm font-medium text-primary mb-6 shadow-lg border border-border"
           >
             <HiStar className="w-4 h-4" />
             Customer Reviews
@@ -103,9 +129,7 @@ const TestimonialsSection = () => {
           >
             <span className="text-foreground">What Our</span>
             <br />
-            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              Clients Say
-            </span>
+            <span className="text-primary">Clients Say</span>
           </motion.h2>
 
           <motion.p
@@ -121,110 +145,118 @@ const TestimonialsSection = () => {
         </div>
 
         {/* Swiper Slider */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          viewport={{ once: true }}
-        >
-          <Swiper
-            modules={[Autoplay, Pagination]}
-            autoplay={{
-              delay: 4000,
-              disableOnInteraction: false,
-              pauseOnMouseEnter: true,
-            }}
-            pagination={{
-              clickable: true,
-              dynamicBullets: true,
-            }}
-            spaceBetween={30}
-            slidesPerView={1}
-            breakpoints={{
-              640: { slidesPerView: 1, spaceBetween: 20 },
-              768: { slidesPerView: 2, spaceBetween: 30 },
-              1024: { slidesPerView: 3, spaceBetween: 30 },
-            }}
-            className="testimonials-swiper"
-            style={{ paddingBottom: "50px" }}
+        {testimonialReviews.length > 0 ? (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            viewport={{ once: true }}
           >
-            {reviews?.map((review, index) => (
-              <SwiperSlide key={review.id}>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                  className="bg-white/80 backdrop-blur-md p-8 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-500 border border-primary/10 group h-full flex flex-col justify-between"
-                >
-                  {/* Rating */}
-                  <div className="flex mb-6">
-                    {renderStars(review.rating)}
-                    <span className="ml-2 text-sm text-foreground/60 font-medium">
-                      ({review.rating || "0"}/5)
-                    </span>
-                  </div>
+            <Swiper
+              modules={[Autoplay, Pagination]}
+              autoplay={{
+                delay: 4000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+              }}
+              pagination={{
+                clickable: true,
+                dynamicBullets: true,
+              }}
+              spaceBetween={30}
+              slidesPerView={1}
+              breakpoints={{
+                640: { slidesPerView: 1, spaceBetween: 20 },
+                768: { slidesPerView: 2, spaceBetween: 30 },
+                1024: { slidesPerView: 3, spaceBetween: 30 },
+              }}
+              className="testimonials-swiper"
+              style={{ paddingBottom: "50px" }}
+            >
+              {testimonialReviews.map((review, index) => (
+                <SwiperSlide key={review.id}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                    className="bg-card backdrop-blur-md p-8 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-500 border border-border group h-full flex flex-col justify-between"
+                  >
+                    {/* Rating */}
+                    <div className="flex items-center mb-6">
+                      {renderStars(review.rating)}
+                      <span className="ml-2 text-sm text-foreground/60 font-medium">
+                        ({review.rating || "0"}/5)
+                      </span>
+                    </div>
 
-                  {/* Review Text */}
-                  <div className="flex-1 mb-6">
-                    <p className="text-foreground/80 leading-relaxed text-lg italic">
-                      &quot;
-                      {review.review || "Great service! Highly recommended."}
-                      &quot;
-                    </p>
-                  </div>
+                    {/* Review Text */}
+                    <div className="flex-1 mb-6">
+                      <p className="text-foreground/80 leading-relaxed text-lg italic">
+                        &quot;
+                        {review.review || "Great service! Highly recommended."}
+                        &quot;
+                      </p>
+                    </div>
 
-                  {/* Client Info */}
-                  <div className="flex items-center gap-4 pt-4 border-t border-primary/10">
-                    <div className="relative">
-                      {review.customer_photo ? (
-                        <div className="w-14 h-14 rounded-full overflow-hidden ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300">
-                          <Image
-                            src={review.customer_photo}
-                            alt={review.customer_name}
-                            width={56}
-                            height={56}
-                            className="object-cover w-full h-full"
-                            unoptimized
-                          />
-                        </div>
-                      ) : (
-                        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-lg font-bold text-primary ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300">
-                          {getInitials(review.customer_name)}
+                    {/* Client Info */}
+                    <div className="flex items-center gap-4 pt-4 border-t border-border">
+                      <div className="relative">
+                        {review.customer_photo ? (
+                          <div className="w-14 h-14 rounded-full overflow-hidden ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300">
+                            <Image
+                              src={review.customer_photo}
+                              alt={review.customer_name}
+                              width={56}
+                              height={56}
+                              className="object-cover w-full h-full"
+                              unoptimized
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-lg font-bold text-primary ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300">
+                            {getInitials(review.customer_name)}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex-1">
+                        <h4 className="font-bold text-foreground text-lg group-hover:text-primary transition-colors duration-300">
+                          {review.customer_name}
+                        </h4>
+                        <p className="text-primary/80 font-medium text-sm">
+                          {review.service_name || "Beauty Service"}
+                        </p>
+                        <p className="text-foreground/50 text-xs mt-1">
+                          {new Date(review.review_date).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "long",
+                            }
+                          )}
+                        </p>
+                      </div>
+
+                      {/* Popular Badge */}
+                      {review.is_popular === 1 && (
+                        <div className="bg-warning text-white px-3 py-1 rounded-full text-xs font-semibold">
+                          Popular
                         </div>
                       )}
                     </div>
-
-                    <div className="flex-1">
-                      <h4 className="font-bold text-foreground text-lg group-hover:text-primary transition-colors duration-300">
-                        {review.customer_name}
-                      </h4>
-                      <p className="text-primary/80 font-medium text-sm">
-                        {review.service_name || "Beauty Service"}
-                      </p>
-                      <p className="text-foreground/50 text-xs mt-1">
-                        {new Date(review.review_date).toLocaleDateString(
-                          "en-US",
-                          {
-                            year: "numeric",
-                            month: "long",
-                          }
-                        )}
-                      </p>
-                    </div>
-
-                    {/* Popular Badge */}
-                    {review.is_popular === 1 && (
-                      <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                        Popular
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </motion.div>
+                  </motion.div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </motion.div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-foreground/60 text-lg">
+              No testimonials available at the moment.
+            </p>
+          </div>
+        )}
 
         {/* Bottom CTA */}
         <motion.div
@@ -238,14 +270,14 @@ const TestimonialsSection = () => {
             Join thousands of satisfied customers who trust us with their beauty
             needs
           </p>
-          <div className="flex items-center justify-center gap-8 text-sm text-foreground/60">
+          <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-foreground/60">
             <div className="flex items-center gap-2">
-              <HiStar className="w-4 h-4 text-yellow-400" />
+              <HiStar className="w-4 h-4 text-warning" />
               <span>4.9+ Average Rating</span>
             </div>
             <div className="flex items-center gap-2">
               <span>✓</span>
-              <span>500+ Happy Clients</span>
+              <span>{reviewsData?.data?.total || 500}+ Happy Clients</span>
             </div>
             <div className="flex items-center gap-2">
               <span>✓</span>
@@ -264,7 +296,7 @@ const TestimonialsSection = () => {
         .testimonials-swiper .swiper-pagination-bullet {
           width: 12px;
           height: 12px;
-          background: var(--primary);
+          background: var(--color-primary);
           opacity: 0.3;
           transition: all 0.3s ease;
         }
