@@ -59,8 +59,10 @@ const contactSchema = yup.object().shape({
 
 const ContactSection = () => {
   const [isSuccess, setIsSuccess] = useState(false);
+
+  // Fix: Access nested data structure correctly
   const { data: servicesData } = useServices();
-  const services = servicesData?.data ?? [];
+  const services = servicesData?.data?.data ?? [];
 
   const {
     register,
@@ -88,7 +90,7 @@ const ContactSection = () => {
   };
 
   return (
-    <section className="py-20 bg-gradient-to-br from-muted/5 to-accent/5">
+    <section className="py-20 bg-muted/20">
       <Container>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           {/* Left Side - Content */}
@@ -101,14 +103,14 @@ const ContactSection = () => {
           >
             {/* Header */}
             <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-md px-4 py-2 rounded-full text-sm font-medium text-primary shadow-lg border border-primary/10">
+              <div className="inline-flex items-center gap-2 bg-card backdrop-blur-md px-4 py-2 rounded-full text-sm font-medium text-primary shadow-lg border border-border">
                 <HiSparkles className="w-4 h-4" />
                 Get in Touch
               </div>
 
               <h2 className="font-heading text-4xl md:text-5xl font-bold text-foreground leading-tight">
                 Let&apos;s Create Your
-                <span className="block bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                <span className="block text-primary">
                   Beauty Story Together
                 </span>
               </h2>
@@ -153,8 +155,8 @@ const ContactSection = () => {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-accent/10 rounded-2xl flex items-center justify-center flex-shrink-0">
-                  <HiStar className="w-6 h-6 text-accent" />
+                <div className="w-12 h-12 bg-warning/10 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <HiStar className="w-6 h-6 text-warning" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground mb-2">
@@ -169,7 +171,7 @@ const ContactSection = () => {
             </div>
 
             {/* Contact Information */}
-            <div className="bg-white/60 backdrop-blur-md rounded-3xl p-8 border border-primary/10 shadow-lg">
+            <div className="bg-card backdrop-blur-md rounded-3xl p-8 border border-border shadow-lg">
               <h3 className="font-heading text-xl font-bold text-foreground mb-6">
                 Contact Information
               </h3>
@@ -246,13 +248,13 @@ const ContactSection = () => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5 }}
-                className="bg-green-50 border border-green-200 rounded-3xl p-8 text-center"
+                className="bg-success/10 border border-success/20 rounded-3xl p-8 text-center"
               >
-                <HiCheckCircle className="w-20 h-20 text-green-500 mx-auto mb-6" />
-                <h3 className="text-3xl font-bold text-green-800 mb-4">
+                <HiCheckCircle className="w-20 h-20 text-success mx-auto mb-6" />
+                <h3 className="text-3xl font-bold text-success mb-4">
                   Message Sent Successfully!
                 </h3>
-                <p className="text-green-700 text-lg">
+                <p className="text-success/80 text-lg">
                   Thank you for contacting us. We&apos;ll get back to you within
                   24 hours with personalized service recommendations.
                 </p>
@@ -260,7 +262,7 @@ const ContactSection = () => {
             ) : (
               <form
                 onSubmit={handleSubmit(onSubmit)}
-                className="bg-white/80 backdrop-blur-md rounded-3xl p-8 shadow-xl border border-primary/10 space-y-6"
+                className="bg-card backdrop-blur-md rounded-3xl p-8 shadow-xl border border-border space-y-6"
               >
                 <div className="text-center mb-8">
                   <h3 className="font-heading text-2xl font-bold text-foreground mb-2">
@@ -283,10 +285,10 @@ const ContactSection = () => {
                       <input
                         {...register("first_name")}
                         type="text"
-                        className={`w-full pl-12 pr-4 py-4 bg-white/60 backdrop-blur-sm border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 ${
+                        className={`w-full pl-12 pr-4 py-4 bg-background border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 ${
                           errors.first_name
                             ? "border-red-500"
-                            : "border-primary/20 focus:border-primary"
+                            : "border-border focus:border-primary"
                         }`}
                         placeholder="John"
                       />
@@ -307,10 +309,10 @@ const ContactSection = () => {
                       <input
                         {...register("last_name")}
                         type="text"
-                        className={`w-full pl-12 pr-4 py-4 bg-white/60 backdrop-blur-sm border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 ${
+                        className={`w-full pl-12 pr-4 py-4 bg-background border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 ${
                           errors.last_name
                             ? "border-red-500"
-                            : "border-primary/20 focus:border-primary"
+                            : "border-border focus:border-primary"
                         }`}
                         placeholder="Doe"
                       />
@@ -334,10 +336,10 @@ const ContactSection = () => {
                       <input
                         {...register("email")}
                         type="email"
-                        className={`w-full pl-12 pr-4 py-4 bg-white/60 backdrop-blur-sm border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 ${
+                        className={`w-full pl-12 pr-4 py-4 bg-background border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 ${
                           errors.email
                             ? "border-red-500"
-                            : "border-primary/20 focus:border-primary"
+                            : "border-border focus:border-primary"
                         }`}
                         placeholder="john@example.com"
                       />
@@ -358,10 +360,10 @@ const ContactSection = () => {
                       <input
                         {...register("phone")}
                         type="tel"
-                        className={`w-full pl-12 pr-4 py-4 bg-white/60 backdrop-blur-sm border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 ${
+                        className={`w-full pl-12 pr-4 py-4 bg-background border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 ${
                           errors.phone
                             ? "border-red-500"
-                            : "border-primary/20 focus:border-primary"
+                            : "border-border focus:border-primary"
                         }`}
                         placeholder="9876543210"
                       />
@@ -381,10 +383,10 @@ const ContactSection = () => {
                   </label>
                   <select
                     {...register("service_id")}
-                    className={`w-full px-4 py-4 bg-white/60 backdrop-blur-sm border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 appearance-none cursor-pointer ${
+                    className={`w-full px-4 py-4 bg-background border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 appearance-none cursor-pointer ${
                       errors.service_id
                         ? "border-red-500"
-                        : "border-primary/20 focus:border-primary"
+                        : "border-border focus:border-primary"
                     }`}
                   >
                     <option value="">
@@ -413,10 +415,10 @@ const ContactSection = () => {
                     <input
                       {...register("subject")}
                       type="text"
-                      className={`w-full pl-12 pr-4 py-4 bg-white/60 backdrop-blur-sm border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 ${
+                      className={`w-full pl-12 pr-4 py-4 bg-background border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 ${
                         errors.subject
                           ? "border-red-500"
-                          : "border-primary/20 focus:border-primary"
+                          : "border-border focus:border-primary"
                       }`}
                       placeholder="How can we help you today?"
                     />
@@ -436,10 +438,10 @@ const ContactSection = () => {
                   <textarea
                     {...register("message")}
                     rows={5}
-                    className={`w-full px-4 py-4 bg-white/60 backdrop-blur-sm border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 resize-none ${
+                    className={`w-full px-4 py-4 bg-background border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 resize-none ${
                       errors.message
                         ? "border-red-500"
-                        : "border-primary/20 focus:border-primary"
+                        : "border-border focus:border-primary"
                     }`}
                     placeholder="Tell us more about your beauty goals, preferred services, or any specific requirements..."
                   />
@@ -456,7 +458,7 @@ const ContactSection = () => {
                   disabled={isSubmitting}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full bg-gradient-to-r from-primary to-secondary text-white py-4 px-8 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-primary text-white py-4 px-8 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/90"
                 >
                   {isSubmitting ? (
                     <div className="flex items-center justify-center gap-3">

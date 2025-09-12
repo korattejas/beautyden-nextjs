@@ -12,6 +12,8 @@ import {
   HiTag,
   HiShoppingBag,
   HiXMark,
+  HiChevronLeft,
+  HiChevronRight,
 } from "react-icons/hi2";
 import { useServices, useServiceCategories } from "@/hooks/useApi";
 import { BookingService } from "@/types/booking";
@@ -31,11 +33,27 @@ const ServiceSelection = ({
   preSelectedServiceId,
 }: ServiceSelectionProps) => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const { data: servicesData, isLoading: servicesLoading } = useServices();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Build filters for API call
+  const filters = {
+    page: currentPage,
+    ...(selectedCategories.length > 0 &&
+      selectedCategories[0] !== "all" && {
+        category_id: selectedCategories[0], // API might expect single category
+      }),
+    ...(searchQuery && { search: searchQuery }),
+  };
+
+  const { data: servicesData, isLoading: servicesLoading } =
+    useServices(filters);
   const { data: categoriesData, isLoading: categoriesLoading } =
     useServiceCategories();
 
-  const services = servicesData?.data ?? [];
+  // Fix: Access nested data structure correctly
+  const services = servicesData?.data?.data ?? [];
+  const paginationData = servicesData?.data;
   const categories = categoriesData?.data ?? [];
 
   // Pre-select service if coming from service page
@@ -56,27 +74,25 @@ const ServiceSelection = ({
           category_id: preSelectedService.category_id.toString(),
           category_name: preSelectedService.category_name,
           description: preSelectedService.description,
-          icon: preSelectedService.icon,
+          // icon: preSelectedService.icon,
         };
         onServicesChange([...selectedServices, bookingService]);
       }
     }
   }, [preSelectedServiceId, services, selectedServices, onServicesChange]);
 
-  // Filter services based on selected categories
-  const filteredServices =
-    selectedCategories.length > 0
-      ? services.filter((service) =>
-          selectedCategories.includes(service.category_id.toString())
-        )
-      : services;
-
   const toggleCategory = (categoryId: string) => {
-    setSelectedCategories((prev) =>
-      prev.includes(categoryId)
-        ? prev.filter((id) => id !== categoryId)
-        : [...prev, categoryId]
-    );
+    setSelectedCategories([categoryId]); // Single category selection for API
+    setCurrentPage(1); // Reset to first page when changing category
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Smooth scroll to services section
+    document.getElementById("services-section")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
   };
 
   const toggleService = (service: any) => {
@@ -133,6 +149,12 @@ const ServiceSelection = ({
     );
   }
 
+  const clearAllFilters = () => {
+    setSelectedCategories([]);
+    setSearchQuery("");
+    setCurrentPage(1);
+  };
+
   return (
     <div className="max-w-7xl mx-auto">
       {/* Header */}
@@ -159,23 +181,53 @@ const ServiceSelection = ({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Section - Services Selection */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Category Filters */}
+          {/* Search and Category Filters */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
-            className="bg-white/60 backdrop-blur-md rounded-3xl p-6 border border-primary/10 shadow-lg"
+            className="bg-card backdrop-blur-md rounded-3xl p-6 border border-border shadow-lg"
           >
+            {/* Search Bar */}
+            <div className="mb-6">
+              <div className="relative">
+                <HiSparkles className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40 z-10" />
+                <input
+                  type="text"
+                  placeholder="Search services..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1); // Reset to first page when searching
+                  }}
+                  className="w-full pl-12 pr-4 py-3 bg-background border border-border rounded-full focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 placeholder:text-foreground/40"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery("");
+                      setCurrentPage(1);
+                    }}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40 hover:text-primary transition-colors"
+                  >
+                    <HiXMark className="w-full h-full" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Category Filters */}
             <h3 className="font-semibold text-foreground mb-4">
               Filter by Category
             </h3>
             <div className="flex flex-wrap gap-3">
               <button
-                onClick={() => setSelectedCategories([])}
+                onClick={() => toggleCategory("all")}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium transition-all duration-300 text-sm ${
-                  selectedCategories.length === 0
-                    ? "bg-gradient-to-r from-primary to-secondary text-white shadow-lg"
-                    : "bg-white/80 text-foreground/70 hover:text-primary hover:bg-primary/5 border border-primary/10"
+                  selectedCategories.length === 0 ||
+                  selectedCategories[0] === "all"
+                    ? "bg-primary text-white shadow-lg"
+                    : "bg-background text-foreground/70 hover:text-primary hover:bg-primary/5 border border-border"
                 }`}
               >
                 <HiSparkles className="w-3 h-3" />
@@ -191,8 +243,8 @@ const ServiceSelection = ({
                   onClick={() => toggleCategory(category.id.toString())}
                   className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium transition-all duration-300 text-sm ${
                     selectedCategories.includes(category.id.toString())
-                      ? "bg-gradient-to-r from-primary to-secondary text-white shadow-lg"
-                      : "bg-white/80 text-foreground/70 hover:text-primary hover:bg-primary/5 border border-primary/10"
+                      ? "bg-primary text-white shadow-lg"
+                      : "bg-background text-foreground/70 hover:text-primary hover:bg-primary/5 border border-border"
                   }`}
                 >
                   {category.icon && (
@@ -211,126 +263,274 @@ const ServiceSelection = ({
                 </motion.button>
               ))}
             </div>
+
+            {/* Active Filters */}
+            {(searchQuery || selectedCategories.length > 0) && (
+              <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-border">
+                <span className="text-sm text-foreground/60 font-medium">
+                  Active filters:
+                </span>
+
+                {searchQuery && (
+                  <span className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full text-sm font-medium">
+                    &quot;{searchQuery}&quot;
+                    <button onClick={() => setSearchQuery("")}>
+                      <HiXMark className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+
+                {selectedCategories.length > 0 &&
+                  selectedCategories[0] !== "all" && (
+                    <span className="inline-flex items-center gap-2 bg-secondary/10 text-secondary px-3 py-1.5 rounded-full text-sm font-medium">
+                      {
+                        categories.find(
+                          (c) => c.id.toString() === selectedCategories[0]
+                        )?.name
+                      }
+                      <button onClick={() => setSelectedCategories([])}>
+                        <HiXMark className="w-3 h-3" />
+                      </button>
+                    </span>
+                  )}
+
+                <button
+                  onClick={clearAllFilters}
+                  className="text-sm text-foreground/60 hover:text-primary transition-colors font-medium underline decoration-dotted underline-offset-2"
+                >
+                  Clear All
+                </button>
+              </div>
+            )}
           </motion.div>
 
           {/* Services Grid */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={selectedCategories.join(",")}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4 }}
-              className="grid grid-cols-1 md:grid-cols-2 gap-4"
-            >
-              {filteredServices.map((service, index) => {
-                const isSelected = selectedServices.find(
-                  (s) => s.id === service.id.toString()
-                );
+          <div id="services-section">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`${selectedCategories.join(",")}-${currentPage}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4 }}
+                className="grid grid-cols-1 md:grid-cols-2 gap-4"
+              >
+                {services.map((service, index) => {
+                  const isSelected = selectedServices.find(
+                    (s) => s.id === service.id.toString()
+                  );
 
-                return (
-                  <motion.div
-                    key={`service-${service.id}`}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: index * 0.05 }}
-                    className={`bg-white/80 backdrop-blur-md rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border-2 ${
-                      isSelected
-                        ? "border-primary shadow-primary/20"
-                        : "border-primary/10 hover:border-primary/30"
-                    }`}
-                  >
-                    {/* Service Image */}
-                    {service.icon && (
-                      <div className="relative h-32 overflow-hidden">
-                        <Image
-                          src={service.icon}
-                          alt={service.name}
-                          fill
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                          className="object-cover"
-                          unoptimized
-                        />
-                        {isSelected && (
-                          <div className="absolute top-2 right-2 bg-primary text-white rounded-full p-1">
-                            <HiSparkles className="w-3 h-3" />
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Service Details */}
-                    <div className="p-4">
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-foreground mb-1 text-sm line-clamp-2">
-                            {service.name}
-                          </h3>
-                          <span className="inline-flex items-center gap-1 text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-                            <HiTag className="w-2 h-2" />
-                            {service.category_name}
-                          </span>
+                  return (
+                    <motion.div
+                      key={`service-${service.id}-${currentPage}`}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: index * 0.05 }}
+                      className={`bg-card backdrop-blur-md rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border-2 ${
+                        isSelected
+                          ? "border-primary shadow-primary/20"
+                          : "border-border hover:border-primary/30"
+                      }`}
+                    >
+                      {/* Service Image */}
+                      {service.icon && (
+                        <div className="relative h-32 overflow-hidden">
+                          <Image
+                            src={service.icon}
+                            alt={service.name}
+                            fill
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                            className="object-cover"
+                            unoptimized
+                          />
+                          {isSelected && (
+                            <div className="absolute top-2 right-2 bg-primary text-white rounded-full p-1">
+                              <HiSparkles className="w-3 h-3" />
+                            </div>
+                          )}
                         </div>
-                        <div className="text-right ml-2">
-                          <p className="text-lg font-bold text-primary">
-                            ₹{Number(service.price).toLocaleString()}
-                          </p>
-                          <div className="flex items-center gap-1 text-xs text-foreground/60">
-                            <HiClock className="w-2 h-2" />
-                            {service.duration || "60 min"}
-                          </div>
-                        </div>
-                      </div>
-
-                      {service.description && (
-                        <p className="text-foreground/70 text-xs mb-3 line-clamp-2">
-                          {service.description}
-                        </p>
                       )}
 
-                      <button
-                        onClick={() => toggleService(service)}
-                        className={`w-full flex items-center justify-center gap-2 py-2 rounded-xl font-medium text-sm transition-all duration-300 ${
-                          isSelected
-                            ? "bg-primary text-white hover:bg-primary/90"
-                            : "bg-primary/10 text-primary hover:bg-primary/20"
-                        }`}
-                      >
-                        {isSelected ? (
-                          <>
-                            <HiMinus className="w-3 h-3" />
-                            Remove
-                          </>
-                        ) : (
-                          <>
-                            <HiPlus className="w-3 h-3" />
-                            Add Service
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </motion.div>
-          </AnimatePresence>
+                      {/* Service Details */}
+                      <div className="p-4">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-foreground mb-1 text-sm line-clamp-2">
+                              {service.name}
+                            </h3>
+                            <span className="inline-flex items-center gap-1 text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                              <HiTag className="w-2 h-2" />
+                              {service.category_name}
+                            </span>
+                          </div>
+                          <div className="text-right ml-2">
+                            <p className="text-lg font-bold text-primary">
+                              ₹{Number(service.price).toLocaleString()}
+                            </p>
+                            <div className="flex items-center gap-1 text-xs text-foreground/60">
+                              <HiClock className="w-2 h-2" />
+                              {service.duration || "60 min"}
+                            </div>
+                          </div>
+                        </div>
 
-          {/* Empty State */}
-          {filteredServices.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-12"
-            >
-              <div className="text-4xl mb-4">🔍</div>
-              <h3 className="text-lg font-bold text-foreground mb-2">
-                No services found
-              </h3>
-              <p className="text-foreground/60 text-sm">
-                Try selecting different categories or clear your filters.
-              </p>
-            </motion.div>
-          )}
+                        {service.description && (
+                          <p className="text-foreground/70 text-xs mb-3 line-clamp-2">
+                            {service.description}
+                          </p>
+                        )}
+
+                        <button
+                          onClick={() => toggleService(service)}
+                          className={`w-full flex items-center justify-center gap-2 py-2 rounded-xl font-medium text-sm transition-all duration-300 ${
+                            isSelected
+                              ? "bg-primary text-white hover:bg-primary/90"
+                              : "bg-primary/10 text-primary hover:bg-primary/20"
+                          }`}
+                        >
+                          {isSelected ? (
+                            <>
+                              <HiMinus className="w-3 h-3" />
+                              Remove
+                            </>
+                          ) : (
+                            <>
+                              <HiPlus className="w-3 h-3" />
+                              Add Service
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Pagination */}
+            {paginationData && paginationData.last_page > 1 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="flex flex-col items-center space-y-4 mt-8"
+              >
+                {/* Results Info */}
+                <div className="text-sm text-foreground/60">
+                  Showing{" "}
+                  <span className="font-medium text-foreground">
+                    {paginationData.from}
+                  </span>{" "}
+                  to{" "}
+                  <span className="font-medium text-foreground">
+                    {paginationData.to}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-medium text-foreground">
+                    {paginationData.total}
+                  </span>{" "}
+                  services
+                </div>
+
+                {/* Pagination Controls */}
+                <div className="flex items-center space-x-2">
+                  {/* Previous Button */}
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      currentPage === 1
+                        ? "bg-muted text-foreground/40 cursor-not-allowed"
+                        : "bg-card text-foreground hover:bg-primary hover:text-white border border-border"
+                    }`}
+                  >
+                    <HiChevronLeft className="w-4 h-4 mr-1" />
+                    Previous
+                  </button>
+
+                  {/* Page Numbers */}
+                  <div className="flex items-center space-x-1">
+                    {Array.from(
+                      { length: Math.min(5, paginationData.last_page) },
+                      (_, i) => {
+                        const page = i + 1;
+                        return (
+                          <button
+                            key={page}
+                            onClick={() => handlePageChange(page)}
+                            className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                              currentPage === page
+                                ? "bg-primary text-white"
+                                : "bg-card text-foreground hover:bg-primary/10 border border-border"
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        );
+                      }
+                    )}
+
+                    {paginationData.last_page > 5 && (
+                      <>
+                        <span className="px-3 py-2 text-foreground/60">
+                          ...
+                        </span>
+                        <button
+                          onClick={() =>
+                            handlePageChange(paginationData.last_page)
+                          }
+                          className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                            currentPage === paginationData.last_page
+                              ? "bg-primary text-white"
+                              : "bg-card text-foreground hover:bg-primary/10 border border-border"
+                          }`}
+                        >
+                          {paginationData.last_page}
+                        </button>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Next Button */}
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === paginationData.last_page}
+                    className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      currentPage === paginationData.last_page
+                        ? "bg-muted text-foreground/40 cursor-not-allowed"
+                        : "bg-card text-foreground hover:bg-primary hover:text-white border border-border"
+                    }`}
+                  >
+                    Next
+                    <HiChevronRight className="w-4 h-4 ml-1" />
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Empty State */}
+            {services.length === 0 && !servicesLoading && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-12"
+              >
+                <div className="text-4xl mb-4">🔍</div>
+                <h3 className="text-lg font-bold text-foreground mb-2">
+                  No services found
+                </h3>
+                <p className="text-foreground/60 text-sm mb-4">
+                  Try adjusting your search or category filters.
+                </p>
+                <button
+                  onClick={clearAllFilters}
+                  className="text-primary hover:text-primary/80 font-medium text-sm underline"
+                >
+                  Clear all filters
+                </button>
+              </motion.div>
+            )}
+          </div>
         </div>
 
         {/* Right Section - Selected Services & Summary */}
@@ -339,7 +539,7 @@ const ServiceSelection = ({
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
-            className="bg-gradient-to-br from-primary/5 to-secondary/5 backdrop-blur-md rounded-3xl p-6 border border-primary/20 shadow-xl sticky top-8"
+            className="bg-accent/50 backdrop-blur-md rounded-3xl p-6 border border-border shadow-xl sticky top-8"
           >
             {/* Header */}
             <div className="flex items-center gap-3 mb-6">
@@ -368,7 +568,7 @@ const ServiceSelection = ({
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -20 }}
                       transition={{ duration: 0.3, delay: index * 0.05 }}
-                      className="flex items-center gap-3 bg-white/60 backdrop-blur-sm rounded-2xl p-3 border border-primary/10"
+                      className="flex items-center gap-3 bg-card backdrop-blur-sm rounded-2xl p-3 border border-border"
                     >
                       {service.icon && (
                         <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
@@ -418,7 +618,7 @@ const ServiceSelection = ({
             {/* Summary */}
             {selectedServices.length > 0 && (
               <>
-                <div className="border-t border-primary/20 pt-4 mb-6">
+                <div className="border-t border-border pt-4 mb-6">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm text-foreground/70">
                       Duration:
@@ -447,7 +647,7 @@ const ServiceSelection = ({
 
                 <Button
                   onClick={onNext}
-                  className="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+                  className="w-full bg-primary text-white py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
                 >
                   Continue to Date & Time
                   <HiArrowRight className="w-4 h-4" />
@@ -460,7 +660,7 @@ const ServiceSelection = ({
                 <p className="text-foreground/60 text-sm mb-4">
                   Select services to continue
                 </p>
-                <div className="w-full bg-gray-200 py-3 rounded-2xl font-medium text-gray-500 cursor-not-allowed">
+                <div className="w-full bg-muted py-3 rounded-2xl font-medium text-foreground/50 cursor-not-allowed">
                   Continue to Date & Time
                 </div>
               </div>
