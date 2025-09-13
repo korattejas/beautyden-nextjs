@@ -18,7 +18,7 @@ import {
   HiHeart,
   HiStar,
 } from "react-icons/hi2";
-import { useServices } from "@/hooks/useApi";
+import { useServices, useSettings } from "@/hooks/useApi";
 import { submitContactForm } from "@/services/contact.service";
 import { ContactFormData } from "@/types/contact";
 import Container from "@/components/ui/Container";
@@ -44,7 +44,7 @@ const contactSchema = yup.object().shape({
     .required("Phone number is required")
     .matches(/^[0-9]+$/, "Phone number must contain only digits")
     .min(10, "Phone number must be at least 10 digits"),
-  service_id: yup.string().required("Please select a service"),
+  // service_id: yup.string().required("Please select a service"),
   subject: yup
     .string()
     .required("Subject is required")
@@ -60,9 +60,18 @@ const contactSchema = yup.object().shape({
 const ContactSection = () => {
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Fix: Access nested data structure correctly
+  // Get settings and services data
+  const { data: settingsData } = useSettings();
   const { data: servicesData } = useServices();
-  const services = servicesData?.data?.data ?? [];
+
+  const settings = settingsData?.data ?? [];
+  // const services = servicesData?.data?.data ?? [];
+
+  // Helper function to get setting value by key
+  const getSetting = (key: string) => {
+    const setting = settings.find((s) => s.key === key);
+    return setting?.value || "";
+  };
 
   const {
     register,
@@ -170,7 +179,7 @@ const ContactSection = () => {
               </div>
             </div>
 
-            {/* Contact Information */}
+            {/* Contact Information - Dynamic from API */}
             <div className="bg-card backdrop-blur-md rounded-3xl p-8 border border-border shadow-lg">
               <h3 className="font-heading text-xl font-bold text-foreground mb-6">
                 Contact Information
@@ -184,11 +193,14 @@ const ContactSection = () => {
                   <div>
                     <p className="text-sm text-foreground/60">Call us</p>
                     <a
-                      href="tel:+919876543210"
+                      href={`tel:+91${getSetting("phone_number")}`}
                       className="font-semibold text-foreground hover:text-primary transition-colors"
                     >
-                      +91 98765 43210
+                      +91 {getSetting("phone_number")}
                     </a>
+                    <p className="text-xs text-foreground/50 mt-1">
+                      {getSetting("phone_hours")}
+                    </p>
                   </div>
                 </div>
 
@@ -199,11 +211,14 @@ const ContactSection = () => {
                   <div>
                     <p className="text-sm text-foreground/60">Email us</p>
                     <a
-                      href="mailto:hello@beautyden.com"
+                      href={`mailto:${getSetting("email_id")}`}
                       className="font-semibold text-foreground hover:text-primary transition-colors"
                     >
-                      hello@beautyden.com
+                      {getSetting("email_id")}
                     </a>
+                    <p className="text-xs text-foreground/50 mt-1">
+                      {getSetting("email_response_time")}
+                    </p>
                   </div>
                 </div>
 
@@ -214,7 +229,7 @@ const ContactSection = () => {
                   <div>
                     <p className="text-sm text-foreground/60">Service Area</p>
                     <p className="font-semibold text-foreground">
-                      Mumbai, Maharashtra
+                      {getSetting("service_location") || "India"}
                     </p>
                   </div>
                 </div>
@@ -228,7 +243,7 @@ const ContactSection = () => {
                       Available Hours
                     </p>
                     <p className="font-semibold text-foreground">
-                      Mon - Sun: 8AM - 10PM
+                      {getSetting("service_time")}
                     </p>
                   </div>
                 </div>
@@ -376,8 +391,8 @@ const ContactSection = () => {
                   </div>
                 </div>
 
-                {/* Service Selection */}
-                <div>
+                {/* Service Selection - Fixed Dropdown */}
+                {/* <div>
                   <label className="block text-sm font-semibold text-foreground mb-3">
                     Service Interest *
                   </label>
@@ -403,7 +418,7 @@ const ContactSection = () => {
                       {errors.service_id.message}
                     </p>
                   )}
-                </div>
+                </div> */}
 
                 {/* Subject Field */}
                 <div>

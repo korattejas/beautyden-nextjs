@@ -3,7 +3,7 @@ export interface ContactFormData {
   last_name: string;
   email: string;
   phone: string;
-  service_id: string;
+  service_id?: string;
   subject: string;
   message: string;
 }

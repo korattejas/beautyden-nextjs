@@ -1,6 +1,7 @@
 import Container from "@/components/ui/Container";
 import ContactForm from "@/sections/contact/ContactForm";
 import ContactHero from "@/sections/contact/ContactHero";
+// import ContactImageSection from "@/sections/contact/ContactImageSection";
 
 export default function ContactPage() {
   return (
@@ -14,6 +15,7 @@ export default function ContactPage() {
           {/* </div> */}
         </Container>
       </section>
+      {/* <ContactImageSection /> */}
     </div>
   );
 }
