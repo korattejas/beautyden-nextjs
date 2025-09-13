@@ -65,25 +65,6 @@ export const useTeamMembers = () => {
   });
 };
 
-// Hiring hooks
-// export const useHiring = () => {
-//   return useQuery({
-//     queryKey: ["hiring"],
-//     queryFn: getHiringData,
-//   });
-// };
-
-// export const useSubmitApplication = () => {
-//   const queryClient = useQueryClient();
-
-//   return useMutation({
-//     mutationFn: submitHiringApplication,
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({ queryKey: ["hiring"] });
-//     },
-//   });
-// };
-
 export const useBlogCategories = () => {
   return useQuery({
     queryKey: ["blogCategories"],
@@ -97,6 +78,7 @@ export const useBlogs = (filters: BlogFilters = {}) => {
     queryKey: ["blogs", filters],
     queryFn: () => getBlogs(filters),
     staleTime: 5 * 60 * 1000,
+    // keepPreviousData: true,
   });
 };
 

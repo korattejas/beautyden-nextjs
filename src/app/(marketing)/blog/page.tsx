@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useBlogs } from "@/hooks/useApi";
 import { useDebounce } from "@/hooks/useDebounce";
 import Container from "@/components/ui/Container";
+import Pagination from "@/components/ui/Pagination";
 
 import { BlogFilters as FilterTypes } from "@/types/blog";
 import BlogHero from "@/sections/blog/BlogHero";
@@ -11,12 +12,36 @@ import BlogFilters from "@/sections/blog/BlogFilters";
 import BlogCard from "@/sections/blog/BlogCard";
 
 export default function BlogPage() {
-  const [filters, setFilters] = useState<FilterTypes>({});
+  const [filters, setFilters] = useState<FilterTypes>({
+    page: 1,
+    per_page: 10,
+  });
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const debouncedFilters = useDebounce(filters, 500);
+  // Combine filters with pagination
+  const combinedFilters = { ...filters, page: currentPage };
+  const debouncedFilters = useDebounce(combinedFilters, 500);
   const { data, isLoading, error } = useBlogs(debouncedFilters);
 
-  const blogs = data?.data ?? [];
+  // Fix: Access nested data structure correctly
+  const blogs = data?.data?.data ?? [];
+  const paginationData = data?.data;
+
+  const handleFiltersChange = (newFilters: FilterTypes) => {
+    setFilters(newFilters);
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Smooth scroll to top when changing pages
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const clearAllFilters = () => {
+    setFilters({ page: 1, per_page: 9 });
+    setCurrentPage(1);
+  };
 
   if (error) {
     return (
@@ -31,7 +56,7 @@ export default function BlogPage() {
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300"
+            className="bg-primary text-white px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-all duration-300"
           >
             Try Again
           </button>
@@ -41,12 +66,15 @@ export default function BlogPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+    <div className="min-h-screen bg-background">
       <BlogHero />
 
       <section className="py-8">
         <Container>
-          <BlogFilters filters={filters} onFiltersChange={setFilters} />
+          <BlogFilters
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
+          />
         </Container>
       </section>
 
@@ -54,16 +82,16 @@ export default function BlogPage() {
         <Container>
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {Array.from({ length: 6 }, (_, index) => (
+              {Array.from({ length: 9 }, (_, index) => (
                 <div
                   key={index}
-                  className="bg-white rounded-3xl overflow-hidden shadow-lg"
+                  className="bg-card rounded-3xl overflow-hidden shadow-lg"
                 >
-                  <div className="h-48 bg-gray-200 animate-pulse" />
+                  <div className="h-48 bg-muted animate-pulse" />
                   <div className="p-6">
-                    <div className="h-4 bg-gray-200 animate-pulse rounded mb-3" />
-                    <div className="h-6 bg-gray-200 animate-pulse rounded mb-3" />
-                    <div className="h-4 bg-gray-200 animate-pulse rounded w-3/4" />
+                    <div className="h-4 bg-muted animate-pulse rounded mb-3" />
+                    <div className="h-6 bg-muted animate-pulse rounded mb-3" />
+                    <div className="h-4 bg-muted animate-pulse rounded w-3/4" />
                   </div>
                 </div>
               ))}
@@ -74,16 +102,39 @@ export default function BlogPage() {
               <h3 className="text-2xl font-bold text-foreground mb-2">
                 No articles found
               </h3>
-              <p className="text-foreground/60">
+              <p className="text-foreground/60 mb-6">
                 Try adjusting your search or filters.
               </p>
+              <button
+                onClick={clearAllFilters}
+                className="bg-primary text-white px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-all duration-300"
+              >
+                Clear All Filters
+              </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {blogs.map((blog, index) => (
-                <BlogCard key={blog.id} blog={blog} index={index} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {blogs.map((blog, index) => (
+                  <BlogCard key={blog.id} blog={blog} index={index} />
+                ))}
+              </div>
+
+              {/* Pagination Component */}
+              {paginationData && paginationData.last_page > 1 && (
+                <section className="mt-12">
+                  <Pagination
+                    currentPage={paginationData.current_page}
+                    totalPages={paginationData.last_page}
+                    onPageChange={handlePageChange}
+                    totalItems={paginationData.total}
+                    itemsPerPage={paginationData.per_page}
+                    showingFrom={paginationData.from}
+                    showingTo={paginationData.to}
+                  />
+                </section>
+              )}
+            </>
           )}
         </Container>
       </section>

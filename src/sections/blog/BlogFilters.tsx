@@ -18,7 +18,12 @@ const BlogFilters = ({ filters, onFiltersChange }: BlogFiltersProps) => {
   const categories = categoriesData?.data ?? [];
 
   const handleFilterChange = (key: keyof FilterTypes, value: string) => {
-    onFiltersChange({ ...filters, [key]: value });
+    onFiltersChange({
+      ...filters,
+      [key]: value,
+      page: 1,
+      per_page: 9,
+    });
   };
 
   if (isLoading) {

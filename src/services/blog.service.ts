@@ -32,6 +32,12 @@ const buildQueryString = (filters: BlogFilters): string => {
   if (filters.category_id) {
     params.append("category_id", filters.category_id);
   }
+  if (filters.page && filters.page > 1) {
+    params.append("page", filters.page.toString());
+  }
+  if (filters.per_page) {
+    params.append("per_page", filters.per_page.toString());
+  }
 
   return params.toString();
 };

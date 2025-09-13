@@ -29,11 +29,33 @@ export interface Blog {
   featured: number;
 }
 
+export interface PaginationLink {
+  url: string | null;
+  label: string;
+  active: boolean;
+}
+
+export interface PaginatedBlogsData {
+  current_page: number;
+  data: Blog[];
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  links: PaginationLink[];
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number;
+  total: number;
+}
+
 export interface BlogsResponse {
   code: number;
   status: boolean;
   message: string;
-  data: Blog[];
+  data: PaginatedBlogsData;
 }
 
 export interface BlogViewResponse {
@@ -46,4 +68,6 @@ export interface BlogViewResponse {
 export interface BlogFilters {
   search?: string;
   category_id?: string;
+  page?: number;
+  per_page?: number;
 }
