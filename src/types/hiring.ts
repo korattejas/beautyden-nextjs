@@ -14,6 +14,7 @@ export interface Hiring {
   experience_level_text: string;
   hiring_type_text: string;
   gender_preference_text: string;
+  created_at: string;
 }
 
 export interface HiringResponse {
