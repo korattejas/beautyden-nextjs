@@ -1,6 +1,6 @@
 "use client";
 
-import { useFAQs } from "@/hooks/useApi";
+import { useFAQs, useSettings } from "@/hooks/useApi";
 import Container from "@/components/ui/Container";
 import FAQItem from "./FAQItem";
 import { motion } from "framer-motion";
@@ -9,8 +9,15 @@ import Button from "@/components/ui/Button";
 
 const FAQList = () => {
   const { data, isLoading, error } = useFAQs();
+  const { data: settingsData } = useSettings();
 
   const faqs = data?.data || [];
+  const settings = settingsData?.data ?? [];
+
+  const getSetting = (key: string) => {
+    const setting = settings.find((s:any) => s.key === key);
+    return setting?.value || "";
+  };
 
   if (isLoading) {
     return (
@@ -119,7 +126,8 @@ const FAQList = () => {
                 </Button>
 
                 <Button
-                  href="tel:+911234567890"
+                  // href="tel:+911234567890"
+                  href={`tel:${getSetting("phone_number")}`}
                   variant="outline"
                   className="border-2 border-primary text-primary hover:bg-primary hover:text-white px-8 py-4 rounded-full font-semibold transition-all duration-300"
                 >

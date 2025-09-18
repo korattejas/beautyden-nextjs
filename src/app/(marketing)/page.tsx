@@ -15,7 +15,7 @@ export default function HomePage() {
     <>
       <HeroSection />
       <CategoryServices />
-      <WhyChooseUsSection />
+      {/* <WhyChooseUsSection /> */}
       {/* <PopularServicesSection /> */}
       <HowItWorksSection />
       <TestimonialsSection />

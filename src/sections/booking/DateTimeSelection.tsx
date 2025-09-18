@@ -229,8 +229,9 @@ const DateTimeSelection = ({
               <DatePicker
                 selected={selectedDateObj}
                 onChange={handleDateChange}
-                minDate={new Date()}
-                maxDate={new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)}
+                // minDate={new Date()}
+                // maxDate={new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)}
+                minDate={new Date()} // ✅ still prevents past dates
                 inline
                 dateFormat="yyyy-MM-dd"
                 calendarClassName="custom-datepicker"

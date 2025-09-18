@@ -116,7 +116,7 @@ export default function HiringPage() {
               Why Join BeautyDen?
             </div>
 
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+            <h2 className="text-4xl md:text-5xl sm:text-3xl font-bold text-foreground mb-6">
               Build Your Career with Us
             </h2>
 

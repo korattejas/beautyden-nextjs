@@ -30,11 +30,11 @@ const HiringCard = ({ job, index }: HiringCardProps) => {
   const daysAgo = getDaysAgo(job.created_at);
 
   // Experience level icons
-  const getExperienceLevelIcon = (minExp: string, maxExp: string | null) => {
-    const min = parseInt(minExp);
-    if (min === 0) return "🌱"; // Entry level
-    if (min <= 2) return "⭐"; // Mid level
-    return "👑"; // Senior level
+  const getExperienceLevelIcon = (exp_level:string | number | null) => {
+    if (exp_level == 1) return "🌱"; // Entry level
+    if (exp_level == 2) return "⭐"; // Mid level
+    if (exp_level == 3) return "👑"; // Senior level
+    return "👑"; // default fallback
   };
 
   const experienceText = job.max_experience
@@ -78,7 +78,7 @@ Thank you! 🙏`;
           {/* Experience Level in top-right box */}
           <div className="bg-accent/50 px-3 py-1 rounded-full flex items-center gap-1">
             <span className="text-sm">
-              {getExperienceLevelIcon(job.min_experience, job.max_experience)}
+              {getExperienceLevelIcon(job.experience_level)}
             </span>
             <span className="text-xs font-medium text-foreground/70">
               {experienceText}

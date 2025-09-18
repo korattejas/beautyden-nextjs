@@ -32,8 +32,10 @@ const contactSchema = yup.object().shape({
     .max(50, "First name must be less than 50 characters"),
   last_name: yup
     .string()
-    .required("Last name is required")
-    .min(2, "Last name must be at least 2 characters")
+    // .required("Last name is required")
+    .notRequired()
+    .nullable()
+    // .min(2, "Last name must be at least 2 characters")
     .max(50, "Last name must be less than 50 characters"),
   email: yup
     .string()
@@ -47,8 +49,10 @@ const contactSchema = yup.object().shape({
   // service_id: yup.string().required("Please select a service"),
   subject: yup
     .string()
-    .required("Subject is required")
-    .min(5, "Subject must be at least 5 characters")
+    // .required("Subject is required")
+    .notRequired()
+    .nullable()
+    // .min(5, "Subject must be at least 5 characters")
     .max(100, "Subject must be less than 100 characters"),
   message: yup
     .string()
@@ -69,7 +73,7 @@ const ContactSection = () => {
 
   // Helper function to get setting value by key
   const getSetting = (key: string) => {
-    const setting = settings.find((s) => s.key === key);
+    const setting = settings.find((s:any) => s.key === key);
     return setting?.value || "";
   };
 
@@ -242,9 +246,11 @@ const ContactSection = () => {
                     <p className="text-sm text-foreground/60">
                       Available Hours
                     </p>
-                    <p className="font-semibold text-foreground">
+                    {/* <p className="font-semibold text-foreground">
                       {getSetting("service_time")}
-                    </p>
+                    </p> */}
+                    <p className="font-semibold text-foreground">24/7</p>
+
                   </div>
                 </div>
               </div>
@@ -290,7 +296,7 @@ const ContactSection = () => {
                 </div>
 
                 {/* Name Fields */}
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid md:grid-cols-1 gap-6">
                   <div>
                     <label className="block text-sm font-semibold text-foreground mb-3">
                       First Name *
@@ -317,7 +323,7 @@ const ContactSection = () => {
 
                   <div>
                     <label className="block text-sm font-semibold text-foreground mb-3">
-                      Last Name *
+                      Last Name
                     </label>
                     <div className="relative">
                       <HiUser className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40" />
@@ -423,7 +429,7 @@ const ContactSection = () => {
                 {/* Subject Field */}
                 <div>
                   <label className="block text-sm font-semibold text-foreground mb-3">
-                    Subject *
+                    Subject
                   </label>
                   <div className="relative">
                     <HiChatBubbleBottomCenterText className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40" />

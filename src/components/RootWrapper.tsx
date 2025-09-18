@@ -1,12 +1,48 @@
-"use client";
+﻿"use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { ReactNode, useState, useEffect } from "react";
+import { ReactNode, useState } from "react";
+import { CityProvider, useCityContext } from "@/contexts/CityContext";
+import CitySelectionPopup from "@/components/ui/CitySelectionPopup";
+import { City } from "@/types/city";
 
 interface RootWrapperProps {
   children: ReactNode;
 }
+
+// Inner component that uses the city context
+const RootWrapperInner = ({ children }: { children: ReactNode }) => {
+  const {
+    showCityPopup,
+    setShowCityPopup,
+      setSelectedCity,
+  } = useCityContext();
+
+  const handleCitySelect = (city: City) => {
+    setSelectedCity(city);
+    setShowCityPopup(false);
+  };
+
+  const handleClosePopup = () => {
+    setShowCityPopup(false);
+    // Mark as visited even if no city is selected
+    if (typeof window !== "undefined") {
+      localStorage.setItem("beautyden_has_visited", "true");
+    }
+  };
+
+  return (
+    <>
+      {children}
+      <CitySelectionPopup
+        isOpen={showCityPopup}
+        onClose={handleClosePopup}
+        onCitySelect={handleCitySelect}
+      />
+    </>
+  );
+};
 
 export default function RootWrapper({ children }: RootWrapperProps) {
   const [queryClient] = useState(() => new QueryClient());
@@ -57,7 +93,11 @@ export default function RootWrapper({ children }: RootWrapperProps) {
           - Analytics
       */}
       <QueryClientProvider client={queryClient}>
-        {children}
+        <CityProvider>
+          <RootWrapperInner>
+            {children}
+          </RootWrapperInner>
+        </CityProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </div>

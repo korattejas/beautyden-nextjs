@@ -9,7 +9,7 @@ import {
   HiSparkles,
   HiClock,
 } from "react-icons/hi2";
-import { useHomeCounters } from "@/hooks/useApi";
+import { useHomeCounters, useSettings } from "@/hooks/useApi";
 
 // Icon mapping based on label names
 const getIconForLabel = (label: string) => {
@@ -50,6 +50,13 @@ const getDescriptionForLabel = (label: string, value: string) => {
 
 const AboutStats = () => {
   const { data: countersData, isLoading, error } = useHomeCounters();
+  const { data: settingsData } = useSettings();
+
+  const settings = settingsData?.data || [];
+  const getSetting = (key: string) => {
+    const setting = settings.find((s) => s.key === key);
+    return setting?.value || "";
+  };
 
   const stats = countersData?.data || [];
 
@@ -147,7 +154,11 @@ const AboutStats = () => {
                     </div>
 
                     <div className="text-4xl font-bold text-primary mb-2 group-hover:text-secondary transition-colors duration-300">
-                      {stat.value}
+                      {stat?.label == "Happy Clients" ?
+                       getSetting("happy_clients") 
+                      : stat?.label == ("Average Rating") ? 
+                       getSetting("rating") 
+                      : stat.value}
                     </div>
 
                     <h3 className="font-semibold text-foreground mb-4 text-lg">

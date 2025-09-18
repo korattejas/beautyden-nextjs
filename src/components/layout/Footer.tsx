@@ -13,7 +13,7 @@ import {
   HiArrowRight,
 } from "react-icons/hi2";
 import { HiCode } from "react-icons/hi";
-import { FaFacebook, FaInstagram, FaYoutube, FaGithub } from "react-icons/fa";
+import { FaFacebook, FaInstagram, FaYoutube, FaGithub,FaWhatsapp  } from "react-icons/fa";
 import Link from "next/link";
 import { useSettings } from "@/hooks/useApi";
 
@@ -69,6 +69,14 @@ const Footer = () => {
       icon: FaYoutube,
       href: getSetting("youtub_id") || "https://youtube.com/@beautyden",
       color: "hover:text-red-500",
+    },
+    {
+      name: "WhatsApp",
+      icon: FaWhatsapp,
+      href:
+        getSetting("whatsapp_number") ||
+        "https://wa.me/9574758282?text=Hi%20BeautyDen!",
+      color: "hover:text-green-500",
     },
   ];
 
@@ -212,6 +220,66 @@ const Footer = () => {
         </div>
 
         <motion.div
+  initial={{ opacity: 0, y: 20 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.6, delay: 0.3 }}
+  viewport={{ once: true }}
+  className="relative border-t border-white/10 py-6"
+>
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+    {/* Get in Touch */}
+    <div>
+      {/* <h4 className="text-white font-semibold text-lg mb-3 flex items-center gap-2">
+        <HiPhone className="w-5 h-5 text-primary" />
+        Get In Touch
+      </h4> */}
+
+      <div className="flex flex-col sm:flex-row sm:items-center sm:gap-6 gap-3 text-sm text-white/70">
+        {/* Phone */}
+        <a href={`tel:+91${getSetting("phone_number")}`} className="flex items-center gap-2 hover:text-white transition-colors">
+          <HiPhone className="w-4 h-4 text-primary" />
+          +91 {getSetting("phone_number") || "9574758282"}
+        </a>
+
+        {/* Email */}
+        <a href={`mailto:${getSetting("email_id")}`} className="flex items-center gap-2 hover:text-white transition-colors">
+          <HiEnvelope className="w-4 h-4 text-primary" />
+          {getSetting("email_id") || "contact@beautyden.in"}
+        </a>
+
+        {/* Location */}
+        <div className="flex items-center gap-2">
+          <HiMapPin className="w-4 h-4 text-primary" />
+          {getSetting("service_location") || "India"}
+        </div>
+      </div>
+    </div>
+
+    {/* Follow Us */}
+    <div className="flex flex-col sm:flex-row sm:justify-end sm:items-center gap-4">
+      <span className="text-white/60 font-medium">Follow Us:</span>
+      <div className="flex gap-3">
+        {socialLinks.map((social, index) => {
+          const IconComponent = social.icon;
+          return (
+            <motion.a
+              key={index}
+              href={social.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.1, y: -2 }}
+              whileTap={{ scale: 0.9 }}
+              className={`w-10 h-10 bg-white/5 backdrop-blur-sm rounded-xl flex items-center justify-center text-white/60 ${social.color} transition-all duration-200 hover:shadow-lg border border-white/10 hover:border-primary/20 hover:bg-white/10`}
+            >
+              <IconComponent className="w-4 h-4" />
+            </motion.a>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+</motion.div>
+        {/* <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
@@ -224,7 +292,6 @@ const Footer = () => {
           </h4>
 
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-            {/* Phone */}
             <div className="flex items-center gap-3 text-white/80 hover:text-white transition-colors group">
               <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                 <HiPhone className="w-4 h-4 text-primary" />
@@ -242,7 +309,6 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Email */}
             <div className="flex items-center gap-3 text-white/80 hover:text-white transition-colors group">
               <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                 <HiEnvelope className="w-4 h-4 text-primary" />
@@ -260,7 +326,6 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Location */}
             <div className="flex items-center gap-3 text-white/80">
               <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
                 <HiMapPin className="w-4 h-4 text-primary" />
@@ -273,7 +338,6 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Working Hours */}
             <div className="flex items-center gap-3 text-white/80">
               <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
                 <HiClock className="w-4 h-4 text-primary" />
@@ -286,10 +350,10 @@ const Footer = () => {
               </div>
             </div>
           </div>
-        </motion.div>
+        </motion.div> */}
 
         {/* Social Media & Stats Section */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
@@ -297,7 +361,6 @@ const Footer = () => {
           className="relative border-t border-white/10 py-8"
         >
           <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
-            {/* Social Media */}
             <div className="flex items-center gap-6">
               <span className="text-white/60 font-medium">Follow Us:</span>
               <div className="flex gap-3">
@@ -320,7 +383,6 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Stats */}
             <div className="flex items-center gap-8 text-white/60 text-sm">
               {getSetting("rating") && (
                 <div className="flex items-center gap-2">
@@ -348,7 +410,7 @@ const Footer = () => {
               )}
             </div>
           </div>
-        </motion.div>
+        </motion.div> */}
 
         {/* Bottom Copyright */}
         <motion.div

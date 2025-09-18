@@ -18,7 +18,6 @@ export const submitContactForm = async (
         "Content-Type": "multipart/form-data",
       },
     });
-
     if (typeof response.data === "string" && response.data.includes(":")) {
       const decryptedData = decryptData(response.data);
       return decryptedData;

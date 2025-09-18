@@ -7,6 +7,7 @@ export interface BookingService {
   category_name: string;
   description?: string;
   icon?: string;
+  discount_price?:string;
 }
 
 export interface BookingFormData {

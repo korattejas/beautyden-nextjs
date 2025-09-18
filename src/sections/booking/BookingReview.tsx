@@ -115,7 +115,24 @@ const BookingReview = ({
                       {service.category_name} • {service.duration}
                     </p>
                   </div>
-                  <p className="font-bold text-foreground">₹{service.price}</p>
+                  {/* <p className="font-bold text-foreground">₹{service.price}</p> */}
+                  <div className="text-right self-start">
+          {service?.discount_price ? (
+            <div className="flex flex-row gap-1 self-start items-end">
+              
+              <span className="font-bold text-foreground">
+                Start ₹{service?.discount_price}
+              </span>
+              <span className="text-sm text-foreground/60 line-through">
+                ₹{service.price}
+              </span>
+            </div>
+          ) : (
+            <span className="font-bold text-foreground">
+              Start ₹{service.price}
+            </span>
+          )}
+        </div>
                 </div>
               ))}
             </div>
@@ -236,12 +253,12 @@ const BookingReview = ({
                   {getTotalDuration()} min
                 </span>
               </div>
-              <div className="flex justify-between items-center border-t border-primary/20 pt-3">
+              {/* <div className="flex justify-between items-center border-t border-primary/20 pt-3">
                 <span className="text-foreground/70">Subtotal</span>
                 <span className="font-semibold text-foreground">
                   ₹{getTotalPrice()}
                 </span>
-              </div>
+              </div> */}
               <div className="flex justify-between items-center">
                 <span className="text-foreground/70">Service Charge</span>
                 <span className="font-semibold text-foreground">₹0</span>

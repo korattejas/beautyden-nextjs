@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useServices } from "@/hooks/useApi";
+import { useServices, useSettings } from "@/hooks/useApi";
 import { useDebounce } from "@/hooks/useDebounce";
 
 import Container from "@/components/ui/Container";
@@ -16,6 +16,7 @@ import ServiceFilterSkeleton from "@/components/loading/ServiceFilterSkeleton";
 
 export default function ServicesPage() {
   const [activeCategory, setActiveCategory] = useState("9"); // Default to "All Services"
+  const [activeSubCategory, setActiveSubCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -26,8 +27,11 @@ export default function ServicesPage() {
   const { data, error, isLoading } = useServices({
     search: debouncedSearchQuery,
     category_id: activeCategory,
+    subcategory_id: activeSubCategory, // 👈 pass here
     page: currentPage,
   });
+
+  
 
   const services = data?.data?.data ?? [];
   const paginationData = data?.data;
@@ -44,8 +48,20 @@ export default function ServicesPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleCategoryChange = (categoryId: string) => {
+  const handleCategoryChange = (categoryId: string,subcategories:string[] | any) => {
     setActiveCategory(categoryId);
+    if (subcategories && subcategories.length > 0) {
+      // Auto-select first subcategory
+      setActiveSubCategory(subcategories[0]);
+    } else {
+      // Reset subcategory if none exist
+      setActiveSubCategory(null);
+    }
+  
+    setCurrentPage(1); // Reset to first page when changing category
+  };
+  const handleSubCategoryChange = (subCategoryId: string | null) => {
+    setActiveSubCategory(subCategoryId);
     setCurrentPage(1); // Reset to first page when changing category
   };
 
@@ -87,8 +103,10 @@ export default function ServicesPage() {
           ) : (
             <ServiceFilter
               activeCategory={activeCategory}
+              activeSubCategory={activeSubCategory}
               searchQuery={searchQuery}
               onCategoryChange={handleCategoryChange}
+              onSubCategoryChange={handleSubCategoryChange}
               onSearchChange={handleSearchChange}
             />
           )}
@@ -121,7 +139,7 @@ export default function ServicesPage() {
             </section>
           ) : (
             <>
-              <ServiceGrid services={services} />
+              <ServiceGrid services={services}  />
 
               {/* Pagination Component */}
               {paginationData && paginationData.last_page > 1 && (

@@ -50,7 +50,9 @@ export interface ServicesResponse {
 export interface ServicesFilters {
   search?: string;
   category_id?: string;
+  subcategory_id?:string | null;
   page?: number;
+  city_id?: number | string;
 }
 
 const buildQueryString = (filters: ServicesFilters): string => {
@@ -62,8 +64,15 @@ const buildQueryString = (filters: ServicesFilters): string => {
   if (filters.category_id && filters.category_id !== "9") {
     params.append("category_id", filters.category_id);
   }
+  if(filters.subcategory_id && filters?.subcategory_id !== null){
+params.append("sub_category_id",filters?.subcategory_id)
+  }
+ 
   if (filters.page && filters.page > 1) {
     params.append("page", filters.page.toString());
+  }
+  if(filters.city_id ){
+    params.append("city_id", filters.city_id.toString());
   }
 
   return params.toString();
@@ -79,12 +88,10 @@ export const getServices = async (
       : endpoints.SERVICES;
 
     const response = await api.post(url);
-    console.log("response: ", response);
 
     // Check if response is encrypted (production)
     if (typeof response.data === "string" && response.data.includes(":")) {
       const decryptedData = decryptData(response.data);
-      console.log("decryptedData: ", decryptedData);
       return decryptedData;
     }
 

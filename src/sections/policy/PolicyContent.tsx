@@ -2,8 +2,10 @@
 
 import { motion } from "framer-motion";
 import Container from "@/components/ui/Container";
-import { usePolicy } from "@/hooks/useApi";
+import { usePolicy, useSettings } from "@/hooks/useApi";
 import { PolicyType } from "@/types/policy";
+import Button from "@/components/ui/Button";
+import { HiEnvelope, HiQuestionMarkCircle } from "react-icons/hi2";
 
 interface PolicyContentProps {
   type: PolicyType;
@@ -18,6 +20,14 @@ const decodeHTML = (html: string) => {
 
 const PolicyContent = ({ type }: PolicyContentProps) => {
   const { data, isLoading, error } = usePolicy(type);
+  const { data: settingsData } = useSettings();
+
+  const settings = settingsData?.data ?? [];
+
+  const getSetting = (key: string) => {
+    const setting = settings.find((s:any) => s.key === key);
+    return setting?.value || "";
+  };
 
   if (isLoading) {
     return (
@@ -36,7 +46,50 @@ const PolicyContent = ({ type }: PolicyContentProps) => {
                 ))}
               </div>
             </div>
+
+               {/* Still have questions section */}
+       <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center bg-gradient-to-r from-primary/10 to-secondary/10 rounded-3xl p-12 border border-primary/20"
+          >
+            <div className="max-w-2xl mx-auto">
+              <HiQuestionMarkCircle className="w-16 h-16 text-primary mx-auto mb-6" />
+
+              <h3 className="font-heading text-3xl font-bold text-foreground mb-4">
+                Still Have Questions?
+              </h3>
+
+              <p className="text-foreground/70 text-lg mb-8 leading-relaxed">
+                Can&apos;t find the answer you&apos;re looking for? Our friendly
+                support team is here to help you with any questions about our
+                services.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button
+                  href="/contact"
+                  className="bg-gradient-to-r from-primary to-secondary text-white px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 inline-flex items-center gap-2"
+                >
+                  <HiEnvelope className="w-5 h-5" />
+                  Contact Support
+                </Button>
+
+                <Button
+                  // href="tel:+911234567890"
+                  href={`tel:${getSetting("phone_number")}`}
+                  variant="outline"
+                  className="border-2 border-primary text-primary hover:bg-primary hover:text-white px-8 py-4 rounded-full font-semibold transition-all duration-300"
+                >
+                  Call Us Now
+                </Button>
+              </div>
+            </div>
+          </motion.div>
           </div>
+          
         </Container>
       </section>
     );
@@ -106,7 +159,7 @@ const PolicyContent = ({ type }: PolicyContentProps) => {
           </motion.article>
 
           {/* Last Updated */}
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -120,9 +173,11 @@ const PolicyContent = ({ type }: PolicyContentProps) => {
                 day: "numeric",
               })}
             </p>
-          </motion.div>
+          </motion.div> */}
         </div>
       </Container>
+
+    
     </section>
   );
 };

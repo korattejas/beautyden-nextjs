@@ -58,7 +58,7 @@ const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
     >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Search Input */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-3">
           <div className="relative group">
             <HiMagnifyingGlass className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40 z-10 group-focus-within:text-primary transition-colors" />
             <input
@@ -107,7 +107,7 @@ const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
         </div>
 
         {/* Media Filters */}
-        <div className="flex gap-2">
+        {/* <div className="flex gap-2">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -145,7 +145,7 @@ const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
             <HiVideoCamera className="w-4 h-4" />
             <span className="hidden sm:inline">Videos</span>
           </motion.button>
-        </div>
+        </div> */}
       </div>
 
       {/* Active Filters Display */}

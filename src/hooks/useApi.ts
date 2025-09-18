@@ -20,12 +20,18 @@ import { getPolicies } from "@/services/policy.service";
 import { PolicyType } from "@/types/policy";
 import { getSettings } from "@/services/settings.service";
 import { getHomeCounters } from "@/services/homeCounter.service";
+import { useCityContext } from "../contexts/CityContext";
 
 // Services hooks
 export const useServices = (filters: ServicesFilters = {}) => {
+  const { selectedCity } = useCityContext(); // ✅ get city from context
   return useQuery({
-    queryKey: ["services", filters],
-    queryFn: () => getServices(filters),
+    // queryKey: ["services", filters],
+    // queryFn: () => getServices(filters),
+
+  
+    queryKey: ["services", { ...filters, city_id: selectedCity?.id }], // ✅ include in key
+    queryFn: () => getServices({ ...filters, city_id: selectedCity?.id }), // ✅ include in query
     staleTime: 5 * 60 * 1000, // 5 minutes
     // keepPreviousData: true,
   });

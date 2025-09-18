@@ -1,5 +1,4 @@
 "use client";
-
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useServiceCategories } from "@/hooks/useApi";
@@ -7,15 +6,19 @@ import { HiMagnifyingGlass, HiXMark, HiSparkles } from "react-icons/hi2";
 
 interface ServiceFilterProps {
   activeCategory: string;
+  activeSubCategory:string | null;
   searchQuery: string;
-  onCategoryChange: (categoryId: string) => void;
+  onCategoryChange: (categoryId: string,subIds?:string[]) => void;
   onSearchChange: (search: string) => void;
+  onSubCategoryChange:(categoryId: string) => void;
 }
 
 const ServiceFilter = ({
   activeCategory,
+  activeSubCategory,
   searchQuery,
   onCategoryChange,
+  onSubCategoryChange,
   onSearchChange,
 }: ServiceFilterProps) => {
   const { data: categoriesData, isLoading, error } = useServiceCategories();
@@ -76,7 +79,9 @@ const ServiceFilter = ({
     onSearchChange("");
     onCategoryChange("9");
   };
-
+  const selectedCategory = categories.find(
+    (c) => c.id.toString() === activeCategory
+  ) ;
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -84,7 +89,8 @@ const ServiceFilter = ({
       transition={{ duration: 0.6 }}
       className="bg-card backdrop-blur-md rounded-3xl p-6 shadow-lg border border-border mb-8"
     >
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      {/* <div className="grid grid-cols-1 lg:grid-cols-4 gap-6"> */}
+      <div className="flex flex-col gap-6">
         {/* Search Bar */}
         <div className="lg:col-span-2">
           <div className="relative group">
@@ -122,7 +128,13 @@ const ServiceFilter = ({
                   transition={{ duration: 0.4, delay: index * 0.05 }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => onCategoryChange(categoryId)}
+                  onClick={() => {
+                   const cat =  categories.find(
+                      (c) => c.id.toString() === categoryId
+                    );
+                    const subIds= cat?.subcategories?.map((i: any)=> i?.id) || [];
+                    onCategoryChange(categoryId, subIds)
+                  }}
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
                     isActive
                       ? "bg-primary text-white shadow-md shadow-primary/25"
@@ -156,7 +168,52 @@ const ServiceFilter = ({
           </div>
         </div>
       </div>
-
+      {selectedCategory?.subcategories?.length > 0 && (
+        <div className="mt-6 pt-4 border-t border-border">
+          <div className="flex flex-wrap gap-2">
+            {selectedCategory && selectedCategory.subcategories.map((sub: any, index: any) => {
+              const subId = sub.id.toString();
+              const isActive = activeSubCategory == subId;
+              return (
+                <motion.button
+                  key={sub.id}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => onSubCategoryChange(subId)}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? "bg-primary text-white shadow-md shadow-primary/25"
+                      : "bg-background hover:bg-primary/10 text-foreground/70 hover:text-primary border border-border"
+                  }`}
+                >
+                  <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center">
+                    {selectedCategory.icon ? (
+                      <Image
+                        src={selectedCategory.icon}
+                        alt={`${selectedCategory.name} icon`}
+                        width={20}
+                        height={20}
+                        className="w-full h-full object-cover"
+                        unoptimized
+                      />
+                    ) : (
+                      <HiSparkles
+                        className={`w-4 h-4 ${
+                          isActive ? "text-white" : "text-primary"
+                        }`}
+                      />
+                    )}
+                  </div>
+                  <span className="whitespace-nowrap"> {sub.name}</span>
+                </motion.button>
+              );
+            })}
+          </div>
+        </div>
+      )}
       {/* Active Filters Display */}
       {hasActiveFilters && (
         <motion.div

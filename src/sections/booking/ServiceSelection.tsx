@@ -15,9 +15,10 @@ import {
   HiChevronLeft,
   HiChevronRight,
 } from "react-icons/hi2";
-import { useServices, useServiceCategories } from "@/hooks/useApi";
+import { useServices, useServiceCategories, useSettings } from "@/hooks/useApi";
 import { BookingService } from "@/types/booking";
 import Button from "@/components/ui/Button";
+import MobileCartHeader from "./MobileCardHeader";
 
 interface ServiceSelectionProps {
   selectedServices: BookingService[];
@@ -32,7 +33,8 @@ const ServiceSelection = ({
   onNext,
   preSelectedServiceId,
 }: ServiceSelectionProps) => {
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<any[]>([]);
+  const [selectedSubCategories,setSelectedSubCategory]= useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -42,6 +44,7 @@ const ServiceSelection = ({
     ...(selectedCategories.length > 0 &&
       selectedCategories[0] !== "all" && {
         category_id: selectedCategories[0], // API might expect single category
+        subcategory_id:selectedSubCategories
       }),
     ...(searchQuery && { search: searchQuery }),
   };
@@ -51,10 +54,23 @@ const ServiceSelection = ({
   const { data: categoriesData, isLoading: categoriesLoading } =
     useServiceCategories();
 
+    const { data: settingsData, isLoading: settingsLoading } = useSettings();
+    const settings = settingsData?.data || [];
+  
+    // Helper function to get setting value by key
+    const getSetting = (key: string) => {
+      return settings.find((setting) => setting.key === key)?.value || "";
+    };
+  
+
   // Fix: Access nested data structure correctly
   const services = servicesData?.data?.data ?? [];
   const paginationData = servicesData?.data;
   const categories = categoriesData?.data ?? [];
+
+  const selectedCategory = categories.find(
+    (c) => c.id.toString() === selectedCategories[0]
+  ) ;
 
   // Pre-select service if coming from service page
   useEffect(() => {
@@ -74,6 +90,7 @@ const ServiceSelection = ({
           category_id: preSelectedService.category_id.toString(),
           category_name: preSelectedService.category_name,
           description: preSelectedService.description,
+          discount_price:preSelectedService?.discount_price,
           // icon: preSelectedService.icon,
         };
         onServicesChange([...selectedServices, bookingService]);
@@ -81,10 +98,22 @@ const ServiceSelection = ({
     }
   }, [preSelectedServiceId, services, selectedServices, onServicesChange]);
 
-  const toggleCategory = (categoryId: string) => {
+  const toggleCategory = (categoryId: string,subcategories?: any) => {
     setSelectedCategories([categoryId]); // Single category selection for API
+    if (subcategories && subcategories.length > 0) {
+      // Auto-select first subcategory
+      setSelectedSubCategory(subcategories[0]);
+    } else {
+      // Reset subcategory if none exist
+      setSelectedSubCategory(null);
+    }
     setCurrentPage(1); // Reset to first page when changing category
   };
+
+  const toggleSubCategory = (subCatId:string)=>{
+    setSelectedSubCategory(subCatId);
+    setCurrentPage(1);
+  }
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -105,6 +134,7 @@ const ServiceSelection = ({
       category_name: service.category_name,
       description: service.description,
       icon: service.icon,
+discount_price:service?.discount_price
     };
 
     const isSelected = selectedServices.find((s) => s.id === bookingService.id);
@@ -240,7 +270,13 @@ const ServiceSelection = ({
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.3, delay: index * 0.05 }}
-                  onClick={() => toggleCategory(category.id.toString())}
+                  onClick={() => {
+                    const cat =  categories.find(
+                      (c:any) => c.id.toString() == category.id.toString()
+                    );
+                    const subIds= cat?.subcategories?.map((i: any)=> i?.id) || [];
+                    toggleCategory(category.id.toString(),subIds)
+                  }}
                   className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium transition-all duration-300 text-sm ${
                     selectedCategories.includes(category.id.toString())
                       ? "bg-primary text-white shadow-lg"
@@ -263,7 +299,52 @@ const ServiceSelection = ({
                 </motion.button>
               ))}
             </div>
-
+            {selectedCategory?.subcategories?.length > 0 && (
+        <div className="mt-6 pt-4 border-t border-border">
+          <div className="flex flex-wrap gap-2">
+            {selectedCategory  && selectedCategory?.subcategories.map((sub: any, index: any) => {
+              const subId = sub.id.toString();
+              const isActive = selectedSubCategories == subId;
+              return (
+                <motion.button
+                  key={sub.id}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => toggleSubCategory(subId)}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? "bg-primary text-white shadow-md shadow-primary/25"
+                      : "bg-background hover:bg-primary/10 text-foreground/70 hover:text-primary border border-border"
+                  }`}
+                >
+                  <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center">
+                    {selectedCategory?.icon ? (
+                      <Image
+                        src={selectedCategory.icon}
+                        alt={`${selectedCategory.name} icon`}
+                        width={20}
+                        height={20}
+                        className="w-full h-full object-cover"
+                        unoptimized
+                      />
+                    ) : (
+                      <HiSparkles
+                        className={`w-4 h-4 ${
+                          isActive ? "text-white" : "text-primary"
+                        }`}
+                      />
+                    )}
+                  </div>
+                  <span className="whitespace-nowrap"> {sub.name}</span>
+                </motion.button>
+              );
+            })}
+          </div>
+        </div>
+      )}
             {/* Active Filters */}
             {(searchQuery || selectedCategories.length > 0) && (
               <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-border">
@@ -315,11 +396,22 @@ const ServiceSelection = ({
                 transition={{ duration: 0.4 }}
                 className="grid grid-cols-1 md:grid-cols-2 gap-4"
               >
+                {/* cart header */}
+                           <MobileCartHeader
+  totalItems={selectedServices.length}
+  totalPrice={selectedServices.reduce((acc, s) => acc + Number(s.price), 0)}
+  onNext={onNext}
+/>
                 {services.map((service, index) => {
                   const isSelected = selectedServices.find(
                     (s) => s.id === service.id.toString()
                   );
-
+                  const hasDiscount =
+                  service.discount_price
+              
+                const displayPrice = service.price
+                  
+  const originalPrice = parseFloat(service.price);
                   return (
                     <motion.div
                       key={`service-${service.id}-${currentPage}`}
@@ -364,13 +456,38 @@ const ServiceSelection = ({
                             </span>
                           </div>
                           <div className="text-right ml-2">
-                            <p className="text-lg font-bold text-primary">
+                            {/* <p className="text-lg font-bold text-primary">
                               ₹{Number(service.price).toLocaleString()}
-                            </p>
-                            <div className="flex items-center gap-1 text-xs text-foreground/60">
+                            </p> */}
+                            {/* Price Section */}
+<div className="mb-4 flex flex-col">
+ 
+  <div className="flex items-center gap-2 mt-1">
+    {/* Final Price */}
+    <span className="text-xs font-medium text-foreground/70">{getSetting("service_price_start_text")}</span>
+
+    <span className="text-[14px] font-bold text-primary">
+      ₹{displayPrice.toLocaleString()}
+    </span>
+
+    {/* Strike-through original price */}
+    {hasDiscount && (
+      <>
+        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">
+        {/* {Math.round(((originalPrice - displayPrice) / originalPrice) * 100)}% OFF */}
+       { service.discount_price }
+      </span>
+    
+      </>
+    )}
+  </div>
+  <div className="flex items-center gap-1 self-end text-xs text-foreground/60">
                               <HiClock className="w-2 h-2" />
                               {service.duration || "60 min"}
                             </div>
+</div>
+
+                          
                           </div>
                         </div>
 
@@ -542,6 +659,8 @@ const ServiceSelection = ({
             className="bg-accent/50 backdrop-blur-md rounded-3xl p-6 border border-border shadow-xl sticky top-8"
           >
             {/* Header */}
+    
+ 
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-primary/10 rounded-2xl flex items-center justify-center">
                 <HiShoppingBag className="w-5 h-5 text-primary" />
@@ -557,6 +676,7 @@ const ServiceSelection = ({
               </div>
             </div>
 
+           
             {/* Selected Services */}
             {selectedServices.length > 0 ? (
               <div className="space-y-4 mb-6">

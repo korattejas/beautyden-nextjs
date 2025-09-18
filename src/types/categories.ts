@@ -4,6 +4,7 @@ export interface ServiceCategory {
   icon: string | null;
   description: string;
   is_popular: number;
+  subcategories:any;
 }
 
 export interface ServiceCategoriesResponse {

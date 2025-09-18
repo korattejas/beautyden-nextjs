@@ -3,6 +3,7 @@ import AboutMission from "@/sections/about/AboutMission";
 import AboutStats from "@/sections/about/AboutStats";
 import AboutTeam from "@/sections/about/AboutTeam";
 import AboutValues from "@/sections/about/AboutValues";
+import WhyChooseUsSection from "@/sections/home/WhyChooseUsSection";
 
 export default function AboutPage() {
   return (
@@ -10,7 +11,8 @@ export default function AboutPage() {
       <AboutHero />
       <AboutMission />
       <AboutStats />
-      <AboutTeam />
+      {/* <AboutTeam /> */}
+      <WhyChooseUsSection />
       <AboutValues />
     </div>
   );

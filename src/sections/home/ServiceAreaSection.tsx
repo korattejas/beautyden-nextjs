@@ -76,11 +76,13 @@ const ServiceAreaSection = () => {
               viewport={{ once: true }}
               className="font-heading text-4xl md:text-5xl font-bold mb-6"
             >
+               <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold mb-6 leading-snug">
               <span className="text-foreground">We Come</span>
               <br />
               <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 Directly to You
               </span>
+            </h2>
             </motion.h2>
 
             {/* Description */}
@@ -91,10 +93,13 @@ const ServiceAreaSection = () => {
               viewport={{ once: true }}
               className="text-lg text-foreground/70 mb-8 leading-relaxed"
             >
+               <p className="text-base sm:text-lg text-foreground/70 mb-8 leading-relaxed">
               Experience premium beauty services in the comfort of your chosen
               location. Whether you&apos;re at home, office, or celebrating at a
               special venue, our certified professionals bring the salon
               experience directly to you.
+            </p>
+
             </motion.p>
 
             {/* Coverage Details */}
@@ -105,6 +110,7 @@ const ServiceAreaSection = () => {
               viewport={{ once: true }}
               className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8"
             >
+              
               {serviceAreas.map((area, index) => {
                 const IconComponent = area.icon;
                 return (
@@ -114,24 +120,25 @@ const ServiceAreaSection = () => {
                     whileInView={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
                     viewport={{ once: true }}
-                    className="flex items-start gap-3 p-4 bg-white/60 backdrop-blur-md rounded-2xl border border-primary/10 hover:shadow-lg transition-all duration-300"
+                    className="flex items-start gap-3 p-4 bg-white/60 backdrop-blur-md rounded-xl border border-primary/10 hover:shadow-md transition-all duration-300"
                   >
                     <div
-                      className={`w-10 h-10 bg-gradient-to-r ${area.color} rounded-xl flex items-center justify-center flex-shrink-0`}
+                      className={`w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-r ${area.color} rounded-lg flex items-center justify-center flex-shrink-0`}
                     >
                       <IconComponent className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-foreground text-sm mb-1">
+                      <h3 className="font-semibold text-foreground text-sm sm:text-base mb-1">
                         {area.title}
                       </h3>
-                      <p className="text-foreground/60 text-xs leading-relaxed">
+                      <p className="text-foreground/60 text-xs sm:text-sm leading-relaxed">
                         {area.description}
                       </p>
                     </div>
                   </motion.div>
                 );
               })}
+      
             </motion.div>
 
             {/* Service Radius */}
@@ -171,21 +178,23 @@ const ServiceAreaSection = () => {
               viewport={{ once: true }}
               className="flex flex-col sm:flex-row gap-4"
             >
+               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Button
                 href="/book"
-                size="lg"
-                className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                // size="lg"
+                className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 Book Your Service
               </Button>
               <Button
                 href="/contact"
                 variant="outline"
-                size="lg"
-                className="border-2 border-primary/30 text-primary hover:bg-primary/5 px-8 py-4 rounded-full font-semibold transition-all duration-300"
+                size="sm"
+                className="border-2 border-primary/30 text-primary hover:bg-primary/5 px-4 sm:px-6 py-2 sm:py-3 rounded-full font-medium transition-all duration-300"
               >
                 Check Coverage Area
               </Button>
+            </div>
             </motion.div>
           </motion.div>
 

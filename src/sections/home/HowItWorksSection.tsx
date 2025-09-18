@@ -39,44 +39,46 @@ const steps = [
 
 const HowItWorksSection = () => {
   return (
-    <section className="py-16">
+    <section className="py-16 sm:py-20 lg:py-24">
       <Container>
-        <div className="text-center mb-16">
-          <h2 className="font-heading text-4xl md:text-5xl font-bold text-primary mb-4">
+        {/* Section Heading */}
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-4">
             How It Works
           </h2>
-          <p className="text-xl text-foreground/70 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-foreground/70 max-w-2xl mx-auto">
             Book your beauty service in just 4 simple steps and experience
             luxury at your doorstep
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {/* Steps Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
           {steps.map((step, index) => {
             const IconComponent = step.icon;
             return (
               <div key={index} className="relative group">
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 text-center shadow-lg group-hover:shadow-xl transition-all duration-300 border border-primary/10 group-hover:border-primary/20">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 sm:p-8 text-center shadow-lg group-hover:shadow-xl transition-all duration-300 border border-primary/10 group-hover:border-primary/20">
                   {/* Step number */}
-                  <div className="absolute -top-4 left-4 bg-gradient-to-r from-primary to-secondary text-white font-bold text-sm px-3 py-1 rounded-full">
+                  <div className="absolute -top-4 left-4 bg-gradient-to-r from-primary to-secondary text-white font-bold text-xs sm:text-sm px-3 py-1 rounded-full shadow">
                     {step.number}
                   </div>
 
                   {/* Icon */}
                   <div className="flex justify-center mb-4">
-                    <IconComponent className="w-12 h-12 text-primary group-hover:scale-110 transition-transform duration-300" />
+                    <IconComponent className="w-10 h-10 sm:w-12 sm:h-12 text-primary group-hover:scale-110 transition-transform duration-300" />
                   </div>
 
                   {/* Content */}
-                  <h3 className="font-heading text-xl font-semibold text-primary mb-3">
+                  <h3 className="font-heading text-lg sm:text-xl font-semibold text-primary mb-3">
                     {step.title}
                   </h3>
-                  <p className="text-foreground/70 leading-relaxed">
+                  <p className="text-sm sm:text-base text-foreground/70 leading-relaxed">
                     {step.description}
                   </p>
                 </div>
 
-                {/* Connecting line (hidden on mobile) */}
+                {/* Connecting line (desktop only) */}
                 {index < steps.length - 1 && (
                   <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-primary/30 to-secondary/30" />
                 )}
