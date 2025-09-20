@@ -27,14 +27,12 @@ const CitySelectionPopup: React.FC<CitySelectionPopupProps> = ({
 
   // Filter cities based on search term and availability
   const availableCities = cities.filter(
-    (city) =>
+    (city:City) =>
       // !city.launch_quarter && // Only show cities that are available now
       city.name.toLowerCase().includes(searchTerm.toLowerCase()) && city.status == 0
   );
 
-  const popularCities = availableCities.filter(
-    (city) => city.is_popular == 1
-  );
+ 
 
   const handleCitySelect = (city: City) => {
     setSelectedCity(city);

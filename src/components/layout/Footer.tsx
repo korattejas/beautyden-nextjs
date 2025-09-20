@@ -1,14 +1,12 @@
 "use client";
 
 import Container from "@/components/ui/Container";
-import Button from "@/components/ui/Button";
 import { motion } from "framer-motion";
 import {
   HiSparkles,
   HiPhone,
   HiEnvelope,
   HiMapPin,
-  HiClock,
   HiHeart,
   HiArrowRight,
 } from "react-icons/hi2";
@@ -26,7 +24,7 @@ const Footer = () => {
 
   // Helper function to get setting value by key
   const getSetting = (key: string) => {
-    return settings.find((setting) => setting.key === key)?.value || "";
+    return settings.find((setting: any) => setting.key === key)?.value || "";
   };
 
   const quickLinks = [

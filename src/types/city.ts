@@ -7,6 +7,7 @@ export interface City {
   icon: string | null;
   launch_quarter: string | null;
   is_popular: string;
+  status:string | number;
 }
 
 export interface CitiesResponse {

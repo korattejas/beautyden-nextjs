@@ -33,7 +33,9 @@ const contactSchema = yup.object().shape({
   last_name: yup
     .string()
     // .required("Last name is required")
-    .notRequired()
+    // .notRequired()
+    .default(null)
+    .transform((value) => value === undefined ? null : value)
     .nullable()
     // .min(2, "Last name must be at least 2 characters")
     .max(50, "Last name must be less than 50 characters"),
@@ -50,8 +52,10 @@ const contactSchema = yup.object().shape({
   subject: yup
     .string()
     // .required("Subject is required")
-    .notRequired()
+    // .notRequired()
+    .default(null)
     .nullable()
+    .transform((value) => value === undefined ? null : value)
     // .min(5, "Subject must be at least 5 characters")
     .max(100, "Subject must be less than 100 characters"),
   message: yup
@@ -59,6 +63,7 @@ const contactSchema = yup.object().shape({
     .required("Message is required")
     .min(10, "Message must be at least 10 characters")
     .max(500, "Message must be less than 500 characters"),
+    // service_id: yup.string().nullable().notRequired().default(undefined),
 });
 
 const ContactSection = () => {
@@ -80,9 +85,9 @@ const ContactSection = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors , isSubmitting },
     reset,
-  } = useForm<ContactFormData>({
+  } = useForm<ContactFormData | any>({
     resolver: yupResolver(contactSchema),
   });
 
@@ -307,18 +312,18 @@ const ContactSection = () => {
                         {...register("first_name")}
                         type="text"
                         className={`w-full pl-12 pr-4 py-4 bg-background border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 ${
-                          errors.first_name
+                          errors?.first_name
                             ? "border-red-500"
                             : "border-border focus:border-primary"
                         }`}
                         placeholder="John"
                       />
                     </div>
-                    {errors.first_name && (
-                      <p className="text-red-500 text-sm mt-2">
-                        {errors.first_name.message}
-                      </p>
-                    )}
+                    {errors.first_name?.message && (
+  <p className="text-red-500 text-sm mt-2">
+    {errors.first_name.message.toString()}
+  </p>
+)}
                   </div>
 
                   <div>
@@ -338,9 +343,9 @@ const ContactSection = () => {
                         placeholder="Doe"
                       />
                     </div>
-                    {errors.last_name && (
+                    {errors.last_name?.message && (
                       <p className="text-red-500 text-sm mt-2">
-                        {errors.last_name.message}
+                        {errors.last_name.message.toString()}
                       </p>
                     )}
                   </div>
@@ -365,9 +370,9 @@ const ContactSection = () => {
                         placeholder="john@example.com"
                       />
                     </div>
-                    {errors.email && (
+                    {errors.email?.message && (
                       <p className="text-red-500 text-sm mt-2">
-                        {errors.email.message}
+                        {errors.email.message.toString()}
                       </p>
                     )}
                   </div>
@@ -389,9 +394,9 @@ const ContactSection = () => {
                         placeholder="9876543210"
                       />
                     </div>
-                    {errors.phone && (
+                    {errors.phone?.message && (
                       <p className="text-red-500 text-sm mt-2">
-                        {errors.phone.message}
+                        {errors.phone.message.toString()}
                       </p>
                     )}
                   </div>
@@ -444,9 +449,9 @@ const ContactSection = () => {
                       placeholder="How can we help you today?"
                     />
                   </div>
-                  {errors.subject && (
+                  {errors.subject?.message && (
                     <p className="text-red-500 text-sm mt-2">
-                      {errors.subject.message}
+                      {errors.subject.message.toString()}
                     </p>
                   )}
                 </div>
@@ -466,9 +471,9 @@ const ContactSection = () => {
                     }`}
                     placeholder="Tell us more about your beauty goals, preferred services, or any specific requirements..."
                   />
-                  {errors.message && (
+                  {errors.message?.message && (
                     <p className="text-red-500 text-sm mt-2">
-                      {errors.message.message}
+                      {errors.message.message.toString()}
                     </p>
                   )}
                 </div>
