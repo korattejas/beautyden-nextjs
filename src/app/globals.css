@@ -1,18 +1,30 @@
 @import "tailwindcss";
 
 :root {
-  /* Elegant cream & blue/teal palette */
-  --background: #fdfcf8; /* Light cream */
-  --foreground: #2c2a26; /* Rich dark brown */
-  --primary: #1e88e5; /* Your specific teal color */
-  --secondary: #42a5f5; /* Sky blue */
-  --accent: #f0f9ff; /* Light blue accent */
-  --muted: #f1f0ec; /* Soft beige */
-  --success: #059669; /* Green success */
+  /* Elegant black, white & gray palette */
+  --background: #ffffff; /* Pure white background */
+  --foreground: #0f0f0f; /* Deep black text */
+  --primary: #000000; /* Pure black primary */
+  --secondary: #404040; /* Dark gray secondary */
+  --accent: #f8f9fa; /* Very light gray accent */
+  --muted: #f5f5f5; /* Light gray muted */
+  --success: #16a34a; /* Green success */
   --warning: #f59e0b; /* Amber warning */
-  --border: #e7e5e0; /* Light taupe border */
+  --border: #e5e5e5; /* Light gray border */
   --card: #ffffff; /* Pure white for cards */
-  --shadow: rgba(0, 0, 0, 0.08); /* Subtle shadow */
+  --shadow: rgba(0, 0, 0, 0.1); /* Black shadow */
+
+  /* Additional gray shades for flexibility */
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
 }
 
 @theme inline {
@@ -28,7 +40,20 @@
   --color-card: var(--card);
   --font-sans: var(--font-base);
   --font-serif: var(--font-heading);
+
+  /* Gray scale utilities */
+  --color-gray-50: var(--gray-50);
+  --color-gray-100: var(--gray-100);
+  --color-gray-200: var(--gray-200);
+  --color-gray-300: var(--gray-300);
+  --color-gray-400: var(--gray-400);
+  --color-gray-500: var(--gray-500);
+  --color-gray-600: var(--gray-600);
+  --color-gray-700: var(--gray-700);
+  --color-gray-800: var(--gray-800);
+  --color-gray-900: var(--gray-900);
 }
+
 /* Rest of your existing CSS remains the same */
 body {
   background: var(--background);
@@ -39,13 +64,13 @@ body {
   line-height: 1.6;
 }
 
-/* Updated selection color */
+/* Updated selection color to black */
 ::selection {
   background: var(--primary);
   color: white;
 }
 
-/* Updated scrollbar */
+/* Updated scrollbar to black/gray */
 ::-webkit-scrollbar-thumb {
   background: var(--primary);
   border-radius: 3px;
@@ -65,22 +90,25 @@ body {
 }
 
 .animate-shimmer {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(
+    90deg,
+    var(--gray-100) 25%,
+    var(--gray-200) 50%,
+    var(--gray-100) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
 
-/* Policy */
-
-/* Policy Content Styles */
+/* Policy Content Styles - Updated with new color scheme */
 .policy-content {
-  color: #374151;
+  color: var(--gray-700);
   line-height: 1.75;
 }
 
 .policy-content h1,
 .policy-content h2 {
-  color: #1f2937;
+  color: var(--foreground);
   font-weight: 700;
   margin-top: 2rem;
   margin-bottom: 1.5rem;
@@ -88,7 +116,7 @@ body {
 
 .policy-content h1 {
   font-size: 2.25rem;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 2px solid var(--border);
   padding-bottom: 0.75rem;
 }
 
@@ -97,7 +125,7 @@ body {
 }
 
 .policy-content h3 {
-  color: #374151;
+  color: var(--gray-800);
   font-size: 1.5rem;
   font-weight: 600;
   margin-top: 1.75rem;
@@ -105,7 +133,7 @@ body {
 }
 
 .policy-content h4 {
-  color: #4b5563;
+  color: var(--gray-700);
   font-size: 1.25rem;
   font-weight: 600;
   margin-top: 1.5rem;
@@ -114,14 +142,14 @@ body {
 
 .policy-content p {
   margin-bottom: 1.25rem;
-  color: #4b5563;
+  color: var(--gray-600);
 }
 
 .policy-content ul,
 .policy-content ol {
   margin: 1.25rem 0;
   padding-left: 2rem;
-  color: #4b5563;
+  color: var(--gray-600);
 }
 
 .policy-content li {
@@ -130,18 +158,18 @@ body {
 }
 
 .policy-content strong {
-  color: #1f2937;
+  color: var(--foreground);
   font-weight: 600;
 }
 
 .policy-content a {
-  color: #3b82f6;
+  color: var(--gray-800);
   text-decoration: underline;
   font-weight: 500;
 }
 
 .policy-content a:hover {
-  color: #1d4ed8;
+  color: var(--primary);
   text-decoration: none;
 }
 

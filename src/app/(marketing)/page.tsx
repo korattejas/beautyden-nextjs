@@ -6,7 +6,7 @@ import HowItWorksSection from "@/sections/home/HowItWorksSection";
 // import PopularServicesSection from "@/sections/home/PopularServicesSection";
 import ServiceAreaSection from "@/sections/home/ServiceAreaSection";
 import TestimonialsSection from "@/sections/home/TestimonialsSection";
-import WhyChooseUsSection from "@/sections/home/WhyChooseUsSection";
+// import WhyChooseUsSection from "@/sections/home/WhyChooseUsSection";
 import { HiHeart, HiSparkles } from "react-icons/hi";
 // import FeaturedServicesSection from "@/sections/home/FeaturedServicesSection";
 

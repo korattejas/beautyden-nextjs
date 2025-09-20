@@ -58,9 +58,9 @@ const HowItWorksSection = () => {
             const IconComponent = step.icon;
             return (
               <div key={index} className="relative group">
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 sm:p-8 text-center shadow-lg group-hover:shadow-xl transition-all duration-300 border border-primary/10 group-hover:border-primary/20">
+                <div className="bg-white/80 rounded-full backdrop-blur-sm  p-6 sm:p-8 text-center shadow-lg group-hover:shadow-xl transition-all duration-300 border border-primary/10 group-hover:border-primary/20">
                   {/* Step number */}
-                  <div className="absolute -top-4 left-4 bg-gradient-to-r from-primary to-secondary text-white font-bold text-xs sm:text-sm px-3 py-1 rounded-full shadow">
+                  <div className="absolute top-4 left-4 bg-gradient-to-r from-primary to-secondary text-white font-bold text-xs sm:text-sm px-3 py-1 rounded-full shadow">
                     {step.number}
                   </div>
 
@@ -80,7 +80,7 @@ const HowItWorksSection = () => {
 
                 {/* Connecting line (desktop only) */}
                 {index < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-primary/30 to-secondary/30" />
+                  <div className="hidden lg:block absolute top-1/2 -right-8 w-8 h-0.5 bg-gradient-to-r from-primary/30 to-secondary/30" />
                 )}
               </div>
             );

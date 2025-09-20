@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Raleway, Poppins } from "next/font/google";
 import "./globals.css";
 import RootWrapper from "@/components/RootWrapper";
 
-const inter = Inter({
+const poppins = Poppins({
   variable: "--font-base",
   subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
-const playfairDisplay = Playfair_Display({
+const raleway = Raleway({
   variable: "--font-heading",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
@@ -29,9 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${inter.variable} ${playfairDisplay.variable} antialiased`}
-      >
+      <body className={`${poppins.variable} ${raleway.variable} antialiased`}>
         <RootWrapper>{children}</RootWrapper>
       </body>
     </html>

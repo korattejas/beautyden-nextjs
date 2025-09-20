@@ -48,7 +48,7 @@ const ReviewsHero = () => {
       : getCounterValue("experts");
 
   return (
-    <section className="pt-24 pb-16 relative overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10">
+    <section className="pt-24 pb-16 relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute top-0 left-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl" />
       <div className="absolute top-20 right-20 w-40 h-40 bg-secondary/5 rounded-full blur-3xl" />
