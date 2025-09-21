@@ -1,4 +1,3 @@
-import CTASection from "@/components/CTASection";
 import CategoryServices from "@/sections/home/CategoryServices";
 import ComingSoonCities from "@/sections/home/ComingSoonCities";
 import HeroSection from "@/sections/home/HeroSection";
@@ -7,7 +6,8 @@ import HowItWorksSection from "@/sections/home/HowItWorksSection";
 import ServiceAreaSection from "@/sections/home/ServiceAreaSection";
 import TestimonialsSection from "@/sections/home/TestimonialsSection";
 // import WhyChooseUsSection from "@/sections/home/WhyChooseUsSection";
-import { HiHeart, HiSparkles } from "react-icons/hi";
+// import WhyChooseUsSection from "@/sections/home/WhyChooseUsSection";
+
 // import FeaturedServicesSection from "@/sections/home/FeaturedServicesSection";
 
 export default function HomePage() {

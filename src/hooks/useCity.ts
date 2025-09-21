@@ -3,13 +3,13 @@
 // Custom hook for easy access to city functionality
 export const useCity = () => {
   const context = useCityContext();
-  
+
   return {
     selectedCity: context.selectedCity,
     setSelectedCity: context.setSelectedCity,
     showCityPopup: context.showCityPopup,
     setShowCityPopup: context.setShowCityPopup,
-    isFirstVisit: context.isFirstVisit,
+    // isFirstVisit: context.isFirstVisit,
     // Helper methods
     clearCity: () => context.setSelectedCity(null),
     reopenCityPopup: () => context.setShowCityPopup(true),
