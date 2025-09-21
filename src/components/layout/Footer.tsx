@@ -128,27 +128,6 @@ const Footer = () => {
                 </p>
 
                 {/* Social Links */}
-                <div>
-                  <p className="text-white font-medium mb-3">Follow Us</p>
-                  <div className="flex gap-3">
-                    {socialLinks.map((social, index) => {
-                      const IconComponent = social.icon;
-                      return (
-                        <motion.a
-                          key={index}
-                          href={social.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          whileHover={{ scale: 1.1, y: -2 }}
-                          whileTap={{ scale: 0.9 }}
-                          className={`w-10 h-10 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center justify-center text-gray-400 ${social.color} transition-all duration-200 border border-gray-700 hover:border-gray-600`}
-                        >
-                          <IconComponent className="w-4 h-4" />
-                        </motion.a>
-                      );
-                    })}
-                  </div>
-                </div>
               </div>
             </motion.div>
 

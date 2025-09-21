@@ -1,36 +1,124 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { HiBars3, HiXMark } from "react-icons/hi2";
+import {
+  HiBars3,
+  HiXMark,
+  HiMapPin,
+  HiChevronDown,
+  HiSparkles,
+  HiHeart,
+  HiBriefcase,
+  HiInformationCircle,
+  // HiChatBubbleLeftRightEllipsis,
+} from "react-icons/hi2";
 import Image from "next/image";
+import { useCityContext } from "@/contexts/CityContext";
+import { useServiceCategories } from "@/hooks/useApi";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showCityDropdown, setShowCityDropdown] = useState(false);
+  const [showServicesMenu, setShowServicesMenu] = useState(false);
+  const [showAboutMenu, setShowAboutMenu] = useState(false);
   const pathname = usePathname();
 
+  const servicesRef = useRef<HTMLDivElement>(null);
+  const aboutRef = useRef<HTMLDivElement>(null);
+  const cityRef = useRef<HTMLDivElement>(null);
+
+  // City context
+  const { selectedCity, setShowCityPopup } = useCityContext();
+
+  // Fetch service categories
+  const { data: categoriesData } = useServiceCategories();
+  const categories = categoriesData?.data || [];
+  const popularCategories = categories
+    .filter((cat) => cat.is_popular === 1)
+    .slice(0, 6);
+
+  // Navigation structure
   const navItems = [
-    { name: "Home", href: "/" },
-    { name: "Services", href: "/services" },
-    { name: "About", href: "/about" },
-    { name: "Reviews", href: "/reviews" },
-    { name: "Hiring", href: "/hiring" },
-    { name: "Contact", href: "/contact" },
+    {
+      name: "Services",
+      href: "/services",
+      hasMegaMenu: true,
+      type: "services",
+    },
+    {
+      name: "About",
+      href: "/about",
+      hasMegaMenu: true,
+      type: "about",
+    },
+    {
+      name: "Contact",
+      href: "/contact",
+    },
+  ];
+
+  // About menu items
+  const aboutMenuItems = [
+    {
+      name: "About Us",
+      href: "/about",
+      icon: HiInformationCircle,
+      description: "Learn about our mission and values",
+    },
+    {
+      name: "Reviews",
+      href: "/reviews",
+      icon: HiHeart,
+      description: "What our customers say",
+    },
+    {
+      name: "Careers",
+      href: "/hiring",
+      icon: HiBriefcase,
+      description: "Join our team of professionals",
+    },
   ];
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        servicesRef.current &&
+        !servicesRef.current.contains(event.target as Node)
+      ) {
+        setShowServicesMenu(false);
+      }
+      if (
+        aboutRef.current &&
+        !aboutRef.current.contains(event.target as Node)
+      ) {
+        setShowAboutMenu(false);
+      }
+      if (cityRef.current && !cityRef.current.contains(event.target as Node)) {
+        setShowCityDropdown(false);
+      }
+    };
+
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   useEffect(() => {
     setIsOpen(false);
+    setShowServicesMenu(false);
+    setShowAboutMenu(false);
   }, [pathname]);
 
   useEffect(() => {
@@ -44,13 +132,19 @@ const Navigation = () => {
     };
   }, [isOpen]);
 
+  const handleCitySelect = () => {
+    setShowCityPopup(true);
+    setShowCityDropdown(false);
+    setIsOpen(false);
+  };
+
   return (
     <>
       <header
         className={`fixed top-0 w-full z-50 transition-all duration-300 ${
           isScrolled
-            ? "bg-white shadow-sm border-b border-gray-100"
-            : "bg-white"
+            ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-200"
+            : "bg-white border-b border-gray-100"
         }`}
       >
         <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -62,42 +156,235 @@ const Navigation = () => {
                 alt="BeautyDen Logo"
                 height={40}
                 width={140}
-                className="object-contain h-12"
+                className="object-contain h-10"
               />
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-1">
+            <div className="hidden lg:flex items-center space-x-1">
               {navItems.map((item) => {
-                const isActive = pathname === item.href;
+                const isActive =
+                  pathname === item.href ||
+                  (item.type === "about" &&
+                    ["/about", "/reviews", "/hiring"].includes(pathname));
+
+                if (item.hasMegaMenu) {
+                  return (
+                    <div
+                      key={item.name}
+                      ref={item.type === "services" ? servicesRef : aboutRef}
+                      className="relative"
+                    >
+                      <button
+                        onMouseEnter={() => {
+                          if (item.type === "services")
+                            setShowServicesMenu(true);
+                          if (item.type === "about") setShowAboutMenu(true);
+                        }}
+                        onMouseLeave={() => {
+                          if (item.type === "services")
+                            setShowServicesMenu(false);
+                          if (item.type === "about") setShowAboutMenu(false);
+                        }}
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-1 ${
+                          isActive ||
+                          (item.type === "services" && showServicesMenu) ||
+                          (item.type === "about" && showAboutMenu)
+                            ? "text-primary bg-primary/5"
+                            : "text-gray-700 hover:text-primary hover:bg-gray-50"
+                        }`}
+                      >
+                        {item.name}
+                        <HiChevronDown
+                          className={`w-3 h-3 transition-transform duration-200 ${
+                            (item.type === "services" && showServicesMenu) ||
+                            (item.type === "about" && showAboutMenu)
+                              ? "rotate-180"
+                              : ""
+                          }`}
+                        />
+                      </button>
+
+                      {/* Services Mega Menu */}
+                      {item.type === "services" && (
+                        <AnimatePresence>
+                          {showServicesMenu && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 8 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: 8 }}
+                              transition={{ duration: 0.15 }}
+                              onMouseEnter={() => setShowServicesMenu(true)}
+                              onMouseLeave={() => setShowServicesMenu(false)}
+                              className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-[500px] max-w-[500px] bg-white rounded-2xl shadow-xl border border-gray-200 p-6 z-50"
+                            >
+                              <div className="grid grid-cols-3 gap-3">
+                                {popularCategories.map((category) => (
+                                  <Link
+                                    key={category.id}
+                                    href={`/services?category=${category.id}`}
+                                    className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors duration-200"
+                                  >
+                                    {category.icon ? (
+                                      <div className="w-8 h-8 rounded-lg overflow-hidden">
+                                        <Image
+                                          src={category.icon}
+                                          alt={category.name}
+                                          width={32}
+                                          height={32}
+                                          className="w-full h-full object-cover"
+                                          unoptimized
+                                        />
+                                      </div>
+                                    ) : (
+                                      <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                                        <HiSparkles className="w-4 h-4 text-primary" />
+                                      </div>
+                                    )}
+                                    <span className="text-sm font-medium text-gray-900 truncate">
+                                      {category.name}
+                                    </span>
+                                  </Link>
+                                ))}
+                              </div>
+
+                              <div className="mt-4 pt-4 border-t border-gray-100">
+                                <Link
+                                  href="/services"
+                                  className="flex items-center justify-center gap-2 text-primary hover:bg-primary/5 px-4 py-2 rounded-lg font-medium text-sm transition-colors duration-200"
+                                >
+                                  <HiSparkles className="w-4 h-4" />
+                                  View All Services
+                                </Link>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      )}
+
+                      {/* About Mega Menu */}
+                      {item.type === "about" && (
+                        <AnimatePresence>
+                          {showAboutMenu && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 8 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: 8 }}
+                              transition={{ duration: 0.15 }}
+                              onMouseEnter={() => setShowAboutMenu(true)}
+                              onMouseLeave={() => setShowAboutMenu(false)}
+                              className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-200 p-6 z-50"
+                            >
+                              <div className="space-y-2">
+                                {aboutMenuItems.map((menuItem) => {
+                                  const IconComponent = menuItem.icon;
+                                  return (
+                                    <Link
+                                      key={menuItem.name}
+                                      href={menuItem.href}
+                                      className="flex items-start gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors duration-200"
+                                    >
+                                      <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mt-0.5">
+                                        <IconComponent className="w-4 h-4 text-primary" />
+                                      </div>
+                                      <div>
+                                        <div className="font-medium text-gray-900 text-sm">
+                                          {menuItem.name}
+                                        </div>
+                                        <div className="text-xs text-gray-500 mt-0.5">
+                                          {menuItem.description}
+                                        </div>
+                                      </div>
+                                    </Link>
+                                  );
+                                })}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      )}
+                    </div>
+                  );
+                }
+
                 return (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
                       isActive
                         ? "text-primary bg-primary/5"
                         : "text-gray-700 hover:text-primary hover:bg-gray-50"
                     }`}
                   >
                     {item.name}
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeTab"
-                        className="absolute inset-0 bg-primary/5 rounded-lg border border-primary/20"
-                        transition={{ type: "spring", duration: 0.6 }}
-                      />
-                    )}
                   </Link>
                 );
               })}
             </div>
 
-            {/* Book Now Button */}
-            <div className="hidden md:flex items-center">
+            {/* Desktop Right Section */}
+            <div className="hidden md:flex items-center gap-3">
+              {/* City Selector */}
+              <div ref={cityRef} className="relative">
+                <button
+                  onClick={() => setShowCityDropdown(!showCityDropdown)}
+                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors duration-200"
+                >
+                  <HiMapPin className="w-4 h-4 text-primary" />
+                  <span className="max-w-20 truncate">
+                    {selectedCity ? selectedCity.name : "City"}
+                  </span>
+                  <HiChevronDown className="w-3 h-3" />
+                </button>
+
+                {/* City Dropdown */}
+                <AnimatePresence>
+                  {showCityDropdown && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 8 }}
+                      className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200 py-3 z-50"
+                    >
+                      {selectedCity ? (
+                        <>
+                          <div className="px-4 py-2 border-b border-gray-100">
+                            <div className="font-medium text-gray-900 text-sm">
+                              {selectedCity.name}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {selectedCity.area && `${selectedCity.area}, `}
+                              {selectedCity.state}
+                            </div>
+                          </div>
+                          <button
+                            onClick={handleCitySelect}
+                            className="w-full px-4 py-2 text-sm text-left text-primary hover:bg-gray-50 transition-colors duration-200"
+                          >
+                            Change City
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          onClick={handleCitySelect}
+                          className="w-full px-4 py-3 text-sm text-left hover:bg-gray-50 transition-colors duration-200"
+                        >
+                          <div className="font-medium">Select Your City</div>
+                          <div className="text-xs text-gray-500">
+                            Get personalized services
+                          </div>
+                        </button>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Book Now Button */}
               <Link
                 href="/book"
-                className="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-lg font-medium text-sm transition-colors duration-200"
+                className="bg-primary hover:bg-primary/90 text-white px-5 py-2 rounded-lg font-medium text-sm transition-colors duration-200"
               >
                 Book Now
               </Link>
@@ -109,9 +396,9 @@ const Navigation = () => {
               className="md:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200"
             >
               {isOpen ? (
-                <HiXMark className="w-6 h-6" />
+                <HiXMark className="w-5 h-5" />
               ) : (
-                <HiBars3 className="w-6 h-6" />
+                <HiBars3 className="w-5 h-5" />
               )}
             </button>
           </div>
@@ -122,7 +409,6 @@ const Navigation = () => {
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -131,17 +417,34 @@ const Navigation = () => {
               onClick={() => setIsOpen(false)}
             />
 
-            {/* Mobile Menu Panel */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.2 }}
-              className="fixed top-16 left-4 right-4 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 md:hidden"
+              className="fixed top-16 left-4 right-4 bg-white rounded-xl shadow-xl border border-gray-200 z-50 md:hidden"
             >
-              <div className="py-4">
+              <div className="p-4">
+                {/* City Selector - Mobile */}
+                <button
+                  onClick={handleCitySelect}
+                  className="w-full flex items-center gap-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200 mb-4"
+                >
+                  <HiMapPin className="w-5 h-5 text-primary" />
+                  <div className="flex-1 text-left">
+                    <div className="font-medium text-sm">
+                      {selectedCity ? selectedCity.name : "Select Your City"}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {selectedCity
+                        ? `${selectedCity.state}`
+                        : "Get personalized services"}
+                    </div>
+                  </div>
+                </button>
+
                 {/* Navigation Items */}
-                <div className="px-4 space-y-1">
+                <div className="space-y-1">
                   {navItems.map((item) => {
                     const isActive = pathname === item.href;
                     return (
@@ -149,9 +452,9 @@ const Navigation = () => {
                         key={item.name}
                         href={item.href}
                         onClick={() => setIsOpen(false)}
-                        className={`flex items-center px-4 py-3 text-base font-medium rounded-xl transition-colors duration-200 ${
+                        className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
                           isActive
-                            ? "text-primary bg-primary/5 border border-primary/20"
+                            ? "text-primary bg-primary/5"
                             : "text-gray-700 hover:text-primary hover:bg-gray-50"
                         }`}
                       >
@@ -159,14 +462,28 @@ const Navigation = () => {
                       </Link>
                     );
                   })}
+
+                  {/* Mobile About Submenu */}
+                  <div className="ml-4 space-y-1 border-l border-gray-200 pl-4">
+                    {aboutMenuItems.map((menuItem) => (
+                      <Link
+                        key={menuItem.name}
+                        href={menuItem.href}
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors duration-200"
+                      >
+                        {menuItem.name}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Mobile CTA */}
-                <div className="px-4 mt-4 pt-4 border-t border-gray-100">
+                <div className="mt-4 pt-4 border-t border-gray-100">
                   <Link
                     href="/book"
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center justify-center bg-primary hover:bg-primary/90 text-white px-4 py-3 rounded-xl font-medium text-base transition-colors duration-200"
+                    className="flex items-center justify-center bg-primary hover:bg-primary/90 text-white px-4 py-2.5 rounded-lg font-medium text-sm transition-colors duration-200"
                   >
                     Book Now
                   </Link>

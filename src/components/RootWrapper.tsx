@@ -2,9 +2,11 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import { CityProvider, useCityContext } from "@/contexts/CityContext";
 import CitySelectionPopup from "@/components/ui/CitySelectionPopup";
+import SplashScreen from "@/components/SplashScreen";
 import { City } from "@/types/city";
 
 interface RootWrapperProps {
@@ -13,11 +15,7 @@ interface RootWrapperProps {
 
 // Inner component that uses the city context
 const RootWrapperInner = ({ children }: { children: ReactNode }) => {
-  const {
-    showCityPopup,
-    setShowCityPopup,
-      setSelectedCity,
-  } = useCityContext();
+  const { showCityPopup, setShowCityPopup, setSelectedCity } = useCityContext();
 
   const handleCitySelect = (city: City) => {
     setSelectedCity(city);
@@ -46,57 +44,53 @@ const RootWrapperInner = ({ children }: { children: ReactNode }) => {
 
 export default function RootWrapper({ children }: RootWrapperProps) {
   const [queryClient] = useState(() => new QueryClient());
+  const [showSplash, setShowSplash] = useState(true);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load WhatsApp widget script
-  // useEffect(() => {
-  //   const scriptId = "aisensy-wa-widget";
+  // Splash screen logic
+  useEffect(() => {
+    // Check if user has already seen splash screen in this session
+    const hasSeenSplash = sessionStorage.getItem("beautyden_has_seen_splash");
 
-  //   // Check if script is already loaded
-  //   if (!document.getElementById(scriptId)) {
-  //     const script = document.createElement("script");
-  //     script.id = scriptId;
-  //     script.type = "text/javascript";
-  //     script.src =
-  //       "https://d3mkw6s8thqya7.cloudfront.net/integration-plugin.js";
-  //     script.setAttribute("widget-id", "aaa45p");
-  //     script.async = true;
+    if (hasSeenSplash) {
+      setShowSplash(false);
+      setIsLoaded(true);
+    } else {
+      // Minimum splash time of 2.5 seconds
+      const minTime = setTimeout(() => {
+        setIsLoaded(true);
+      }, 2500);
 
-  //     // Append to body
-  //     document.body.appendChild(script);
+      return () => clearTimeout(minTime);
+    }
+  }, []);
 
-  //     // Optional: Add error handling
-  //     script.onerror = () => {
-  //       console.error("Failed to load WhatsApp widget script");
-  //     };
-
-  //     script.onload = () => {
-  //       console.log("WhatsApp widget script loaded successfully");
-  //     };
-  //   }
-
-  //   // Cleanup function (optional)
-  //   return () => {
-  //     const existingScript = document.getElementById(scriptId);
-  //     if (existingScript) {
-  //       // Only remove if needed (usually not required for persistent widgets)
-  //       // existingScript.remove();
-  //     }
-  //   };
-  // }, []);
+  const handleSplashComplete = () => {
+    setShowSplash(false);
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("beautyden_has_seen_splash", "true");
+    }
+  };
 
   return (
     <div className="">
-      {/* Add third-party providers here like:
-          - React Query
-          - Auth providers
-          - Theme providers
-          - Analytics
-      */}
       <QueryClientProvider client={queryClient}>
         <CityProvider>
-          <RootWrapperInner>
-            {children}
-          </RootWrapperInner>
+          {/* Splash Screen */}
+          <AnimatePresence mode="wait">
+            {showSplash && isLoaded && (
+              <SplashScreen key="splash" onComplete={handleSplashComplete} />
+            )}
+          </AnimatePresence>
+
+          {/* Main Content */}
+          <AnimatePresence mode="wait">
+            {!showSplash && (
+              <div key="content">
+                <RootWrapperInner>{children}</RootWrapperInner>
+              </div>
+            )}
+          </AnimatePresence>
         </CityProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
