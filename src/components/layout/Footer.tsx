@@ -307,7 +307,7 @@ const Footer = () => {
           className="relative border-t border-gray-800 py-6"
         >
           <div className="flex flex-col lg:flex-row justify-between items-center gap-4 text-gray-400 text-sm">
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col lg:flex-row items-center gap-4">
               <span>© {currentYear} BeautyDen. All rights reserved.</span>
               <div className="flex items-center gap-2">
                 <span>Made with</span>

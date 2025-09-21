@@ -22,7 +22,7 @@ export default function HomePage() {
       <ServiceAreaSection />
       <ComingSoonCities />
 
-      <CTASection
+      {/* <CTASection
         variant="gradient"
         title="Join Our Beauty Community"
         subtitle="Start Your Journey"
@@ -47,7 +47,7 @@ export default function HomePage() {
           "Satisfaction Guaranteed",
         ]}
         className="bg-white"
-      />
+      /> */}
       {/* <FeaturedServicesSection /> */}
     </>
   );
