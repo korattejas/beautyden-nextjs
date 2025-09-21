@@ -91,7 +91,7 @@ const CategoryShowcase = () => {
               <Link href={`/services?category=${category.id}`}>
                 {/* Large Circular Image */}
                 <div className="relative mb-6">
-                  <div className="w-32 h-32 md:w-40 md:h-40 mx-auto rounded-full overflow-hidden bg-gray-100 shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                  <div className="w-32 h-32 md:w-40 md:h-40 mx-auto rounded-3xl overflow-hidden bg-gray-100 shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
                     {category.icon ? (
                       <Image
                         src={category.icon}

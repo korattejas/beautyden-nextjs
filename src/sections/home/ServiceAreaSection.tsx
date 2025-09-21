@@ -5,6 +5,7 @@ import Button from "@/components/ui/Button";
 import { motion } from "framer-motion";
 import { HiMapPin, HiHome, HiSparkles, HiClock } from "react-icons/hi2";
 import Image from "next/image";
+import { useSettings } from "@/hooks/useApi";
 
 const serviceAreas = [
   {
@@ -29,7 +30,26 @@ const serviceAreas = [
   },
 ];
 
+// Fallback image
+const fallbackImage =
+  "https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+
 const ServiceAreaSection = () => {
+  const { data: settingsData } = useSettings();
+
+  // Get first hero image
+  const getHeroImage = () => {
+    const slides = settingsData?.homePageSlides;
+
+    if (slides && Array.isArray(slides) && slides.length > 0) {
+      return slides[0].image;
+    }
+
+    return fallbackImage;
+  };
+
+  const heroImage = getHeroImage();
+
   return (
     <section className="py-16 md:py-24 bg-white">
       <Container>
@@ -104,7 +124,7 @@ const ServiceAreaSection = () => {
               className="flex flex-col sm:flex-row gap-4"
             >
               <Button
-                href="/book"
+                href="/services"
                 className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105"
               >
                 Book Service Now
@@ -120,7 +140,7 @@ const ServiceAreaSection = () => {
             </motion.div>
           </motion.div>
 
-          {/* Right Side - Image */}
+          {/* Right Side - Image with rounded-3xl */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -128,16 +148,17 @@ const ServiceAreaSection = () => {
             viewport={{ once: true }}
             className="relative flex justify-center lg:justify-end"
           >
-            {/* Main Circular Image */}
+            {/* Main Image with rounded-3xl */}
             <div className="relative">
-              <div className="w-80 h-80 md:w-96 md:h-96 rounded-full overflow-hidden shadow-xl border-4 border-white">
+              <div className="w-80 h-80 md:w-96 md:h-96 rounded-3xl overflow-hidden shadow-xl border-4 border-white">
                 <Image
-                  src="https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                  src={heroImage}
                   alt="Professional beauty service"
                   width={400}
                   height={400}
                   className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                   priority
+                  unoptimized
                 />
               </div>
 

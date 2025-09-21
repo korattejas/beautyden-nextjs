@@ -14,6 +14,8 @@ export interface SettingsResponse {
   status: boolean;
   message: string;
   data: Setting[];
+  homePageSlides: any;
+  homePageSlidesContent: any;
 }
 
 export const getSettings = async (): Promise<SettingsResponse> => {
