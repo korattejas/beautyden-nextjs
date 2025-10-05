@@ -347,3 +347,4 @@ If a downloadable file is needed as an actual artifact, share a preferred delive
 <div style="text-align: center">⁂</div>
 
 [^1]: https://laravel.beautyden.in/api/Test/V1/cities
+#okay
