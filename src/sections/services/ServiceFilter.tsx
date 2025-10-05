@@ -87,7 +87,7 @@ const ServiceFilter = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="bg-card backdrop-blur-md rounded-3xl p-6 shadow-lg border border-border mb-8"
+      className="bg-card backdrop-blur-md rounded-3xl p-6 shadow-lg border border-border mb-8 overflow-x-hidden"
     >
       {/* <div className="grid grid-cols-1 lg:grid-cols-4 gap-6"> */}
       <div className="flex flex-col gap-6">
@@ -106,6 +106,7 @@ const ServiceFilter = ({
               <button
                 onClick={() => onSearchChange("")}
                 className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40 hover:text-primary transition-colors"
+                style={{ cursor: "pointer" }}
               >
                 <HiXMark className="w-full h-full" />
               </button>
@@ -115,7 +116,7 @@ const ServiceFilter = ({
 
         {/* Category Filter */}
         <div className="lg:col-span-2">
-          <div className="flex flex-wrap gap-2">
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide px-2 pb-1 sm:flex-wrap sm:overflow-visible sm:px-0">
             {categories.map((category, index) => {
               const categoryId = category.id.toString();
               const isActive = activeCategory === categoryId;
@@ -135,28 +136,26 @@ const ServiceFilter = ({
                     const subIds= cat?.subcategories?.map((i: any)=> i?.id) || [];
                     onCategoryChange(categoryId, subIds)
                   }}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                  className={`shrink-0 flex items-center gap-3 px-6 py-4 rounded-full text-base font-medium transition-all duration-200 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 ${
                     isActive
-                      ? "bg-primary text-white shadow-md shadow-primary/25"
-                      : "bg-background hover:bg-primary/10 text-foreground/70 hover:text-primary border border-border"
+                      ? "bg-primary text-white shadow-md shadow-primary/25 border border-primary/20"
+                      : "bg-background hover:bg-primary/10 text-foreground/80 hover:text-primary border border-border hover:shadow"
                   }`}
                 >
                   {/* Category Icon */}
-                  <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center">
+                  <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center">
                     {category.icon ? (
                       <Image
                         src={category.icon}
                         alt={`${category.name} icon`}
-                        width={20}
-                        height={20}
+                        width={24}
+                        height={24}
                         className="w-full h-full object-cover"
                         unoptimized
                       />
                     ) : (
                       <HiSparkles
-                        className={`w-4 h-4 ${
-                          isActive ? "text-white" : "text-primary"
-                        }`}
+                        className={`w-5 h-5 ${isActive ? "text-white" : "text-primary"}`}
                       />
                     )}
                   </div>
@@ -170,7 +169,10 @@ const ServiceFilter = ({
       </div>
       {selectedCategory?.subcategories?.length > 0 && (
         <div className="mt-6 pt-4 border-t border-border">
-          <div className="flex flex-wrap gap-2">
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-sm font-semibold text-foreground/80">Subcategories</div>
+          </div>
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide px-2 pb-1 sm:flex-wrap sm:overflow-visible sm:px-0">
             {selectedCategory && selectedCategory.subcategories.map((sub: any, index: any) => {
               const subId = sub.id.toString();
               const isActive = activeSubCategory == subId;
@@ -183,27 +185,25 @@ const ServiceFilter = ({
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => onSubCategoryChange(subId)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                  className={`shrink-0 flex items-center gap-3 px-6 py-4 rounded-full text-base font-medium transition-all duration-200 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 ${
                     isActive
-                      ? "bg-primary text-white shadow-md shadow-primary/25"
-                      : "bg-background hover:bg-primary/10 text-foreground/70 hover:text-primary border border-border"
+                      ? "bg-primary text-white shadow-md shadow-primary/25 border border-primary/20"
+                      : "bg-background hover:bg-primary/10 text-foreground/80 hover:text-primary border border-border hover:shadow"
                   }`}
                 >
-                  <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center">
-                    {selectedCategory.icon ? (
+                  <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center">
+                    {sub.icon ? (
                       <Image
-                        src={selectedCategory.icon}
-                        alt={`${selectedCategory.name} icon`}
-                        width={20}
-                        height={20}
+                        src={sub.icon}
+                        alt={`${sub.name} icon`}
+                        width={24}
+                        height={24}
                         className="w-full h-full object-cover"
                         unoptimized
                       />
                     ) : (
                       <HiSparkles
-                        className={`w-4 h-4 ${
-                          isActive ? "text-white" : "text-primary"
-                        }`}
+                        className={`w-5 h-5 ${isActive ? "text-white" : "text-primary"}`}
                       />
                     )}
                   </div>

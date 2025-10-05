@@ -21,6 +21,7 @@ export const endpoints = {
   // Bookings
   BOOKINGS: "/V1/bookings",
   CREATE_BOOKING: "/V1/bookings/create",
+  BOOK_APPOINTMENT: "/V1/bookAppointment",
 
   // Reviews
   REVIEWS: "/V1/reviews",
@@ -42,4 +43,7 @@ export const endpoints = {
   POLICIES: "/V1/policies",
 
   SETTINGS: "/V1/settings",
+  
+  // Product Brands
+  PRODUCT_BRANDS: "/V1/productBrand",
 } as const;

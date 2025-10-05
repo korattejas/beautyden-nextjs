@@ -4,6 +4,7 @@ import {
   getServices,
   getServiceById,
   ServicesFilters,
+  ServicesResponse,
 } from "@/services/services.service";
 import { getServiceCategories } from "@/services/categories.service";
 import { getReviews } from "@/services/reviews.service";
@@ -20,12 +21,13 @@ import { getPolicies } from "@/services/policy.service";
 import { PolicyType } from "@/types/policy";
 import { getSettings } from "@/services/settings.service";
 import { getHomeCounters } from "@/services/homeCounter.service";
+import { getProductBrands } from "@/services/productBrand.service";
 import { useCityContext } from "../contexts/CityContext";
 
 // Services hooks
 export const useServices = (filters: ServicesFilters = {}) => {
   const { selectedCity } = useCityContext(); // ✅ get city from context
-  return useQuery({
+  return useQuery<ServicesResponse, Error, ServicesResponse, (string | { city_id: string | undefined; search?: string; category_id?: string; subcategory_id?: string | null; page?: number; })[]>({
     // queryKey: ["services", filters],
     // queryFn: () => getServices(filters),
 
@@ -33,7 +35,10 @@ export const useServices = (filters: ServicesFilters = {}) => {
     queryKey: ["services", { ...filters, city_id: selectedCity?.id }], // ✅ include in key
     queryFn: () => getServices({ ...filters, city_id: selectedCity?.id }), // ✅ include in query
     staleTime: 5 * 60 * 1000, // 5 minutes
-    // keepPreviousData: true,
+    placeholderData: (prev) => prev as ServicesResponse,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
   });
 };
 
@@ -125,6 +130,14 @@ export const useHomeCounters = () => {
   return useQuery({
     queryKey: ["homeCounters"],
     queryFn: getHomeCounters,
+    staleTime: 60 * 60 * 1000, // 1 hour
+  });
+};
+
+export const useProductBrands = () => {
+  return useQuery({
+    queryKey: ["productBrands"],
+    queryFn: getProductBrands,
     staleTime: 60 * 60 * 1000, // 1 hour
   });
 };

@@ -217,7 +217,7 @@ const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
             </motion.span>
           )}
 
-          {filters.with_photos === "1" && (
+          {/* {filters.with_photos === "1" && (
             <motion.span
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -249,7 +249,7 @@ const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
                 <HiXMark className="w-3 h-3" />
               </button>
             </motion.span>
-          )}
+          )} */}
 
           <motion.button
             initial={{ opacity: 0, scale: 0.8 }}

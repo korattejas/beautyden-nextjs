@@ -3,23 +3,55 @@
 import Container from "@/components/ui/Container";
 import { motion } from "framer-motion";
 import { HiStar, HiArrowLeft, HiArrowRight } from "react-icons/hi2";
-import { FaFacebook, FaInstagram, FaTwitter, FaLinkedin } from "react-icons/fa";
+import { FaFacebook, FaInstagram, FaTwitter, FaWhatsapp, FaYoutube } from "react-icons/fa";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import type { Swiper as SwiperType } from "swiper";
 import "swiper/css";
 import "swiper/css/navigation";
-import { useReviews } from "@/hooks/useApi";
+import { useReviews, useSettings } from "@/hooks/useApi";
 import { Review } from "@/types/reviews";
 
 const TestimonialsSection = () => {
-  const { data: reviewsData, isLoading, error } = useReviews({ page: 1 });
+  const [currentPage, setCurrentPage] = useState(1);
+  const { data: reviewsData, isLoading, error } = useReviews({ page: currentPage });
+  const { data: settingsData } = useSettings();
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [hasLoadedMore, setHasLoadedMore] = useState(false);
+
+  // Reset hasLoadedMore when new data arrives
+  useEffect(() => {
+    if (reviewsData?.data?.data) {
+      setHasLoadedMore(false);
+    }
+  }, [reviewsData?.data?.data]);
 
   const reviews: Review[] = reviewsData?.data?.data || [];
+
+  const getSetting = (key: string): string | undefined => {
+    return settingsData?.data?.find((s) => s.key === key)?.value;
+  };
+
+  const normalizeUrl = (url?: string): string | undefined => {
+    if (!url) return undefined;
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    return `https://${url}`;
+  };
+
+  const ratingFromSettings = getSetting("rating");
+  const ratingDisplay = (() => {
+    const parsed = parseFloat(ratingFromSettings || "");
+    if (isNaN(parsed)) return "4.5";
+    return parsed.toFixed(1);
+  })();
+
+  const facebookUrl = normalizeUrl(getSetting("facebook_id"));
+  const instagramUrl = normalizeUrl(getSetting("instagram_id"));
+  const whatsappUrl = getSetting("whatsapp_phone_number");
+  const youtubeUrl = normalizeUrl(getSetting("youtub_id"));
 
   const getInitials = (name: string): string => {
     if (!name) return "UN";
@@ -80,12 +112,30 @@ const TestimonialsSection = () => {
       (review) =>
         review.review && review.rating && parseFloat(review.rating) >= 4
     )
-    .slice(0, 8);
+    // .slice(0, 8);
 
   const totalSlides = Math.ceil(testimonialReviews.length / 2);
 
+  // Handle pagination when reaching the end of current reviews
+  const handleSlideChange = (swiper: SwiperType) => {
+    setActiveIndex(swiper.activeIndex);
+    
+    // Check if we're near the end and need to load more reviews
+    const currentReviews = testimonialReviews.length;
+    const currentSlide = swiper.activeIndex;
+    const slidesPerView = 2; // Fixed slides per view for desktop
+    const threshold = Math.max(0, currentReviews - slidesPerView * 2);
+    
+    if (currentSlide >= threshold && !hasLoadedMore && reviewsData?.data?.next_page_url) {
+      setCurrentPage(prev => prev + 1);
+      setHasLoadedMore(true);
+    }
+  };
+
+  console.log("testimonialReviews--->",testimonialReviews)
+
   return (
-    <section className="py-12 sm:py-16 lg:py-20 bg-white">
+    <section className="py-12 sm:py-16 lg:py-20 bg-white overflow-x-hidden">
       <Container>
         <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-start">
           {/* Left Side - Stats & Social */}
@@ -105,7 +155,7 @@ const TestimonialsSection = () => {
                 <div className="flex items-center gap-1 sm:gap-2">
                   <HiStar className="w-8 h-8 sm:w-10 sm:h-10 text-orange-400 fill-current" />
                   <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900">
-                    4.5
+                    {ratingDisplay}
                   </span>
                 </div>
               </div>
@@ -121,28 +171,36 @@ const TestimonialsSection = () => {
                 </h3>
                 <div className="flex items-center gap-2 sm:gap-3">
                   <a
-                    href="#"
+                    href={facebookUrl || "#"}
+                    target={facebookUrl ? "_blank" : undefined}
+                    rel={facebookUrl ? "noopener noreferrer" : undefined}
                     className="w-8 h-8 sm:w-9 sm:h-9 bg-gray-100 hover:bg-primary hover:text-white rounded-lg flex items-center justify-center transition-all duration-300"
                   >
                     <FaFacebook className="w-3 h-3 sm:w-4 sm:h-4" />
                   </a>
                   <a
-                    href="#"
+                    href={instagramUrl || "#"}
+                    target={instagramUrl ? "_blank" : undefined}
+                    rel={instagramUrl ? "noopener noreferrer" : undefined}
                     className="w-8 h-8 sm:w-9 sm:h-9 bg-gray-100 hover:bg-primary hover:text-white rounded-lg flex items-center justify-center transition-all duration-300"
                   >
                     <FaInstagram className="w-3 h-3 sm:w-4 sm:h-4" />
                   </a>
                   <a
-                    href="#"
+                  href={`https://wa.me/${whatsappUrl}?text=Hi%20BeautyDen!%20I%20want%20services%20in%20my%20city.`}
+                    target={whatsappUrl ? "_blank" : undefined}
+                    rel={whatsappUrl ? "noopener noreferrer" : undefined}
                     className="w-8 h-8 sm:w-9 sm:h-9 bg-gray-100 hover:bg-primary hover:text-white rounded-lg flex items-center justify-center transition-all duration-300"
                   >
-                    <FaTwitter className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <FaWhatsapp className="w-3 h-3 sm:w-4 sm:h-4" />
                   </a>
                   <a
-                    href="#"
+                    href={youtubeUrl || "#"}
+                    target={youtubeUrl ? "_blank" : undefined}
+                    rel={youtubeUrl ? "noopener noreferrer" : undefined}
                     className="w-8 h-8 sm:w-9 sm:h-9 bg-gray-100 hover:bg-primary hover:text-white rounded-lg flex items-center justify-center transition-all duration-300"
                   >
-                    <FaLinkedin className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <FaYoutube className="w-3 h-3 sm:w-4 sm:h-4" />
                   </a>
                 </div>
               </div>
@@ -158,7 +216,7 @@ const TestimonialsSection = () => {
           </div>
 
           {/* Right Side - Reviews Carousel */}
-          <div className="w-full lg:col-span-8 relative">
+          <div className="w-full lg:col-span-8 relative overflow-hidden lg:overflow-visible">
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -171,31 +229,32 @@ const TestimonialsSection = () => {
                 <div className="flex items-center gap-2 sm:gap-3">
                   <button
                     onClick={() => swiperInstance?.slidePrev()}
-                    className="w-8 h-8 sm:w-10 sm:h-10 bg-pink-100 hover:bg-pink-200 rounded-full flex items-center justify-center transition-colors duration-300"
+                    className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 hover:bg-primary hover:text-white rounded-full flex items-center justify-center transition-colors duration-300"
                     disabled={!swiperInstance}
                   >
-                    <HiArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-pink-600" />
+                    <HiArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                   <button
                     onClick={() => swiperInstance?.slideNext()}
-                    className="w-8 h-8 sm:w-10 sm:h-10 bg-pink-100 hover:bg-pink-200 rounded-full flex items-center justify-center transition-colors duration-300"
+                    className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 hover:bg-primary hover:text-white rounded-full flex items-center justify-center transition-colors duration-300"
                     disabled={!swiperInstance}
                   >
-                    <HiArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-pink-600" />
+                    <HiArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                 </div>
               </div>
 
               <Swiper
                 modules={[Navigation, Autoplay]}
+                autoHeight={false} 
                 onSwiper={setSwiperInstance}
-                onSlideChange={(swiper) => setActiveIndex(swiper.activeIndex)}
+                onSlideChange={handleSlideChange}
                 autoplay={{
                   delay: 4000,
                   disableOnInteraction: false,
                   pauseOnMouseEnter: true,
                 }}
-                loop
+                loop={false}
                 spaceBetween={12}
                 slidesPerView={1}
                 breakpoints={{
@@ -220,17 +279,17 @@ const TestimonialsSection = () => {
                     spaceBetween: 20,
                   },
                 }}
-                className="reviews-swiper"
+                className="reviews-swiper !px-2 sm:!px-0"
                 style={{ paddingBottom: "10px" }}
               >
                 {testimonialReviews.map((review, index) => (
-                  <SwiperSlide key={review.id} className="h-auto">
+                  <SwiperSlide key={review.id} className="flex">
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.6, delay: index * 0.1 }}
                       viewport={{ once: true }}
-                      className="bg-white rounded-xl p-4 sm:p-5 shadow-md border border-gray-100 h-full min-h-[200px] sm:min-h-[220px] lg:min-h-[250px] flex flex-col"
+                      className="bg-white rounded-xl p-4 sm:p-5 shadow-md border border-gray-100 flex flex-col flex-1 h-[240px] sm:h-[260px] lg:h-[280px]"
                     >
                       {/* Customer Profile */}
                       <div className="flex items-start gap-2 sm:gap-3 mb-3 sm:mb-4">

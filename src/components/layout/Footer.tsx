@@ -31,7 +31,7 @@ const Footer = () => {
     { name: "Home", href: "/" },
     { name: "About Us", href: "/about" },
     { name: "Services", href: "/services" },
-    { name: "Booking", href: "/booking" },
+    { name: "Booking", href: "/book" },
   ];
 
   const supportLinks = [
@@ -116,7 +116,7 @@ const Footer = () => {
                     src="/logo.png"
                     alt="BeautyDen Logo"
                     height={50}
-                    width={200}
+                    width={120}
                     className="object-contain h-12 invert"
                   />
                 </div>
@@ -141,17 +141,20 @@ const Footer = () => {
             >
               <h3 className="font-bold text-white text-xl mb-6 relative">
                 Quick Links
-                <div className="absolute -bottom-1 left-0 w-8 h-0.5 bg-white rounded-full" />
+                {/* <div className="absolute -bottom-1 left-0 w-8 h-0.5 bg-white rounded-full" /> */}
               </h3>
               <ul className="space-y-3">
                 {quickLinks.map((link, index) => (
                   <li key={index}>
                     <Link
                       href={link.href}
-                      className="text-gray-300 hover:text-white transition-colors duration-200 flex items-center gap-2 group"
+                      className="text-gray-300 hover:text-white transition-colors duration-200 flex items-center gap-2 group relative"
                     >
-                      <HiArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                      {link.name}
+                      {/* <HiArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200" /> */}
+                      <span className="relative">
+                        {link.name}
+                        <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
+                      </span>
                     </Link>
                   </li>
                 ))}
@@ -168,17 +171,20 @@ const Footer = () => {
             >
               <h3 className="font-bold text-white text-xl mb-6 relative">
                 Support
-                <div className="absolute -bottom-1 left-0 w-8 h-0.5 bg-white rounded-full" />
+                {/* <div className="absolute -bottom-1 left-0 w-8 h-0.5 bg-white rounded-full" /> */}
               </h3>
               <ul className="space-y-3">
                 {supportLinks.map((link, index) => (
                   <li key={index}>
                     <Link
                       href={link.href}
-                      className="text-gray-300 hover:text-white transition-colors duration-200 flex items-center gap-2 group"
+                      className="text-gray-300 hover:text-white transition-colors duration-200 flex items-center gap-2 group relative"
                     >
-                      <HiArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                      {link.name}
+                      {/* <HiArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200" /> */}
+                      <span className="relative">
+                        {link.name}
+                        <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
+                      </span>
                     </Link>
                   </li>
                 ))}
@@ -195,17 +201,20 @@ const Footer = () => {
             >
               <h3 className="font-bold text-white text-xl mb-6 relative">
                 Legal
-                <div className="absolute -bottom-1 left-0 w-8 h-0.5 bg-white rounded-full" />
+                {/* <div className="absolute -bottom-1 left-0 w-8 h-0.5 bg-white rounded-full" /> */}
               </h3>
               <ul className="space-y-3">
                 {legalLinks.map((link, index) => (
                   <li key={index}>
                     <Link
                       href={link.href}
-                      className="text-gray-300 hover:text-white transition-colors duration-200 flex items-center gap-2 group"
+                      className="text-gray-300 hover:text-white transition-colors duration-200 flex items-center gap-2 group relative"
                     >
-                      <HiArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                      {link.name}
+                      {/* <HiArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200" /> */}
+                      <span className="relative">
+                        {link.name}
+                        <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
+                      </span>
                     </Link>
                   </li>
                 ))}
@@ -288,11 +297,11 @@ const Footer = () => {
           <div className="flex flex-col lg:flex-row justify-between items-center gap-4 text-gray-400 text-sm">
             <div className="flex flex-col lg:flex-row items-center gap-4">
               <span>© {currentYear} BeautyDen. All rights reserved.</span>
-              <div className="flex items-center gap-2">
-                <span>Made with</span>
-                <HiHeart className="w-4 h-4 text-red-400 animate-pulse" />
-                <span>for beauty</span>
-              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span>Made with</span>
+              <HiHeart className="w-4 h-4 text-red-400 animate-pulse" />
+              <span>for beauty</span>
             </div>
 
             {/* Developer Credit */}
@@ -305,7 +314,7 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 className="text-white hover:text-gray-300 font-semibold transition-colors duration-200"
               >
-                Vrushik Visavadiya
+                Vrushik
               </a>
             </div>
           </div>

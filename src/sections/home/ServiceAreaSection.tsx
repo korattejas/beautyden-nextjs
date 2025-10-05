@@ -51,7 +51,7 @@ const ServiceAreaSection = () => {
   const heroImage = getHeroImage();
 
   return (
-    <section className="py-16 md:py-24 bg-white">
+    <section className="py-16 md:py-24 bg-white overflow-x-hidden">
       <Container>
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left Side - Content */}
@@ -149,8 +149,8 @@ const ServiceAreaSection = () => {
             className="relative flex justify-center lg:justify-end"
           >
             {/* Main Image with rounded-3xl */}
-            <div className="relative">
-              <div className="w-80 h-80 md:w-96 md:h-96 rounded-3xl overflow-hidden shadow-xl border-4 border-white">
+            <div className="relative overflow-hidden">
+              <div className="w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 rounded-3xl overflow-hidden shadow-xl border-4 border-white">
                 <Image
                   src={heroImage}
                   alt="Professional beauty service"
@@ -163,7 +163,7 @@ const ServiceAreaSection = () => {
               </div>
 
               {/* Service Badge */}
-              <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-2xl p-4 shadow-lg border border-gray-100">
+              <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 bg-white rounded-2xl p-4 shadow-lg border border-gray-100">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
                     <HiMapPin className="w-5 h-5 text-green-600" />
@@ -180,8 +180,8 @@ const ServiceAreaSection = () => {
               </div>
 
               {/* Decorative Elements */}
-              <div className="absolute -top-4 -right-4 w-16 h-16 bg-primary/10 rounded-full blur-sm"></div>
-              <div className="absolute -bottom-8 -left-8 w-12 h-12 bg-gray-200/60 rounded-full blur-sm"></div>
+              <div className="pointer-events-none absolute right-0 top-0 sm:-top-4 sm:-right-4 w-12 h-12 sm:w-16 sm:h-16 bg-primary/10 rounded-full blur-sm"></div>
+              <div className="pointer-events-none absolute left-0 bottom-0 sm:-bottom-8 sm:-left-8 w-10 h-10 sm:w-12 sm:h-12 bg-gray-200/60 rounded-full blur-sm"></div>
             </div>
           </motion.div>
         </div>

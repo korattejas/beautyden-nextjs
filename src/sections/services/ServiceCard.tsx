@@ -14,6 +14,8 @@ interface ServiceCardProps {
   index: number;
 }
 
+const FALLBACK_IMAGE = "/images/services/beauty-default.jpg";
+
 const ServiceModal = ({
   service,
   onClose,
@@ -21,88 +23,119 @@ const ServiceModal = ({
   service: Service;
   onClose: () => void;
 }) => {
+  const [imgError, setImgError] = useState(false);
+  const { data: settingsData } = useSettings();
+  const settings = settingsData?.data || [];
+
+  // Helper function to get setting value by key
+  const getSetting = (key: string) => {
+    return settings.find((setting) => setting.key === key)?.value || "";
+  };
+
+  const hasDiscount = service.discount_price;
+  const displayPrice = service.price;
+  const originalPrice = parseFloat(service.price);
+
   return (
     <motion.div
-  className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-  initial={{ opacity: 0 }}
-  animate={{ opacity: 1 }}
-  exit={{ opacity: 0 }}
->
-  <motion.div
-    className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col relative"
-    initial={{ scale: 0.8, opacity: 0 }}
-    animate={{ scale: 1, opacity: 1 }}
-    exit={{ scale: 0.8, opacity: 0 }}
-    transition={{ duration: 0.3 }}
-  >
-    {/* Close Button */}
-    <button
-      onClick={onClose}
-      className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-white/50 hover:bg-white/70 rounded-full cursor-pointer transition-colors z-50"
+      className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
     >
-      <HiXMark className="w-5 h-5 text-foreground" />
-    </button>
-
-    {/* Scrollable Content */}
-    <div className="flex-1 overflow-y-auto p-6 space-y-4">
-      {/* Service Image */}
-      <div className="relative w-full h-64 rounded-xl overflow-hidden">
-        <Image
-          src={service.icon || defaultImageForCategory(service.category_name)}
-          alt={service.name}
-          fill
-          className="object-cover"
-          unoptimized
-        />
-      </div>
-
-      <h3 className="text-2xl font-bold text-foreground">
-        {service.name}
-      </h3>
-
-      <div className="flex items-center gap-4 text-sm text-foreground/60">
-        <div className="flex items-center gap-1">
-          <HiClock className="w-4 h-4" />
-          <span>{service.duration}</span>
-        </div>
-        <span>{service.reviews || 0} reviews</span>
-      </div>
-
-      {/* Description with fixed height */}
-      <p className="text-foreground/80 leading-relaxed text-sm sm:text-base max-h-32 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-        {service.description}
-      </p>
-
-      {/* Includes with fixed height */}
-      {service.includes && service.includes.length > 0 && (
-        <div>
-          <h4 className="font-semibold text-foreground mb-2 text-sm sm:text-base">Includes:</h4>
-          <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-            {service.includes.map((inc, idx) => (
-              <span
-                key={idx}
-                className="bg-primary/10 text-primary text-xs px-2 py-1 sm:px-3 sm:py-1 rounded-full font-medium"
-              >
-                {inc}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-
-    {/* Book Button - fixed bottom */}
-    <div className="p-4 border-t border-gray-100">
-      <Button
-        href={`/book?service=${service.id}`}
-        className="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 font-semibold rounded-xl"
+      <motion.div
+        className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col relative"
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.8, opacity: 0 }}
+        transition={{ duration: 0.3 }}
       >
-        Book Now
-      </Button>
-    </div>
-  </motion.div>
-</motion.div>
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-white/50 hover:bg-white/70 rounded-full cursor-pointer transition-colors z-50"
+        >
+          <HiXMark className="w-5 h-5 text-foreground" />
+        </button>
 
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          {/* Service Image */}
+          <div className="relative w-full h-64 rounded-xl overflow-hidden">
+            <Image
+              src={imgError ? FALLBACK_IMAGE : (service.icon || defaultImageForCategory(service.category_name) || FALLBACK_IMAGE)}
+              alt={service.name}
+              fill
+              className="object-cover"
+              unoptimized
+              onError={() => setImgError(true)}
+            />
+          </div>
+
+          <h3 className="text-2xl font-bold text-foreground">
+            {service.name}
+          </h3>
+
+          <div className="flex items-center gap-4 text-sm text-foreground/60">
+            <div className="flex items-center gap-1">
+              <HiClock className="w-4 h-4" />
+              <span>{service.duration}</span>
+            </div>
+            <span>{service.reviews || 0} reviews</span>
+          </div>
+
+          {/* Pricing Section */}
+          <div className="bg-gray-50 rounded-xl p-4">
+            <div className="flex items-baseline gap-2" style={{alignItems:"center"}}>
+              <span className="text-sm font-medium text-foreground/70">{getSetting("service_price_start_text")}</span>
+              <span className="text-2xl font-bold text-primary">
+                ₹{displayPrice.toLocaleString()}
+              </span>
+            </div>
+            {hasDiscount && (
+              <div className="flex items-center gap-2 mt-2">
+               
+                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">
+                  {hasDiscount}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Description with fixed height */}
+          <p className="text-foreground/80 leading-relaxed text-sm sm:text-base max-h-32 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+            {service.description}
+          </p>
+
+          {/* Includes with fixed height */}
+          {service.includes && service.includes.length > 0 && (
+            <div>
+              <h4 className="font-semibold text-foreground mb-2 text-sm sm:text-base">Includes:</h4>
+              <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                {service.includes.map((inc, idx) => (
+                  <span
+                    key={idx}
+                    className="bg-primary/10 text-primary text-xs px-2 py-1 sm:px-3 sm:py-1 rounded-full font-medium"
+                  >
+                    {inc}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Book Button - fixed bottom */}
+        <div className="p-4 border-t border-gray-100">
+          <Button
+            href={`/book?service=${service.id}`}
+            className="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 font-semibold rounded-xl"
+          >
+            Book Now
+          </Button>
+        </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
@@ -118,6 +151,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
   const originalPrice = parseFloat(service.price);
   const [showFull, setShowFull] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [cardImgError, setCardImgError] = useState(false);
   const { data: settingsData, isLoading: settingsLoading } = useSettings();
   const settings = settingsData?.data || [];
 
@@ -140,12 +174,13 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
       {/* Service Image */}
       <div className="aspect-[4/3] overflow-hidden relative">
         <Image
-          src={service.icon || defaultImageForCategory(service.category_name)}
+          src={cardImgError ? FALLBACK_IMAGE : (service.icon || defaultImageForCategory(service.category_name) || FALLBACK_IMAGE)}
           alt={service.name}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
           className="object-cover group-hover:scale-110 transition-transform duration-700"
           unoptimized
+          onError={() => setCardImgError(true)}
         />
 
         {/* Category Badge */}
@@ -206,7 +241,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
 
         {/* Includes - Show max 3 */}
        {/* Included Items */}
-{service.includes && service.includes.length > 0 && (
+{/* {service.includes && service.includes.length > 0 && (
   <div className="flex flex-wrap gap-1 mb-4">
     {(showFull ? service.includes : service.includes.slice(0, 3)).map((feature, i) => (
       <span
@@ -226,7 +261,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
       </button>
     )}
   </div>
-)}
+)} */}
 
 
         {/* Pricing and Book Button */}
@@ -254,30 +289,46 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
             )}
           </div> */}
 
-{/* Pricing Display (Myntra Style - Single Line) */}
-<div className="mb-3 flex items-baseline gap-2">
-  <span className="text-sm font-medium text-foreground/70">{getSetting("service_price_start_text")}</span>
-  <span className="text-l font-bold text-primary">
-    ₹{displayPrice.toLocaleString()}
-  </span>
+{/* Pricing Display - Improved Layout */}
+<div className="mb-4">
+  <div className="flex items-baseline gap-2 mb-1" style={{alignItems:"center"}}>
+    <span className="text-sm font-medium text-foreground/70">{getSetting("service_price_start_text")}</span>
+    <span className="text-xl font-bold text-primary">
+      ₹{displayPrice.toLocaleString()}
+    </span>
+  </div>
   {hasDiscount && (
+    <div className="flex items-center gap-2">
       <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">
-        {/* {Math.round(((originalPrice - displayPrice) / originalPrice) * 100)}% OFF */}
-       { service.discount_price }
+        {hasDiscount}
       </span>
-    
+    </div>
   )}
 </div>
 
-          {/* Book Button */}
-          <Button
-            href={`/book?service=${service.id}`}
-            size="sm"
-            className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-secondary text-white py-2.5 font-semibold hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg"
-          >
-            Book Now
-            <HiArrowRight className="w-4 h-4" />
-          </Button>
+          {/* Action Buttons */}
+          <div className="space-y-2">
+            {/* View Service Button */}
+            <Button
+              onClick={() => setShowModal(true)}
+              size="sm"
+              variant="outline"
+              className="w-full flex items-center justify-center gap-2 h-10 rounded-xl bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-all duration-300 border border-gray-200"
+            >
+              <HiSparkles className="w-4 h-4" />
+              View Service
+            </Button>
+            
+            {/* Book Button */}
+            <Button
+              href={`/book?service=${service.id}`}
+              size="sm"
+              className="w-full flex items-center justify-center gap-2 h-10 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg"
+            >
+              Book Now
+              <HiArrowRight className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </div>
     </motion.div>

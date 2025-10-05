@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useServiceCategories } from "@/hooks/useApi";
 import { HiSparkles, HiArrowRight } from "react-icons/hi2";
 import Container from "@/components/ui/Container";
+import Button from "@/components/ui/Button";
 
 const CategoryShowcase = () => {
   const { data: categoriesData, isLoading, error } = useServiceCategories();
@@ -13,7 +14,7 @@ const CategoryShowcase = () => {
 
   if (isLoading) {
     return (
-      <section className="py-16 md:py-24 bg-white">
+      <section className="py-12 md:py-16 bg-white">
         <Container>
           <div className="text-center mb-16">
             <div className="h-8 bg-gray-200 animate-pulse rounded-full max-w-xs mx-auto mb-4" />
@@ -41,10 +42,10 @@ const CategoryShowcase = () => {
   if (popularCategories.length === 0) return null;
 
   return (
-    <section className="py-16 md:py-24 bg-white">
+    <section className="py-12 md:py-16 bg-white">
       <Container>
         {/* Simple Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -135,13 +136,21 @@ const CategoryShowcase = () => {
           viewport={{ once: true }}
           className="text-center mt-16"
         >
-          <Link
+          {/* <Link
             href="/services"
             className="inline-flex items-center gap-2 bg-primary hover:bg-gray-800 text-white px-8 py-4 rounded-full font-semibold transition-all duration-300 hover:scale-105 shadow-lg"
           >
             View All Services
             <HiArrowRight className="w-5 h-5" />
-          </Link>
+          </Link> */}
+          <Button
+                href="/services"
+                size="sm"
+                className="inline-flex items-center gap-2 bg-primary hover:bg-gray-800 text-white px-8 py-4 rounded-full font-semibold transition-all duration-300 hover:scale-105 shadow-lg"
+              >
+                View All Services
+                <HiArrowRight className="w-5 h-5" />
+              </Button>
         </motion.div>
       </Container>
     </section>

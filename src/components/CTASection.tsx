@@ -96,14 +96,14 @@ const CTASection = ({
             transition={{ duration: 0.8, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight">
+            <h3 className="font-heading text-2xl md:text-3xl font-bold mb-4 sm:mb-6 leading-tight">
               {title}
               {subtitle && (
                 <span className="block bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                   {subtitle}
                 </span>
               )}
-            </h2>
+            </h3>
           </motion.div>
 
           {/* Description */}
@@ -112,7 +112,7 @@ const CTASection = ({
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
             viewport={{ once: true }}
-            className={`text-base sm:text-lg md:text-xl mb-8 sm:mb-10 md:mb-12 leading-relaxed max-w-2xl sm:max-w-3xl mx-auto ${
+            className={`text-base mb-8 sm:mb-10 md:mb-12 leading-relaxed max-w-2xl sm:max-w-3xl mx-auto ${
               variant === "image" ? "text-white/90" : "text-foreground/70"
             }`}
           >
@@ -159,7 +159,8 @@ const CTASection = ({
             <Button
               href={primaryButton.href}
               // size="lg"
-              className="group bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 rounded-full font-semibold text-base sm:text-lg shadow-2xl hover:shadow-primary/25 transform hover:scale-105 transition-all duration-300"
+              className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105 inline-flex items-center gap-2"
+           
             >
               {primaryButton.icon}
               {primaryButton.text}
@@ -170,7 +171,7 @@ const CTASection = ({
                 href={secondaryButton.href}
                 variant="outline"
                 // size="lg"
-                className={`px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 rounded-full font-semibold text-base sm:text-lg transition-all duration-300 ${
+                className={`border-2 border-green-500 hover:bg-green-50 px-6 py-3 rounded-full font-semibold transition-all duration-300 inline-flex items-center gap-2 ${
                   variant === "image"
                     ? "bg-white/10 backdrop-blur-md border-2 border-white/30 text-white hover:bg-white hover:text-primary"
                     : "border-2 border-primary/30 text-primary hover:bg-primary/5"
