@@ -1,8 +1,9 @@
 "use client";
 
+import { Suspense } from "react";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { useServices, useSettings } from "@/hooks/useApi";
+import { useServices } from "@/hooks/useApi";
 import { useCityContext } from "@/contexts/CityContext";
 import { useDebounce } from "@/hooks/useDebounce";
 
@@ -16,19 +17,22 @@ import Pagination from "@/components/ui/Pagination";
 import ServiceGridSkeleton from "@/components/loading/ServiceGridSkeleton";
 import ServiceFilterSkeleton from "@/components/loading/ServiceFilterSkeleton";
 
-export default function ServicesPage() {
+// Separate component for the main content that uses searchParams
+function ServicesContent() {
   const { selectedCity, setShowCityPopup } = useCityContext();
   const searchParams = useSearchParams();
-  
+
   // Initialize state with URL parameters
   const [activeCategory, setActiveCategory] = useState("9"); // Default to "All Services"
-  const [activeSubCategory, setActiveSubCategory] = useState<string | null>(null);
+  const [activeSubCategory, setActiveSubCategory] = useState<string | null>(
+    null
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
   // Set initial category from URL parameters
   useEffect(() => {
-    const categoryParam = searchParams.get('category');
+    const categoryParam = searchParams.get("category");
     if (categoryParam) {
       setActiveCategory(categoryParam);
     }
@@ -41,13 +45,11 @@ export default function ServicesPage() {
   const { data, error, isLoading, isFetching } = useServices({
     search: debouncedSearchQuery,
     category_id: activeCategory,
-    subcategory_id: activeSubCategory, // 👈 pass here
+    subcategory_id: activeSubCategory,
     page: currentPage,
   });
 
-  
-
-  const services = data?.data?.data ?? [] as any[];
+  const services = data?.data?.data ?? ([] as any[]);
   const paginationData = data?.data as any;
 
   const clearAllFilters = () => {
@@ -62,7 +64,10 @@ export default function ServicesPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleCategoryChange = (categoryId: string,subcategories:string[] | any) => {
+  const handleCategoryChange = (
+    categoryId: string,
+    subcategories: string[] | any
+  ) => {
     setActiveCategory(categoryId);
     if (subcategories && subcategories.length > 0) {
       // Auto-select first subcategory
@@ -71,9 +76,10 @@ export default function ServicesPage() {
       // Reset subcategory if none exist
       setActiveSubCategory(null);
     }
-  
+
     setCurrentPage(1); // Reset to first page when changing category
   };
+
   const handleSubCategoryChange = (subCategoryId: string | null) => {
     setActiveSubCategory(subCategoryId);
     setCurrentPage(1); // Reset to first page when changing category
@@ -115,8 +121,12 @@ export default function ServicesPage() {
           <Container>
             <div className="max-w-3xl mx-auto text-center bg-white/80 backdrop-blur-md border border-primary/10 rounded-2xl p-8 shadow-sm">
               <div className="text-4xl mb-4">📍</div>
-              <h2 className="text-2xl font-bold text-foreground mb-2">Select your city to view services</h2>
-              <p className="text-foreground/60 mb-6">We personalize available services based on your location.</p>
+              <h2 className="text-2xl font-bold text-foreground mb-2">
+                Select your city to view services
+              </h2>
+              <p className="text-foreground/60 mb-6">
+                We personalize available services based on your location.
+              </p>
               <button
                 onClick={() => setShowCityPopup(true)}
                 className="bg-primary text-white px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-all duration-300"
@@ -179,7 +189,7 @@ export default function ServicesPage() {
             </section>
           ) : (
             <>
-              <ServiceGrid services={services}  />
+              <ServiceGrid services={services} />
 
               {/* Pagination Component */}
               {paginationData && paginationData.last_page > 1 && (
@@ -202,5 +212,31 @@ export default function ServicesPage() {
         </>
       )}
     </div>
+  );
+}
+
+// Loading fallback component
+function ServicesPageFallback() {
+  return (
+    <div className="min-h-screen bg-background">
+      <ServiceHero />
+
+      <section className="pb-12 md:pb-16">
+        <Container>
+          <ServiceFilterSkeleton />
+        </Container>
+      </section>
+
+      <ServiceGridSkeleton />
+    </div>
+  );
+}
+
+// Main component wrapped in Suspense
+export default function ServicesPage() {
+  return (
+    <Suspense fallback={<ServicesPageFallback />}>
+      <ServicesContent />
+    </Suspense>
   );
 }
