@@ -168,16 +168,16 @@ const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
             </motion.span>
           )}
 
-          {filters.category_id && (
+          {filters.service_id && (
             <motion.span
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               className="inline-flex items-center gap-2 bg-secondary/10 text-secondary px-3 py-1.5 rounded-full text-sm font-medium"
             >
               Category:{" "}
-              {categoryOptions.find((c) => c.value === filters.category_id)?.label}
+              {categoryOptions.find((c) => c.value === filters.service_id)?.label}
               <button
-                onClick={() => handleFilterChange("category_id", "")}
+                onClick={() => handleFilterChange("service_id", "")}
                 className="hover:bg-secondary/20 rounded-full p-0.5 transition-colors"
               >
                 <HiXMark className="w-3 h-3" />
