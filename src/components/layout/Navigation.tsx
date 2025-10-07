@@ -20,6 +20,7 @@ import Image from "next/image";
 import { useCityContext } from "@/contexts/CityContext";
 import { useCart } from "@/contexts/CartContext";
 import { useServiceCategories } from "@/hooks/useApi";
+import { formatDuration, parseDurationToMinutes } from "@/utils/time";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -441,7 +442,7 @@ const Navigation = () => {
                                 <div className="min-w-0 flex-1">
                                   <div className="text-sm font-medium text-gray-900 truncate">{it.name}</div>
                                   <div className="text-xs text-gray-500 truncate">{it.category_name}</div>
-                                  <div className="text-xs text-gray-500">{it.duration}</div>
+                                  <div className="text-xs text-gray-500">{formatDuration(parseDurationToMinutes(it.duration))}</div>
                                 </div>
                               </div>
                               <div className="text-right flex-shrink-0">
@@ -528,7 +529,7 @@ const Navigation = () => {
                                 <div className="min-w-0 flex-1">
                                   <div className="text-sm font-medium text-gray-900 truncate">{it.name}</div>
                                   <div className="text-xs text-gray-500 truncate">{it.category_name}</div>
-                                  <div className="text-xs text-gray-500">{it.duration}</div>
+                                  <div className="text-xs text-gray-500">{formatDuration(parseDurationToMinutes(it.duration))}</div>
                                 </div>
                               </div>
                               <div className="text-right flex-shrink-0">

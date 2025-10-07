@@ -80,7 +80,7 @@ const CustomerInformation = ({
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-0">
+    <div className="max-w-3xl mx-auto sm:px-0">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -100,7 +100,7 @@ const CustomerInformation = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
         onSubmit={handleSubmit(onSubmit)}
-        className="bg-white/80 backdrop-blur-md rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-lg border border-primary/10 space-y-6"
+        className="bg-white/80 backdrop-blur-md rounded-2xl sm:rounded-3xl p-4 md:p-6 shadow-lg border border-primary/10 space-y-6"
       >
         {/* Name Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

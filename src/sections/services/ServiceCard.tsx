@@ -8,6 +8,7 @@ import Image from "next/image";
 import { Service } from "@/services/services.service";
 import { useState } from "react";
 import { useSettings } from "@/hooks/useApi";
+import { formatDuration, parseDurationToMinutes } from "@/utils/time";
 
 interface ServiceCardProps {
   service: Service;
@@ -234,7 +235,8 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
         <div className="flex items-center justify-between mb-3 text-xs text-foreground/60 min-h-[20px]">
           <div className="flex items-center gap-1">
             <HiClock className="w-3 h-3" />
-            <span>{service.duration}</span>
+            {/* <span>{formatDuration(parseDurationToMinutes(service.duration))}</span> */}
+            <span>{formatDuration(parseDurationToMinutes(service.duration))}</span>
           </div>
           <span>{service.reviews || 0} reviews</span>
         </div>

@@ -23,6 +23,7 @@ import { BookingService } from "@/types/booking";
 import Button from "@/components/ui/Button";
 import MobileCartHeader from "./MobileCardHeader";
 import { useCart } from "@/contexts/CartContext";
+import { formatDuration, parseDurationToMinutes } from "@/utils/time";
 
 interface ServiceSelectionProps {
   selectedServices: BookingService[];
@@ -326,8 +327,8 @@ console.log("selectedServices----",selectedServices)
 
   const getTotalDuration = () => {
     return cartItems.reduce((total, service) => {
-      const duration = parseInt(service.duration) || 60;
-      return total + duration;
+      const minutes = parseDurationToMinutes(service.duration);
+      return total + minutes;
     }, 0);
   };
 
@@ -639,9 +640,9 @@ console.log("selectedServices----",selectedServices)
                                 </span>
                               </div>
                             )}
-                            <div className="flex items-center gap-1 mt-1 text-xs text-foreground/60">
+            <div className="flex items-center gap-1 mt-1 text-xs text-foreground/60">
                               <HiClock className="w-3 h-3" />
-                              {service.duration || "60 min"}
+                              {formatDuration(parseDurationToMinutes(service.duration || "60"))}
                             </div>
                           </div>
 
@@ -914,7 +915,7 @@ console.log("selectedServices----",selectedServices)
                           {service.name}
                         </p>
                         <p className="text-xs text-foreground/60">
-                          {service.duration}
+                          {formatDuration(parseDurationToMinutes(service.duration))}
                         </p>
                         <p className="text-sm font-bold text-primary">
                           ₹{getDisplayPrice(service)}
@@ -951,7 +952,7 @@ console.log("selectedServices----",selectedServices)
                       Duration:
                     </span>
                     <span className="font-medium text-foreground text-sm">
-                      {getTotalDuration()} min
+                      {formatDuration(getTotalDuration())}
                     </span>
                   </div>
                   <div className="flex justify-between items-center mb-4">

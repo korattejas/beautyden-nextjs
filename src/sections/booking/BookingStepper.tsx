@@ -17,7 +17,7 @@ interface BookingStepperProps {
 const BookingStepper = ({ steps, currentStep }: BookingStepperProps) => {
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <div className="flex items-center justify-between gap-2 sm:gap-4">
+      <div className="flex items-center justify-between gap-2 sm:gap-4" style={{alignItems:"start"}}>
         {steps.map((step, index) => {
           const isActive = currentStep === step.id;
           const isCompleted = currentStep > step.id;

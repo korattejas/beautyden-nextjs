@@ -16,6 +16,8 @@ import Button from "@/components/ui/Button";
 import { BookingFormData } from "@/types/booking";
 import { bookAppointment } from "@/services/booking.service";
 import { useCart } from "@/contexts/CartContext";
+import { formatDuration, parseDurationToMinutes } from "@/utils/time";
+import { useSettings } from "@/hooks/useApi";
 
 interface BookingReviewProps {
   bookingData: BookingFormData;
@@ -32,6 +34,9 @@ const BookingReview = ({
   const [paymentMethod] = useState("pay_after_service"); // For now, only pay after service
   const router = useRouter();
   const { clearCart, items: cartItems } = useCart();
+  const { data: settingsData } = useSettings();
+  const settings = settingsData?.data || [];
+  const getSetting = (key: string) => settings.find((s: any) => s.key === key)?.value || "Start";
 
   // Debug logging
   console.log("BookingReview - bookingData:", bookingData);
@@ -86,8 +91,8 @@ const BookingReview = ({
   };
 
   const getTotalDuration = () => {
-    // Simple duration calculation - sum all service durations
-    return servicesToUse.length * 60; // Assuming 60 minutes per service
+    // Sum parsed durations from each service
+    return servicesToUse.reduce((acc: number, svc: any) => acc + parseDurationToMinutes(svc.duration), 0);
   };
 
   const formatDate = (dateString: string) => {
@@ -237,7 +242,7 @@ const BookingReview = ({
                       {service.name}
                     </p>
                     <p className="text-sm text-foreground/60">
-                      {service.category_name} • {service.duration}
+                      {service.category_name} • {formatDuration(parseDurationToMinutes(service.duration))}
                     </p>
                   </div>
                   {/* <p className="font-bold text-foreground">₹{service.price}</p> */}
@@ -245,16 +250,19 @@ const BookingReview = ({
           {service?.discount_price ? (
             <div className="flex flex-row gap-1 self-start items-end">
               <span className="font-bold text-foreground">
-                Start ₹{service?.discount_price}
+                 ₹{service?.discount_price}
               </span>
               <span className="text-sm text-foreground/60 line-through">
                 ₹{service.price}
               </span>
             </div>
           ) : (
+            <>
+            <span className="mr-1"> {getSetting("service_price_start_text")}</span> 
             <span className="font-bold text-foreground">
-              Start ₹{service.price}
+             ₹{service.price}
             </span>
+            </>
           )}
         </div>
                 </div>
@@ -374,7 +382,7 @@ const BookingReview = ({
               <div className="flex justify-between items-center">
                 <span className="text-foreground/70">Estimated Duration</span>
                 <span className="font-semibold text-foreground">
-                  {getTotalDuration()} min
+                  {formatDuration(getTotalDuration())}
                 </span>
               </div>
               {/* <div className="flex justify-between items-center border-t border-primary/20 pt-3">

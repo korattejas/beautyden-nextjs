@@ -112,6 +112,7 @@ const Footer = () => {
               {/* Logo */}
               <div>
                 <div className="mb-6">
+                <Link href="/" className="flex items-center">
                   <Image
                     src="/logo.png"
                     alt="BeautyDen Logo"
@@ -119,6 +120,7 @@ const Footer = () => {
                     width={120}
                     className="object-contain h-12 invert"
                   />
+                  </Link>
                 </div>
 
                 <p className="text-gray-300 text-lg leading-relaxed max-w-md mb-6">
