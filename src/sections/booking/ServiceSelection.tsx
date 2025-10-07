@@ -582,7 +582,7 @@ console.log("selectedServices----",selectedServices)
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.4, delay: index * 0.05 }}
-                      className={`bg-card backdrop-blur-md rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border-2 ${
+                      className={`bg-card backdrop-blur-md rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border-2 h-full flex flex-col ${
                         isSelected
                           ? "border-primary shadow-primary/20"
                           : "border-border hover:border-primary/30"
@@ -610,7 +610,7 @@ console.log("selectedServices----",selectedServices)
                       </div>
 
                         {/* Service Details */}
-                        <div className="p-4">
+                        <div className="p-4 flex flex-col flex-1">
                           <div className="flex items-start justify-between mb-3">
                             <div className="flex-1">
                               <h3 className="font-semibold text-foreground mb-2 text-sm line-clamp-2">
@@ -646,13 +646,13 @@ console.log("selectedServices----",selectedServices)
                           </div>
 
                         {service.description && (
-                          <p className="text-foreground/70 text-xs mb-3 line-clamp-2">
+                          <p className="text-foreground/70 text-xs mb-3 line-clamp-2 min-h-[32px]">
                             {service.description}
                           </p>
                         )}
 
                         {/* Action Buttons - responsive: full width on mobile, 50/50 on sm+ */}
-                        <div className="flex gap-2 flex-col sm:flex-row">
+                        <div className="flex gap-2 flex-col sm:flex-row mt-auto">
                           {/* View Service Button */}
                           <Button
                             variant="outline"

@@ -483,9 +483,8 @@ const HeroSection = () => {
 
   return (
     <section className="bg-white pt-20 pb-8 sm:pb-12 md:pb-20 lg:pb-24 min-h-[90vh] flex items-center overflow-x-hidden">
-      <div className="w-full">
-        <div className="px-4 sm:px-6 lg:px-8 max-w-8xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 xl:gap-16 items-center">
+      <Container size="xl">
+        <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 xl:gap-16 items-center">
           {/* Left Content */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -699,9 +698,8 @@ const HeroSection = () => {
               </motion.div>
             </div>
           </motion.div>
-          </div>
         </div>
-      </div>
+      </Container>
 
       <style jsx>{`
         .hero-swiper-bullet {

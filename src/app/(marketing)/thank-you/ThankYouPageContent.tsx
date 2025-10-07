@@ -32,7 +32,7 @@ export default function ThankYouPageContent() {
   // Prevent hydration mismatch by not rendering until client-side
   if (!isClient) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-secondary/5 flex items-center justify-center py-12">
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-secondary/5 flex items-center justify-center py-16">
         <Container>
           <div className="max-w-4xl mx-auto text-center">
             <div className="w-24 h-24 bg-gradient-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
@@ -56,7 +56,7 @@ export default function ThankYouPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary/10 via-white to-secondary/10 py-12 sm:py-16">
+    <div className="min-h-screen bg-gradient-to-b from-primary/10 via-white to-secondary/10 mt-16 py-16 sm:py-16">
       <Container>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -98,11 +98,13 @@ export default function ThankYouPageContent() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.5 }}
-                className="inline-flex max-w-full items-center justify-center bg-primary/10 border border-primary/20 rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 mb-8"
+                className="inline-flex max-w-full items-center justify-center bg-primary/10 border border-primary/20 rounded-2xl px-3 sm:px-6 py-2 sm:py-3 mb-8"
               >
                 <div className="flex flex-col items-center max-w-full">
                   <p className="text-xs sm:text-sm text-foreground/60 mb-0.5">Order Number</p>
-                  <p className="text-xl sm:text-2xl font-bold text-primary break-all">{orderNumber}</p>
+                  <div className="w-full max-w-full">
+                    <p className="whitespace-nowrap text-base sm:text-2xl font-bold text-primary">{orderNumber}</p>
+                  </div>
                 </div>
               </motion.div>
             )}

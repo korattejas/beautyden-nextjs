@@ -117,7 +117,7 @@ function ServicesContent() {
     return (
       <div className="min-h-screen bg-background">
         <ServiceHero />
-        <section className="py-16">
+        <section className="pt-0 pb-16">
           <Container>
             <div className="max-w-3xl mx-auto text-center bg-white/80 backdrop-blur-md border border-primary/10 rounded-2xl p-8 shadow-sm">
               <div className="text-4xl mb-4">📍</div>

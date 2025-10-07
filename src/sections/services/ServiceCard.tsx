@@ -212,7 +212,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
 
         {/* Description */}
 
-        <div className="mb-3 text-sm text-foreground/70 leading-relaxed">
+        <div className="mb-3 text-sm text-foreground/70 leading-relaxed min-h-[56px]">
   {showFull || (service.description?.length ?? 0) < 100 ? (
     <span>{service.description}</span>
   ) : (
@@ -231,7 +231,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
 
 
         {/* Duration and Reviews */}
-        <div className="flex items-center justify-between mb-3 text-xs text-foreground/60">
+        <div className="flex items-center justify-between mb-3 text-xs text-foreground/60 min-h-[20px]">
           <div className="flex items-center gap-1">
             <HiClock className="w-3 h-3" />
             <span>{service.duration}</span>
@@ -307,7 +307,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
 </div>
 
           {/* Action Buttons */}
-          <div className="space-y-2">
+          <div className="space-y-2 pb-2">
             {/* View Service Button */}
             <Button
               onClick={() => setShowModal(true)}
