@@ -56,7 +56,7 @@ export default function ThankYouPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-secondary/5 flex items-center justify-center py-12">
+    <div className="min-h-screen bg-gradient-to-b from-primary/10 via-white to-secondary/10 py-12 sm:py-16">
       <Container>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -65,7 +65,7 @@ export default function ThankYouPageContent() {
           className="max-w-4xl mx-auto"
         >
           {/* Success Icon */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-8 px-4">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -79,7 +79,7 @@ export default function ThankYouPageContent() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-4xl md:text-5xl font-bold text-foreground mb-4"
+              className="text-3xl md:text-5xl font-bold text-foreground mb-4"
             >
               Thank You! 💖
             </motion.h1>
@@ -88,7 +88,7 @@ export default function ThankYouPageContent() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="text-xl text-foreground/70 mb-6"
+              className="text-lg md:text-xl text-foreground/70 mb-6"
             >
               Your appointment has been successfully booked
             </motion.p>
@@ -98,10 +98,12 @@ export default function ThankYouPageContent() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.5 }}
-                className="inline-block bg-primary/10 border border-primary/20 rounded-2xl px-6 py-3 mb-8"
+                className="inline-flex max-w-full items-center justify-center bg-primary/10 border border-primary/20 rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 mb-8"
               >
-                <p className="text-sm text-foreground/60 mb-1">Order Number</p>
-                <p className="text-2xl font-bold text-primary">{orderNumber}</p>
+                <div className="flex flex-col items-center max-w-full">
+                  <p className="text-xs sm:text-sm text-foreground/60 mb-0.5">Order Number</p>
+                  <p className="text-xl sm:text-2xl font-bold text-primary break-all">{orderNumber}</p>
+                </div>
               </motion.div>
             )}
           </div>
@@ -112,10 +114,10 @@ export default function ThankYouPageContent() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="bg-white/80 backdrop-blur-md rounded-3xl p-8 md:p-12 shadow-xl border border-primary/10 mb-8"
+              className="bg-white/90 backdrop-blur-md rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 shadow-xl border border-primary/10 mb-8"
             >
               <div
-                className="prose prose-lg max-w-none"
+                className="prose prose-base sm:prose-lg max-w-none"
                 dangerouslySetInnerHTML={renderMessage(message)}
                 style={{
                   fontFamily: "Arial, sans-serif",
@@ -131,14 +133,14 @@ export default function ThankYouPageContent() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.7 }}
-            className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-3xl p-8 md:p-12 border border-primary/10"
+            className="bg-white/70 backdrop-blur-md rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 border border-primary/10"
           >
-            <h3 className="text-2xl font-bold text-foreground mb-6 text-center flex items-center justify-center gap-2">
+            <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-6 text-center flex items-center justify-center gap-2">
               <HiSparkles className="w-6 h-6 text-primary" />
               Need Help?
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
               {/* WhatsApp */}
               <motion.a
                 href="https://wa.me/919574758282"
@@ -190,11 +192,11 @@ export default function ThankYouPageContent() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.8 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center mt-8"
+            className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mt-8 px-4"
           >
             <Button
               href="/"
-              className="bg-gradient-to-r from-primary to-secondary text-white px-8 py-4 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+              className="bg-gradient-to-r from-primary to-secondary text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-semibold text-base sm:text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
             >
               <HiHeart className="w-5 h-5" />
               Back to Home
@@ -203,7 +205,7 @@ export default function ThankYouPageContent() {
             <Button
               href="/services"
               variant="outline"
-              className="border-2 border-primary/20 text-primary hover:bg-primary/5 px-8 py-4 rounded-2xl font-semibold text-lg flex items-center justify-center gap-2"
+              className="border-2 border-primary/20 text-primary hover:bg-primary/5 px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-semibold text-base sm:text-lg flex items-center justify-center gap-2"
             >
               <HiSparkles className="w-5 h-5" />
               Book Another Service

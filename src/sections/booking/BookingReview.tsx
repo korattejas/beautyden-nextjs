@@ -161,19 +161,23 @@ const BookingReview = ({
       clearCart();
       
       // Redirect to thank you page with response data
-      // Fix: Access response data correctly with safety checks
-      let orderNumber = "Unknown";
-      
-      if (response?.data?.order_number) {
-        orderNumber = response.data.order_number;
-      } else if (response?.data?.appointment?.order_number) {
-        orderNumber = response.data.appointment.order_number;
-      }
-      
-      // Use a simple success message instead of the complex HTML from API
-      const message = "Booking successful! We'll contact you shortly to confirm your appointment.";
-      
-      router.push(`/thank-you?orderNumber=${orderNumber}&message=${encodeURIComponent(message)}`);
+      // Try multiple shapes for order number
+      const possibleOrderNumber =
+        response?.data?.order_number ||
+        response?.data?.appointment?.order_number ||
+        null;
+
+      // Prefer API's message if available
+      const messageFromApi = response?.message || "";
+      const message =
+        messageFromApi ||
+        "Booking successful! We'll contact you shortly to confirm your appointment.";
+
+      const params = new URLSearchParams();
+      if (possibleOrderNumber) params.set("orderNumber", String(possibleOrderNumber));
+      params.set("message", encodeURIComponent(message));
+
+      router.push(`/thank-you?${params.toString()}`);
       
     } catch (error: any) {
       console.error("Booking error:", error);

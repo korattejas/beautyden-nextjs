@@ -202,7 +202,7 @@ const DateTimeSelection = ({
       </motion.div>
 
       {/* Main Content - Left Right Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
         {/* Left Section - Date Selection */}
         <motion.div
           initial={{ opacity: 0, x: -30 }}
@@ -273,7 +273,7 @@ const DateTimeSelection = ({
           </div>
 
           {selectedDate ? (
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 max-h-80 overflow-y-auto">
+            <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3 max-h-80 overflow-y-auto">
               {timeSlots.map((slot, index) => (
                 <motion.button
                   key={slot.id}
@@ -284,7 +284,7 @@ const DateTimeSelection = ({
                   whileTap={{ scale: slot.available ? 0.95 : 1 }}
                   onClick={() => slot.available && onTimeChange(slot.id)}
                   disabled={!slot.available}
-                  className={`p-3 rounded-2xl font-semibold text-sm transition-all duration-300 ${
+                  className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl font-semibold text-xs sm:text-sm transition-all duration-300 ${
                     selectedTime === slot.id
                       ? "bg-gradient-to-r from-primary to-secondary text-white shadow-lg scale-105"
                       : slot.available
@@ -351,12 +351,12 @@ const DateTimeSelection = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="flex items-center justify-between pt-6"
+        className="flex items-center justify-between pt-6 gap-3 flex-col-reverse sm:flex-row"
       >
         <Button
           onClick={onPrev}
           variant="outline"
-          className="border-2 border-primary/20 text-primary hover:bg-primary/5 px-8 py-4 rounded-2xl font-semibold flex items-center gap-3 text-lg"
+          className="w-full sm:w-auto border-2 border-primary/20 text-primary hover:bg-primary/5 px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-semibold flex items-center justify-center gap-3 text-base sm:text-lg"
         >
           <HiArrowLeft className="w-5 h-5" />
           Previous Step
@@ -365,7 +365,7 @@ const DateTimeSelection = ({
         <Button
           onClick={onNext}
           disabled={!canProceed}
-          className="bg-gradient-to-r from-primary to-secondary text-white px-8 py-4 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-3 text-lg"
+          className="w-full sm:w-auto bg-gradient-to-r from-primary to-secondary text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3 text-base sm:text-lg"
         >
           Continue to Details
           <HiArrowRight className="w-5 h-5" />

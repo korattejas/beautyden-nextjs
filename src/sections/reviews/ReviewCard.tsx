@@ -102,7 +102,7 @@ const ReviewCard = ({ review, index }: ReviewCardProps) => {
                 />
               ))}
             </div>
-            <span className="text-sm font-medium">{rating}.0</span>
+            <span className="text-sm font-medium">{rating}</span>
           </div>
         )}
 

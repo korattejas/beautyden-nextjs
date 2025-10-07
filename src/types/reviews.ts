@@ -43,7 +43,7 @@ export interface ReviewsResponse {
 
 export interface ReviewsFilters {
   search?: string;
-  service_id?: string;
+  category_id?: string;
   with_photos?: string;
   with_video?: string;
   rating?: string;

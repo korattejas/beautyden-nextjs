@@ -10,8 +10,8 @@ const buildQueryString = (filters: ReviewsFilters): string => {
   if (filters.search) {
     params.append("search", filters.search);
   }
-  if (filters.service_id) {
-    params.append("service_id", filters.service_id);
+  if (filters.category_id) {
+    params.append("category_id", filters.category_id);
   }
   if (filters.with_photos) {
     params.append("with_photos", filters.with_photos);

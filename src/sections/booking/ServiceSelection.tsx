@@ -415,17 +415,17 @@ console.log("selectedServices----",selectedServices)
             <h3 className="font-semibold text-foreground mb-4">
               Filter by Category
             </h3>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => toggleCategory("all")}
-                className={`flex items-center gap-3 px-6 py-4 rounded-full font-medium transition-all duration-300 text-base ${
+                className={`flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-4 rounded-full font-medium transition-all duration-300 text-sm sm:text-base ${
                   selectedCategories.length === 0 ||
                   selectedCategories[0] === "all"
                     ? "bg-primary text-white shadow-lg"
                     : "bg-background text-foreground/70 hover:text-primary hover:bg-primary/5 border border-border"
                 }`}
               >
-                <HiSparkles className="w-5 h-5" />
+                <HiSparkles className="w-4 h-4 sm:w-5 sm:h-5" />
                 All Services
               </button>
 
@@ -442,13 +442,13 @@ console.log("selectedServices----",selectedServices)
                     const subIds= cat?.subcategories?.map((i: any)=> i?.id) || [];
                     toggleCategory(category.id.toString(),subIds)
                   }}
-                  className={`flex items-center gap-3 px-6 py-4 rounded-full font-medium transition-all duration-300 text-base ${
+                  className={`flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-4 rounded-full font-medium transition-all duration-300 text-sm sm:text-base ${
                     selectedCategories.includes(category.id.toString())
                       ? "bg-primary text-white shadow-lg"
                       : "bg-background text-foreground/70 hover:text-primary hover:bg-primary/5 border border-border"
                   }`}
                 >
-                  <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center">
+                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full overflow-hidden flex items-center justify-center">
                     {category.icon ? (
                       <Image
                         src={category.icon}
@@ -459,7 +459,7 @@ console.log("selectedServices----",selectedServices)
                         unoptimized
                       />
                     ) : (
-                      <HiSquares2X2 className="w-5 h-5 text-primary" />
+                      <HiSquares2X2 className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                     )}
                   </div>
                   {category.name}
@@ -481,13 +481,13 @@ console.log("selectedServices----",selectedServices)
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => toggleSubCategory(subId)}
-                  className={`flex items-center gap-3 px-6 py-4 rounded-full text-base font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-4 rounded-full text-sm sm:text-base font-medium transition-all duration-200 ${
                     isActive
                       ? "bg-primary text-white shadow-md shadow-primary/25"
                       : "bg-background hover:bg-primary/10 text-foreground/70 hover:text-primary border border-border"
                   }`}
                 >
-                  <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center">
+                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full overflow-hidden flex items-center justify-center">
                     {sub.icon ? (
                       <Image
                         src={sub.icon}
@@ -499,7 +499,7 @@ console.log("selectedServices----",selectedServices)
                       />
                     ) : (
                       <HiSparkles
-                        className={`w-5 h-5 ${
+                        className={`w-4 h-4 sm:w-5 sm:h-5 ${
                           isActive ? "text-white" : "text-primary"
                         }`}
                       />
@@ -561,7 +561,7 @@ console.log("selectedServices----",selectedServices)
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.4 }}
-                className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                className="grid grid-cols-1 sm:grid-cols-2 gap-4"
               >
                 {/* cart header */}
                            <MobileCartHeader
@@ -651,8 +651,8 @@ console.log("selectedServices----",selectedServices)
                           </p>
                         )}
 
-                        {/* Action Buttons */}
-                        <div className="flex gap-2">
+                        {/* Action Buttons - responsive: full width on mobile, 50/50 on sm+ */}
+                        <div className="flex gap-2 flex-col sm:flex-row">
                           {/* View Service Button */}
                           <Button
                             variant="outline"
@@ -660,7 +660,7 @@ console.log("selectedServices----",selectedServices)
                               setSelectedService(service);
                               setShowModal(true);
                             }}
-                            className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl font-medium text-sm transition-all duration-300 min-h-[40px]"
+                            className="w-full sm:flex-1 flex items-center justify-center gap-2 h-11 rounded-xl font-medium text-sm transition-all duration-300 min-h-[44px]"
                           >
                             <HiSparkles className="w-3 h-3" />
                             View Service
@@ -669,7 +669,7 @@ console.log("selectedServices----",selectedServices)
                           {/* Add/Remove Service Button */}
                           <Button
                             onClick={() => toggleService(service)}
-                            className={`w-full flex items-center justify-center gap-2 h-10 rounded-xl font-medium text-sm transition-all duration-300 bg-gradient-to-r from-primary to-secondary hover:scale-105`}
+                            className={`w-full sm:flex-1 flex items-center justify-center gap-2 h-11 rounded-xl font-semibold text-sm transition-all duration-300 bg-gradient-to-r from-primary to-secondary hover:scale-105`}
                           >
                             {isSelected ? (
                               <>
@@ -700,7 +700,7 @@ console.log("selectedServices----",selectedServices)
                 className="flex flex-col items-center space-y-4 mt-8"
               >
                 {/* Results Info */}
-                <div className="text-sm text-foreground/60">
+                <div className="hidden md:block text-sm text-foreground/60">
                   Showing{" "}
                   <span className="font-medium text-foreground">
                     {paginationData.from}
@@ -715,9 +715,8 @@ console.log("selectedServices----",selectedServices)
                   </span>{" "}
                   services
                 </div>
-
                 {/* Pagination Controls */}
-                <div className="flex items-center space-x-2">
+                <div className="hidden md:flex items-center space-x-2">
                   {/* Previous Button */}
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
@@ -788,6 +787,45 @@ console.log("selectedServices----",selectedServices)
                     Next
                     <HiChevronRight className="w-4 h-4 ml-1" />
                   </button>
+                </div>
+
+                {/* Mobile pagination summary */}
+                <div className="md:hidden w-full">
+                  <div className="flex items-center justify-between gap-2">
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className={`flex items-center justify-center w-10 h-10 rounded-full transition-colors ${
+                        currentPage === 1
+                          ? "bg-muted text-foreground/40 cursor-not-allowed"
+                          : "bg-card text-foreground hover:bg-primary hover:text-white border border-border"
+                      }`}
+                      aria-label="Previous page"
+                    >
+                      <HiChevronLeft className="w-5 h-5" />
+                    </button>
+
+                    <div className="text-sm text-foreground/70">
+                      <span className="font-medium text-foreground">{currentPage}</span> / {paginationData.last_page}
+                    </div>
+
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === paginationData.last_page}
+                      className={`flex items-center justify-center w-10 h-10 rounded-full transition-colors ${
+                        currentPage === paginationData.last_page
+                          ? "bg-muted text-foreground/40 cursor-not-allowed"
+                          : "bg-card text-foreground hover:bg-primary hover:text-white border border-border"
+                      }`}
+                      aria-label="Next page"
+                    >
+                      <HiChevronRight className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <div className="mt-3 text-center text-xs text-foreground/60">
+                    {paginationData.from}–{paginationData.to} of {paginationData.total}
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -940,7 +978,7 @@ console.log("selectedServices----",selectedServices)
                     onServicesChange([...cartItems]);
                     onNext();
                   }}
-                  className="w-full bg-primary text-white py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+                  className="w-full bg-primary text-white py-2.5 sm:py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 text-sm"
                 >
                   Continue to Date & Time
                   <HiArrowRight className="w-4 h-4" />

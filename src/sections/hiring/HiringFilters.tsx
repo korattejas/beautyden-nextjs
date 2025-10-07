@@ -106,11 +106,7 @@ const HiringFilters = ({ filters, onFiltersChange }: HiringFiltersProps) => {
         <div className="lg:w-90">
           <CustomSelect
             options={experienceLevels}
-            value={
-              experienceLevels.find(
-                (option) => option.value === filters.experienceLevel
-              ) || null
-            }
+            value={filters.experienceLevel || ""}
             onChange={(value) => handleExperienceChange(value)}
             placeholder="All Experience Levels"
             // icon={<HiAcademicCap className="w-5 h-5 text-primary" />}

@@ -3,6 +3,8 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Container from "@/components/ui/Container";
+import { useCityContext } from "@/contexts/CityContext";
+import Button from "@/components/ui/Button";
 
 import { BookingFormData, BookingService } from "@/types/booking";
 import { motion } from "framer-motion";
@@ -14,6 +16,7 @@ import BookingStepper from "@/sections/booking/BookingStepper";
 import { useCart } from "@/contexts/CartContext";
 
 const BookingPageContent = () => {
+  const { selectedCity, setShowCityPopup } = useCityContext();
   const { items, addItem, removeItem } = useCart();
   const [currentStep, setCurrentStep] = useState(1);
   const [bookingData, setBookingData] = useState<BookingFormData>({
@@ -123,6 +126,60 @@ const BookingPageContent = () => {
         return null;
     }
   };
+
+  // If no city selected, show same callout as services page
+  if (!selectedCity) {
+    return (
+      <div className="min-h-screen bg-background">
+        <section className="pt-24 pb-12 bg-gradient-to-br from-primary/10 to-secondary/10">
+          <Container>
+            <div className="text-center max-w-3xl mx-auto">
+              <motion.h1
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="font-heading text-4xl md:text-5xl font-bold mb-4"
+              >
+                <span className="text-foreground">Book Your</span>
+                <br />
+                <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  Beauty Service
+                </span>
+              </motion.h1>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="text-xl text-foreground/70"
+              >
+                Professional beauty services delivered to your doorstep
+              </motion.p>
+            </div>
+          </Container>
+        </section>
+
+        <section className="py-16">
+          <Container>
+            <div className="max-w-3xl mx-auto text-center bg-white/80 backdrop-blur-md border border-primary/10 rounded-2xl p-8 shadow-sm">
+              <div className="text-4xl mb-4">📍</div>
+              <h2 className="text-2xl font-bold text-foreground mb-2">
+                Select your city to continue booking
+              </h2>
+              <p className="text-foreground/60 mb-6">
+                We personalize available services based on your location.
+              </p>
+              <Button
+                onClick={() => setShowCityPopup(true)}
+                className="bg-primary text-white px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-all duration-300"
+              >
+                Select City
+              </Button>
+            </div>
+          </Container>
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 overflow-x-hidden">

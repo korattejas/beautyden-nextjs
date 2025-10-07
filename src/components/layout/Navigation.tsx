@@ -166,7 +166,7 @@ const Navigation = () => {
                 alt="BeautyDen Logo"
                 height={50}
                 width={120}
-                className="object-contain h-13"
+                className="object-contain h-12"
               />
             </Link>
 
@@ -498,7 +498,7 @@ const Navigation = () => {
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 8 }}
-                      className="absolute top-full right-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-gray-200 p-4 z-50"
+                      className="fixed left-1/2 -translate-x-1/2 top-16 w-[92vw] max-w-sm bg-white rounded-2xl shadow-2xl border border-gray-200 p-4 z-[100]"
                     >
                       <div className="mb-3 flex items-center justify-between">
                         <div className="text-sm font-semibold text-gray-900">Your Cart</div>
@@ -539,10 +539,10 @@ const Navigation = () => {
                           ))}
                         </div>
                       )}
-                      <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+                      {/* <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
                         <div className="text-sm font-semibold text-gray-900">Total</div>
                         <div className="text-sm font-bold text-primary">₹{totalPrice.toLocaleString()}</div>
-                      </div>
+                      </div> */}
                       <div className="mt-3 grid grid-cols-2 gap-2">
                         <Link href="/book" className="text-center text-sm px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-50" onClick={() => setShowCartDropdown(false)}>View</Link>
                         <Link href="/book" className="text-center text-sm px-3 py-2 rounded-lg bg-primary text-white hover:bg-primary/90" onClick={() => setShowCartDropdown(false)}>Continue</Link>
