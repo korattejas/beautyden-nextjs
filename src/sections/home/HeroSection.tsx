@@ -483,8 +483,9 @@ const HeroSection = () => {
 
   return (
     <section className="bg-white pt-20 pb-8 sm:pb-12 md:pb-20 lg:pb-24 min-h-[90vh] flex items-center overflow-x-hidden">
-      <Container size="xl">
-        <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 xl:gap-16 items-center">
+      <div className="w-full">
+        <div className="px-4 sm:px-6 lg:px-8 max-w-8xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 xl:gap-16 items-center">
           {/* Left Content */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -565,11 +566,11 @@ const HeroSection = () => {
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             viewport={{ once: true }}
-            className="relative flex justify-center lg:justify-end order-1 lg:order-2 overflow-hidden sm:overflow-visible"
+            className="relative flex justify-center lg:justify-end order-1 lg:order-2 overflow-hidden sm:overflow-visible -mx-4 sm:mx-0"
           >
-            <div className="relative">
+            <div className="relative w-full sm:w-auto">
               {/* Rounded 3xl Image Container */}
-              <div className="relative w-[300px] h-[300px] sm:w-[380px] sm:h-[380px] md:w-[430px] md:h-[430px] lg:w-[480px] lg:h-[480px] xl:w-[530px] xl:h-[530px] rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-gray-100 to-gray-200 border-2 sm:border-4 border-white">
+              <div className="relative w-full h-[320px] sm:w-[380px] sm:h-[380px] md:w-[430px] md:h-[430px] lg:w-[480px] lg:h-[480px] xl:w-[530px] xl:h-[530px] rounded-none sm:rounded-3xl overflow-hidden shadow-none sm:shadow-2xl bg-gradient-to-br from-gray-100 to-gray-200 border-0 sm:border-2 lg:border-4 border-white">
                 <Swiper
                   modules={[Navigation, Pagination, Autoplay]}
                   slidesPerView={1}
@@ -698,8 +699,9 @@ const HeroSection = () => {
               </motion.div>
             </div>
           </motion.div>
+          </div>
         </div>
-      </Container>
+      </div>
 
       <style jsx>{`
         .hero-swiper-bullet {

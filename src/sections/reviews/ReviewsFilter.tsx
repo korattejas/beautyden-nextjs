@@ -81,8 +81,8 @@ const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
         <div>
           <CustomSelect
             options={categoryOptions}
-            value={filters.category_id || ""}
-            onChange={(value) => handleFilterChange("category_id", value)}
+            value={filters.service_id || ""}
+            onChange={(value) => handleFilterChange("service_id", value)}
             placeholder="All Categories"
           />
         </div>
