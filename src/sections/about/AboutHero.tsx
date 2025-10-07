@@ -38,7 +38,7 @@ const AboutHero = () => {
       <div className="absolute bottom-20 left-20 w-36 h-36 bg-accent/10 rounded-full blur-3xl" />
 
       <Container>
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
           {/* Left Content */}
           <div>
             <motion.div
@@ -133,13 +133,13 @@ const AboutHero = () => {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="relative"
           >
-            <div className="relative">
+            <div className="relative -mx-4 sm:mx-0">
               <Image
                 src={firstSlideImage}
                 alt="Professional beauty services"
-                width={600}
-                height={400}
-                className="rounded-3xl shadow-2xl object-cover"
+                width={1200}
+                height={800}
+                className="w-screen sm:w-auto h-64 sm:h-auto rounded-none sm:rounded-3xl shadow-none sm:shadow-2xl object-cover"
                 unoptimized
               />
 

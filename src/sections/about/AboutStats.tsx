@@ -90,13 +90,13 @@ const AboutStats = () => {
   }
 
   return (
-    <section className="py-20 bg-gradient-to-br from-primary/5 to-secondary/5 relative overflow-hidden">
+    <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-br from-primary/5 to-secondary/5 relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute top-0 left-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl" />
       <div className="absolute bottom-0 right-0 w-40 h-40 bg-secondary/5 rounded-full blur-3xl" />
 
       <Container>
-        <div className="text-center mb-16">
+        <div className="text-center mb-10 sm:mb-12 md:mb-16">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -113,7 +113,7 @@ const AboutStats = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="font-heading text-4xl md:text-5xl font-bold mb-6"
+            className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold mb-6"
           >
             <span className="text-foreground">Our</span>
             <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent ml-3">
@@ -126,14 +126,14 @@ const AboutStats = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             viewport={{ once: true }}
-            className="text-xl text-foreground/70 max-w-3xl mx-auto leading-relaxed"
+            className="text-base sm:text-xl text-foreground/70 max-w-3xl mx-auto leading-relaxed px-4"
           >
             Numbers that speak for our commitment to excellence and customer
             satisfaction in the beauty industry.
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
           {stats.map((stat, index) => {
             const IconComponent = getIconForLabel(stat.label);
             const description = getDescriptionForLabel(stat.label, stat.value);
@@ -147,13 +147,13 @@ const AboutStats = () => {
                 viewport={{ once: true }}
                 className="text-center group"
               >
-                <div className="bg-white/80 backdrop-blur-md rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-500 border border-primary/10 group-hover:border-primary/20 h-full flex flex-col justify-between">
+                <div className="bg-white/80 backdrop-blur-md rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-lg hover:shadow-xl transition-all duration-500 border border-primary/10 group-hover:border-primary/20 h-full flex flex-col justify-between">
                   <div>
-                    <div className="w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                      <IconComponent className="w-8 h-8 text-white" />
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-primary to-secondary rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-5 lg:mb-6 group-hover:scale-110 transition-transform duration-300">
+                      <IconComponent className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
                     </div>
 
-                    <div className="text-4xl font-bold text-primary mb-2 group-hover:text-secondary transition-colors duration-300">
+                    <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-primary mb-2 group-hover:text-secondary transition-colors duration-300">
                       {stat?.label == "Happy Clients" ?
                        getSetting("happy_clients") 
                       : stat?.label == ("Average Rating") ? 
@@ -161,12 +161,12 @@ const AboutStats = () => {
                       : stat.value}
                     </div>
 
-                    <h3 className="font-semibold text-foreground mb-4 text-lg">
+                    <h3 className="font-semibold text-foreground mb-3 sm:mb-4 text-sm sm:text-base lg:text-lg">
                       {stat.label}
                     </h3>
                   </div>
 
-                  <p className="text-sm text-foreground/60 leading-relaxed">
+                  <p className="text-xs sm:text-sm text-foreground/60 leading-relaxed">
                     {description}
                   </p>
                 </div>

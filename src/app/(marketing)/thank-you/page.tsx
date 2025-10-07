@@ -76,3 +76,6 @@ export const metadata = {
     "booking confirmation, thank you, appointment confirmed, beauty services",
   robots: "noindex, nofollow", // Typically you don't want thank you pages indexed
 };
+
+// Opt this page into dynamic rendering to ensure URL search params are available in production builds
+export const dynamic = "force-dynamic";

@@ -7,7 +7,7 @@ import WhyChooseUsSection from "@/sections/home/WhyChooseUsSection";
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 mt-16">
       <AboutHero />
       <AboutMission />
       <AboutStats />
