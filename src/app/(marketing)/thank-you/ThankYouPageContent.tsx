@@ -26,7 +26,8 @@ export default function ThankYouPageContent() {
     const msg = searchParams.get("message");
 
     if (order) setOrderNumber(order);
-    if (msg) setMessage(decodeURIComponent(msg));
+    // We no longer use message from URL for production safety
+    setMessage("");
   }, [searchParams]);
 
   // Prevent hydration mismatch by not rendering until client-side
@@ -110,25 +111,7 @@ export default function ThankYouPageContent() {
             )}
           </div>
 
-          {/* Message Content */}
-          {message && (
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-              className="bg-white/90 backdrop-blur-md rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 shadow-xl border border-primary/10 mb-8"
-            >
-              <div
-                className="prose prose-base sm:prose-lg max-w-none"
-                dangerouslySetInnerHTML={renderMessage(message)}
-                style={{
-                  fontFamily: "Arial, sans-serif",
-                  lineHeight: "1.6",
-                  color: "#333",
-                }}
-              />
-            </motion.div>
-          )}
+          {/* Removed message rendering for safety; order number shown above */}
 
           {/* Contact Information */}
           <motion.div

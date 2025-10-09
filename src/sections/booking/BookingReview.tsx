@@ -172,15 +172,8 @@ const BookingReview = ({
         response?.data?.appointment?.order_number ||
         null;
 
-      // Prefer API's message if available
-      const messageFromApi = response?.message || "";
-      const message =
-        messageFromApi ||
-        "Booking successful! We'll contact you shortly to confirm your appointment.";
-
       const params = new URLSearchParams();
       if (possibleOrderNumber) params.set("orderNumber", String(possibleOrderNumber));
-      params.set("message", encodeURIComponent(message));
 
       router.push(`/thank-you?${params.toString()}`);
       
