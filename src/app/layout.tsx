@@ -3,6 +3,8 @@ import { Raleway, Poppins } from "next/font/google";
 import "./globals.css";
 import RootWrapper from "@/components/RootWrapper";
 import Script from "next/script";
+import { GoogleAnalytics } from "@next/third-parties/google";
+import CookieConsent from "@/components/CookieConsent";
 
 const poppins = Poppins({
   variable: "--font-base",
@@ -32,7 +34,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${poppins.variable} ${raleway.variable} antialiased`}>
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
         <RootWrapper>{children}</RootWrapper>
+        <CookieConsent />
 
         <Script
           id="structured-data"
