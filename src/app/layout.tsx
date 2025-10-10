@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Raleway, Poppins } from "next/font/google";
 import "./globals.css";
 import RootWrapper from "@/components/RootWrapper";
+import Script from "next/script";
 
 const poppins = Poppins({
   variable: "--font-base",
@@ -32,6 +33,24 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${poppins.variable} ${raleway.variable} antialiased`}>
         <RootWrapper>{children}</RootWrapper>
+
+        <Script
+          id="structured-data"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              name: "Vrushik Visavadiya",
+              jobTitle: "Frontend Developer",
+              url: "https://vrushikvisavadiya.com/",
+              worksFor: {
+                "@type": "Organization",
+                name: "Beauty Den",
+              },
+            }),
+          }}
+        />
       </body>
     </html>
   );
