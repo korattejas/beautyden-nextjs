@@ -17,7 +17,7 @@ export default function WhatsAppWidget() {
     script.id = scriptId;
     script.type = "text/javascript";
     script.src = "https://d3mkw6s8thqya7.cloudfront.net/integration-plugin.js";
-    script.setAttribute("widget-id", "aaa51t");
+    script.setAttribute("widget-id", "aaa54e");
     script.async = true;
 
     // Append to body
