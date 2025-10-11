@@ -169,19 +169,27 @@ const AboutHero = () => {
               </motion.div>
 
               <motion.div
-                animate={{ y: [10, -10] }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: 1,
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                animate={{ 
+                  opacity: 1, 
+                  scale: 1, 
+                  y: [0, -8, 0] 
+                }}
+                transition={{ 
+                  opacity: { duration: 0.6, delay: 1.2 },
+                  scale: { duration: 0.6, delay: 1.2 },
+                  y: { duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1.5 }
                 }}
                 className="absolute -bottom-4 -right-4 bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-xl"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full flex items-center justify-center">
+                  <motion.div 
+                    className="w-12 h-12 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full flex items-center justify-center"
+                    animate={{ rotate: [0, 360] }}
+                    transition={{ duration: 8, repeat: Infinity, ease: "linear", delay: 2 }}
+                  >
                     <HiSparkles className="w-6 h-6 text-white" />
-                  </div>
+                  </motion.div>
                   <div>
                     <div className="font-semibold text-foreground">
                       Premium Quality

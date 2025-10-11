@@ -40,7 +40,7 @@ export default function HomePage() {
           icon: <HiSparkles className="w-5 h-5 mr-2" />,
         }}
         secondaryButton={{
-          text: "Learn More",
+          text: "About BeautyDen",
           href: "/about",
         }}
         features={[

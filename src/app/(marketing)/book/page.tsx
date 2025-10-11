@@ -60,6 +60,21 @@ const BookingPageContent = () => {
       setCurrentStep(currentStep - 1);
     }
   };
+
+  // Listen for navigation events from header cart
+  useEffect(() => {
+    const handleNavigateToNextStep = () => {
+      if (currentStep === 1 && items.length > 0) {
+        // If on step 1 and have items in cart, go to step 2
+        nextStep();
+      }
+    };
+
+    window.addEventListener('navigateToNextStep', handleNavigateToNextStep);
+    return () => {
+      window.removeEventListener('navigateToNextStep', handleNavigateToNextStep);
+    };
+  }, [currentStep, items.length]);
   console.log("bookingData----->>>",bookingData)
   console.log("bookingData.services----->>>",bookingData.services)
   console.log("bookingData.services.length----->>>",bookingData.services?.length)

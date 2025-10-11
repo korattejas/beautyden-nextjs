@@ -161,15 +161,17 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
     return settings.find((setting) => setting.key === key)?.value || "";
   };
 
+  // Check if mobile screen for conditional animations
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   return (
     <>
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: index * 0.05 }}
+      initial={isMobile ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+      whileInView={isMobile ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
+      transition={isMobile ? { duration: 0 } : { duration: 0.6, delay: index * 0.05 }}
       viewport={{ once: true }}
-      whileHover={{ y: -5 }}
+      whileHover={isMobile ? {} : { y: -5 }}
       className="group bg-white/80 backdrop-blur-md rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 border border-primary/10 hover:border-primary/20 h-full flex flex-col"
     >
       {/* Service Image */}

@@ -268,11 +268,13 @@ console.log("selectedServices----",selectedServices)
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    // Smooth scroll to services section
-    document.getElementById("services-section")?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+    // Smooth scroll to services section - disabled on mobile screens
+    if (typeof window !== "undefined" && window.innerWidth >= 768) {
+      document.getElementById("services-section")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
   };
 
   const toggleService = (service: any) => {
@@ -376,7 +378,7 @@ console.log("selectedServices----",selectedServices)
       {/* Main Content - Left Right Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Section - Services Selection */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-6 order-2 lg:order-1">
           {/* Search and Category Filters */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -553,6 +555,7 @@ console.log("selectedServices----",selectedServices)
             )}
           </motion.div>
 
+
           {/* Services Grid */}
           <div id="services-section">
             <AnimatePresence mode="wait">
@@ -564,12 +567,6 @@ console.log("selectedServices----",selectedServices)
                 transition={{ duration: 0.4 }}
                 className="grid grid-cols-1 sm:grid-cols-2 gap-4"
               >
-                {/* cart header */}
-                           <MobileCartHeader
-  totalItems={totalItems}
-  totalPrice={getTotalPrice()}
-  onNext={onNext}
-/>
                 {services.map((service, index) => {
                   const isSelected = cartItems.find(
                     (s) => s.id === service.id.toString()
@@ -856,8 +853,8 @@ console.log("selectedServices----",selectedServices)
           </div>
         </div>
 
-        {/* Right Section - Selected Services & Summary */}
-        <div className="lg:col-span-1">
+        {/* Right Section - Selected Services & Summary - Shows at top on mobile, right on desktop */}
+        <div className="lg:col-span-1 order-1 lg:order-2">
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
