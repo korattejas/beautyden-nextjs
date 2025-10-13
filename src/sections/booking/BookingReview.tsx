@@ -36,7 +36,8 @@ const BookingReview = ({
   const { clearCart, items: cartItems } = useCart();
   const { data: settingsData } = useSettings();
   const settings = settingsData?.data || [];
-  const getSetting = (key: string) => settings.find((s: any) => s.key === key)?.value || "Start";
+  const getSetting = (key: string) =>
+    settings.find((s: any) => s.key === key)?.value || "Start";
 
   // Debug logging
   console.log("BookingReview - bookingData:", bookingData);
@@ -46,8 +47,9 @@ const BookingReview = ({
   console.log("BookingReview - cartItems length:", cartItems?.length);
 
   // Use cart items as fallback if bookingData.services is empty
-  const servicesToUse = bookingData.services?.length > 0 ? bookingData.services : cartItems;
-  
+  const servicesToUse =
+    bookingData.services?.length > 0 ? bookingData.services : cartItems;
+
   // Final safety check - if still no services, show error
   if (!servicesToUse || servicesToUse.length === 0) {
     console.error("No services found in booking data or cart");
@@ -92,7 +94,10 @@ const BookingReview = ({
 
   const getTotalDuration = () => {
     // Sum parsed durations from each service
-    return servicesToUse.reduce((acc: number, svc: any) => acc + parseDurationToMinutes(svc.duration), 0);
+    return servicesToUse.reduce(
+      (acc: number, svc: any) => acc + parseDurationToMinutes(svc.duration),
+      0
+    );
   };
 
   const formatDate = (dateString: string) => {
@@ -122,15 +127,17 @@ const BookingReview = ({
         alert("Please select at least one service before booking.");
         return;
       }
-      console.log("servicesToUse",servicesToUse)
+      console.log("servicesToUse", servicesToUse);
 
       // Prepare payload
-      const serviceIds = servicesToUse.map(service => service.id).join(',');
-      const serviceCategoryId = servicesToUse[0]?.category_id || '1';
+      const serviceIds = servicesToUse.map((service) => service.id).join(",");
+      const serviceCategoryId = servicesToUse[0]?.category_id || "1";
       const totalPrice = getTotalPrice();
       const totalDiscount = servicesToUse.reduce((total, service) => {
         const originalPrice = parseFloat(service.price);
-        const discountPrice = service.discount_price ? parseFloat(service.discount_price) : originalPrice;
+        const discountPrice = service.discount_price
+          ? parseFloat(service.discount_price)
+          : originalPrice;
         return total + (originalPrice - discountPrice);
       }, 0);
 
@@ -143,7 +150,7 @@ const BookingReview = ({
         service_id: serviceIds,
         appointment_date: bookingData.selectedDate,
         appointment_time: bookingData.selectedTime,
-        notes: bookingData.specialNotes || '',
+        notes: bookingData.specialNotes || "",
         quantity: servicesToUse.length,
         price: totalPrice,
         discount_price: totalDiscount > 0 ? totalDiscount : undefined,
@@ -161,10 +168,9 @@ const BookingReview = ({
       // Call API
       const response = await bookAppointment(payload);
       console.log("Booking response:", response);
-      
+
       // Clear cart
-      clearCart();
-      
+
       // Redirect to thank you page with response data
       // Try multiple shapes for order number
       const possibleOrderNumber =
@@ -173,22 +179,24 @@ const BookingReview = ({
         null;
 
       const params = new URLSearchParams();
-      if (possibleOrderNumber) params.set("orderNumber", String(possibleOrderNumber));
+      console.log("params:>>>>> ", params, possibleOrderNumber);
+      clearCart();
+      if (possibleOrderNumber)
+        params.set("orderNumber", String(possibleOrderNumber));
 
       router.push(`/thank-you?${params.toString()}`);
-      
     } catch (error: any) {
       console.error("Booking error:", error);
-      
+
       // Show more detailed error message
       let errorMessage = "Failed to book appointment. Please try again.";
-      
+
       if (error?.response?.data?.message) {
         errorMessage = error.response.data.message;
       } else if (error?.message) {
         errorMessage = error.message;
       }
-      
+
       alert(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -235,29 +243,33 @@ const BookingReview = ({
                       {service.name}
                     </p>
                     <p className="text-sm text-foreground/60">
-                      {service.category_name} • {formatDuration(parseDurationToMinutes(service.duration))}
+                      {service.category_name} •{" "}
+                      {formatDuration(parseDurationToMinutes(service.duration))}
                     </p>
                   </div>
                   {/* <p className="font-bold text-foreground">₹{service.price}</p> */}
                   <div className="text-right self-start">
-          {service?.discount_price ? (
-            <div className="flex flex-row gap-1 self-start items-end">
-              <span className="font-bold text-foreground">
-                 ₹{service?.discount_price}
-              </span>
-              <span className="text-sm text-foreground/60 line-through">
-                ₹{service.price}
-              </span>
-            </div>
-          ) : (
-            <>
-            <span className="mr-1"> {getSetting("service_price_start_text")}</span> 
-            <span className="font-bold text-foreground">
-             ₹{service.price}
-            </span>
-            </>
-          )}
-        </div>
+                    {service?.discount_price ? (
+                      <div className="flex flex-row gap-1 self-start items-end">
+                        <span className="font-bold text-foreground">
+                          ₹{service?.discount_price}
+                        </span>
+                        <span className="text-sm text-foreground/60 line-through">
+                          ₹{service.price}
+                        </span>
+                      </div>
+                    ) : (
+                      <>
+                        <span className="mr-1">
+                          {" "}
+                          {getSetting("service_price_start_text")}
+                        </span>
+                        <span className="font-bold text-foreground">
+                          ₹{service.price}
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
