@@ -7,6 +7,17 @@ type CreateSEOMetadataArgs = {
   keywords?: string[];
   canonical?: string;
   images?: { url: string; width?: number; height?: number; alt?: string }[];
+  robots?: {
+    index?: boolean;
+    follow?: boolean;
+    googleBot?: {
+      index?: boolean;
+      follow?: boolean;
+      "max-video-preview"?: number;
+      "max-image-preview"?: "none" | "standard" | "large";
+      "max-snippet"?: number;
+    };
+  };
 };
 
 export const siteUrl = "https://beautyden.in";
@@ -43,6 +54,7 @@ export function createSEOMetadata(args: CreateSEOMetadataArgs = {}): Metadata {
     keywords = defaultKeywords,
     canonical = siteUrl,
     images = defaultImages,
+    robots: customRobots,
   } = args;
 
   const metadata: Metadata = {
@@ -75,7 +87,7 @@ export function createSEOMetadata(args: CreateSEOMetadataArgs = {}): Metadata {
       images: images.map((img) => img.url),
       creator: "@beautyden",
     },
-    robots: {
+    robots: customRobots || {
       index: true,
       follow: true,
       googleBot: {
@@ -89,6 +101,35 @@ export function createSEOMetadata(args: CreateSEOMetadataArgs = {}): Metadata {
   };
 
   return metadata;
+}
+
+// Dynamic SEO for blog posts using API data
+export function createBlogPostSEOMetadata(blogData: {
+  title: string;
+  meta_description: string;
+  meta_keywords: string;
+  slug: string;
+  category_name: string;
+  author: string;
+  publish_date: string;
+  icon?: string;
+}): Metadata {
+  const keywords = blogData.meta_keywords 
+    ? blogData.meta_keywords.split(', ').map(k => k.trim())
+    : ['beauty tips', 'beauty blog', 'beauty advice'];
+
+  return createSEOMetadata({
+    titleDefault: `${blogData.title} | BeautyDen Blog`,
+    description: blogData.meta_description || `Read about ${blogData.title} on BeautyDen blog. Expert beauty tips and advice.`,
+    keywords: keywords,
+    canonical: `${siteUrl}/blog/${blogData.slug}`,
+    images: blogData.icon ? [{
+      url: blogData.icon,
+      width: 1200,
+      height: 630,
+      alt: blogData.title,
+    }] : undefined,
+  });
 }
 
 

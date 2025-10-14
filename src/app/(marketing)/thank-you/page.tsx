@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import ThankYouPageContent from "./ThankYouPageContent";
 import Container from "@/components/ui/Container";
 import { HiCheckCircle } from "react-icons/hi2";
+import type { Metadata } from "next";
+import { createSEOMetadata, siteUrl } from "@/lib/seo";
 
 // Loading fallback component
 function ThankYouPageSkeleton() {
@@ -68,14 +70,28 @@ export default function ThankYouPage() {
 }
 
 // Metadata for the page
-export const metadata = {
-  title: "Thank You - Booking Confirmed | BeautyDen",
-  description:
-    "Thank you for booking with BeautyDen. Your appointment has been confirmed and we'll be in touch soon.",
-  keywords:
-    "booking confirmation, thank you, appointment confirmed, beauty services",
-  robots: "noindex, nofollow", // Typically you don't want thank you pages indexed
-};
+export const metadata: Metadata = createSEOMetadata({
+  titleDefault: "Thank You - Booking Confirmed | BeautyDen",
+  description: "Thank you for booking with BeautyDen. Your appointment has been confirmed and we'll be in touch soon with your beauty service details.",
+  keywords: [
+    "booking confirmation",
+    "thank you beauty services",
+    "appointment confirmed",
+    "beauty booking success",
+    "beauty service confirmed",
+    "booking completed",
+    "beauty appointment booked",
+    "beauty service thank you",
+    "booking confirmation page",
+    "beauty service success"
+  ],
+  canonical: `${siteUrl}/thank-you`,
+  // Override robots for thank you page
+  robots: {
+    index: false,
+    follow: false,
+  },
+});
 
 // Opt this page into dynamic rendering to ensure URL search params are available in production builds
 export const dynamic = "force-dynamic";

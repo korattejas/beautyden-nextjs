@@ -7,6 +7,19 @@ import { createSEOMetadata, siteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = createSEOMetadata({
   titleDefault: "Contact BeautyDen - Book Home Beauty Services",
+  description: "Get in touch with BeautyDen for home beauty services. Contact us for booking, support, or inquiries. Professional beauty services delivered to your doorstep.",
+  keywords: [
+    "contact beauty services",
+    "beauty service booking",
+    "beauty customer support",
+    "beauty service inquiry",
+    "beauty service contact",
+    "home beauty booking",
+    "beauty service help",
+    "beauty service support",
+    "beauty appointment booking",
+    "beauty service customer care"
+  ],
   canonical: `${siteUrl}/contact`,
 });
 

@@ -9,6 +9,19 @@ import { createSEOMetadata, siteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = createSEOMetadata({
   titleDefault: "About BeautyDen - Professional Beauty Services at Your Doorstep",
+  description: "Learn about BeautyDen's mission to bring professional beauty services to your home. Discover our story, values, and commitment to quality beauty treatments delivered by certified experts.",
+  keywords: [
+    "about beauty services",
+    "beauty company story",
+    "beauty service mission",
+    "professional beauty team",
+    "beauty service values",
+    "home beauty company",
+    "beauty service quality",
+    "beauty service expertise",
+    "beauty service commitment",
+    "beauty service vision"
+  ],
   canonical: `${siteUrl}/about`,
 });
 
