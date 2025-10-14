@@ -11,6 +11,9 @@ import {
   HiUser,
   HiMapPin,
   HiCreditCard,
+  HiShieldCheck,
+  HiPhone,
+  HiEnvelope,
 } from "react-icons/hi2";
 import Button from "@/components/ui/Button";
 import { BookingFormData } from "@/types/booking";
@@ -31,6 +34,8 @@ const BookingReview = ({
   onConfirm,
 }: BookingReviewProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showGuidelines, setShowGuidelines] = useState(false);
+  const [hasAgreedGuidelines, setHasAgreedGuidelines] = useState(false);
   const [paymentMethod] = useState("pay_after_service"); // For now, only pay after service
   const router = useRouter();
   const { clearCart, items: cartItems } = useCart();
@@ -120,6 +125,11 @@ const BookingReview = ({
   };
 
   const handleConfirmBooking = async () => {
+    // Gate: require user agreement before proceeding
+    if (!hasAgreedGuidelines) {
+      setShowGuidelines(true);
+      return;
+    }
     setIsSubmitting(true);
     try {
       // Validate that services exist
@@ -201,6 +211,12 @@ const BookingReview = ({
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleAgreeGuidelines = async () => {
+    setHasAgreedGuidelines(true);
+    setShowGuidelines(false);
+    await handleConfirmBooking();
   };
 
   return (
@@ -467,6 +483,69 @@ const BookingReview = ({
           Previous
         </Button>
       </div>
+
+      {/* Safety & Service Guidelines Modal */}
+      {showGuidelines && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowGuidelines(false)} />
+          <div className="relative z-10 w-full h-full bg-white sm:w-[560px] sm:h-auto sm:max-h-[75vh] sm:mx-4 sm:my-6 sm:rounded-3xl rounded-none shadow-2xl border border-primary/10 overflow-hidden flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+            <div className="px-5 sm:px-8 py-5 sm:py-6 bg-gradient-to-r from-primary/5 to-secondary/5 border-b border-primary/10 flex items-center gap-3 shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <HiShieldCheck className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-lg sm:text-xl font-bold text-foreground">BeautyDen — Safety & Service Guidelines</h3>
+                <p className="text-foreground/60 text-sm">Please review and agree to continue</p>
+              </div>
+            </div>
+
+            <div className="px-5 sm:px-8 py-5 sm:py-6 space-y-4 overflow-y-auto flex-1">
+              <p className="text-foreground/70 text-sm sm:text-base">
+                BeautyDen is committed to ensuring the safety and comfort of both our customers and beauticians.
+                Please follow these simple guidelines:
+              </p>
+
+              <ul className="list-disc pl-5 space-y-2 text-foreground/80 text-sm sm:text-base">
+                <li>Kindly do not exchange personal phone numbers or social media details with the beautician.</li>
+                <li>For children aged 6–18, parental supervision is required during the service.</li>
+                <li>Please avoid booking services for children under 6 years of age.</li>
+                <li>Only avail services listed in your booking cart.</li>
+              </ul>
+
+              <div className="mt-4 p-4 rounded-2xl bg-muted/40 border border-primary/10">
+                <p className="text-sm text-foreground/70 mb-3">If you face any issue or concern, please contact BeautyDen Support immediately:</p>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+                  <a href="tel:+919574758282" className="inline-flex items-center gap-2 text-foreground hover:text-primary transition-colors">
+                    <HiPhone className="w-5 h-5 text-primary" />
+                    <span className="font-medium">+91 9574758282‬</span>
+                  </a>
+                  <a href="mailto:contact@beautyden.in" className="inline-flex items-center gap-2 text-foreground hover:text-primary transition-colors">
+                    <HiEnvelope className="w-5 h-5 text-primary" />
+                    <span className="font-medium">contact@beautyden.in</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div className="px-5 sm:px-8 py-4 sm:py-5 bg-white border-t border-primary/10 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-end shrink-0">
+              <Button
+                variant="outline"
+                onClick={() => setShowGuidelines(false)}
+                className="w-full sm:w-auto border-2 border-primary/20 text-primary hover:bg-primary/5"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleAgreeGuidelines}
+                className="w-full sm:w-auto bg-gradient-to-r from-primary to-secondary text-white"
+                disabled={isSubmitting}
+              >
+                I Agree
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
