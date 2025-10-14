@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { HiXMark } from "react-icons/hi2";
 
 export default function CookieConsent() {
   const [showBanner, setShowBanner] = useState(false);

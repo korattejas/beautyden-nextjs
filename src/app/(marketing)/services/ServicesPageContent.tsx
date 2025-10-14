@@ -42,7 +42,7 @@ function ServicesContent() {
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
   // Fetch services with filters (will include city in hook via context)
-  const { data, error, isLoading, isFetching } = useServices({
+  const { data, error, isLoading } = useServices({
     search: debouncedSearchQuery,
     category_id: activeCategory,
     subcategory_id: activeSubCategory,

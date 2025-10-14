@@ -52,9 +52,9 @@ export default function ThankYouPageContent() {
   }
 
   // Function to render HTML content safely
-  const renderMessage = (htmlString: string) => {
-    return { __html: htmlString };
-  };
+  // const renderMessage = (htmlString: string) => {
+  //   return { __html: htmlString };
+  // };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary/10 via-white to-secondary/10 mt-16 py-16 sm:py-16">

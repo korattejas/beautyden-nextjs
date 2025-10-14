@@ -74,7 +74,7 @@ const BookingPageContent = () => {
     return () => {
       window.removeEventListener('navigateToNextStep', handleNavigateToNextStep);
     };
-  }, [currentStep, items.length]);
+  }, [currentStep, items.length, nextStep]);
   console.log("bookingData----->>>",bookingData)
   console.log("bookingData.services----->>>",bookingData.services)
   console.log("bookingData.services.length----->>>",bookingData.services?.length)

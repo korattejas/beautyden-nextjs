@@ -7,7 +7,6 @@ import {
   HiEnvelope,
   HiMapPin,
   HiHeart,
-  HiArrowRight,
 } from "react-icons/hi2";
 import { HiCode } from "react-icons/hi";
 import { FaFacebook, FaInstagram, FaYoutube, FaWhatsapp } from "react-icons/fa";
