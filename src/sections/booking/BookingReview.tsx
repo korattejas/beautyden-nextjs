@@ -124,9 +124,9 @@ const BookingReview = ({
     });
   };
 
-  const handleConfirmBooking = async () => {
-    // Gate: require user agreement before proceeding
-    if (!hasAgreedGuidelines) {
+  const handleConfirmBooking = async (skipGate: boolean = false) => {
+    // Gate: require user agreement before proceeding (unless explicitly skipped)
+    if (!hasAgreedGuidelines && !skipGate) {
       setShowGuidelines(true);
       return;
     }
@@ -214,9 +214,15 @@ const BookingReview = ({
   };
 
   const handleAgreeGuidelines = async () => {
-    setHasAgreedGuidelines(true);
-    setShowGuidelines(false);
-    await handleConfirmBooking();
+    if (isSubmitting) return;
+    // Show loader on Agree button and keep modal open during processing
+    setIsSubmitting(true);
+    await handleConfirmBooking(true);
+  };
+
+  const handleOpenGuidelines = () => {
+    if (isSubmitting) return;
+    setShowGuidelines(true);
   };
 
   return (
@@ -447,7 +453,7 @@ const BookingReview = ({
 
             {/* Confirm Button */}
             <Button
-              onClick={handleConfirmBooking}
+              onClick={handleOpenGuidelines}
               disabled={isSubmitting}
               className="w-full bg-gradient-to-r from-primary to-secondary text-white py-4 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mb-4"
             >
@@ -487,7 +493,12 @@ const BookingReview = ({
       {/* Safety & Service Guidelines Modal */}
       {showGuidelines && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setShowGuidelines(false)} />
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => {
+              if (!isSubmitting) setShowGuidelines(false);
+            }}
+          />
           <div className="relative z-10 w-full h-full bg-white sm:w-[560px] sm:h-auto sm:max-h-[75vh] sm:mx-4 sm:my-6 sm:rounded-3xl rounded-none shadow-2xl border border-primary/10 overflow-hidden flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
             <div className="px-5 sm:px-8 py-5 sm:py-6 bg-gradient-to-r from-primary/5 to-secondary/5 border-b border-primary/10 flex items-center gap-3 shrink-0">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -532,6 +543,7 @@ const BookingReview = ({
                 variant="outline"
                 onClick={() => setShowGuidelines(false)}
                 className="w-full sm:w-auto border-2 border-primary/20 text-primary hover:bg-primary/5"
+                disabled={isSubmitting}
               >
                 Cancel
               </Button>
@@ -540,7 +552,14 @@ const BookingReview = ({
                 className="w-full sm:w-auto bg-gradient-to-r from-primary to-secondary text-white"
                 disabled={isSubmitting}
               >
-                I Agree
+                {isSubmitting ? (
+                  <div className="flex items-center justify-center gap-3">
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Processing...
+                  </div>
+                ) : (
+                  "I Agree"
+                )}
               </Button>
             </div>
           </div>
