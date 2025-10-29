@@ -11,16 +11,11 @@ import {
   HiUser,
   HiMapPin,
   HiCreditCard,
-  HiShieldCheck,
-  HiPhone,
-  HiEnvelope,
 } from "react-icons/hi2";
 import Button from "@/components/ui/Button";
 import { BookingFormData } from "@/types/booking";
 import { bookAppointment } from "@/services/booking.service";
 import { useCart } from "@/contexts/CartContext";
-import { formatDuration, parseDurationToMinutes } from "@/utils/time";
-import { useSettings } from "@/hooks/useApi";
 
 interface BookingReviewProps {
   bookingData: BookingFormData;
@@ -34,15 +29,9 @@ const BookingReview = ({
   onConfirm,
 }: BookingReviewProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showGuidelines, setShowGuidelines] = useState(false);
-  const [hasAgreedGuidelines, setHasAgreedGuidelines] = useState(false);
   const [paymentMethod] = useState("pay_after_service"); // For now, only pay after service
   const router = useRouter();
   const { clearCart, items: cartItems } = useCart();
-  const { data: settingsData } = useSettings();
-  const settings = settingsData?.data || [];
-  const getSetting = (key: string) =>
-    settings.find((s: any) => s.key === key)?.value || "Start";
 
   // Debug logging
   console.log("BookingReview - bookingData:", bookingData);
@@ -52,9 +41,8 @@ const BookingReview = ({
   console.log("BookingReview - cartItems length:", cartItems?.length);
 
   // Use cart items as fallback if bookingData.services is empty
-  const servicesToUse =
-    bookingData.services?.length > 0 ? bookingData.services : cartItems;
-
+  const servicesToUse = bookingData.services?.length > 0 ? bookingData.services : cartItems;
+  
   // Final safety check - if still no services, show error
   if (!servicesToUse || servicesToUse.length === 0) {
     console.error("No services found in booking data or cart");
@@ -98,11 +86,8 @@ const BookingReview = ({
   };
 
   const getTotalDuration = () => {
-    // Sum parsed durations from each service
-    return servicesToUse.reduce(
-      (acc: number, svc: any) => acc + parseDurationToMinutes(svc.duration),
-      0
-    );
+    // Simple duration calculation - sum all service durations
+    return servicesToUse.length * 60; // Assuming 60 minutes per service
   };
 
   const formatDate = (dateString: string) => {
@@ -124,12 +109,7 @@ const BookingReview = ({
     });
   };
 
-  const handleConfirmBooking = async (skipGate: boolean = false) => {
-    // Gate: require user agreement before proceeding (unless explicitly skipped)
-    if (!hasAgreedGuidelines && !skipGate) {
-      setShowGuidelines(true);
-      return;
-    }
+  const handleConfirmBooking = async () => {
     setIsSubmitting(true);
     try {
       // Validate that services exist
@@ -137,17 +117,15 @@ const BookingReview = ({
         alert("Please select at least one service before booking.");
         return;
       }
-      console.log("servicesToUse", servicesToUse);
+      console.log("servicesToUse",servicesToUse)
 
       // Prepare payload
-      const serviceIds = servicesToUse.map((service) => service.id).join(",");
-      const serviceCategoryId = servicesToUse[0]?.category_id || "1";
+      const serviceIds = servicesToUse.map(service => service.id).join(',');
+      const serviceCategoryId = servicesToUse[0]?.category_id || '1';
       const totalPrice = getTotalPrice();
       const totalDiscount = servicesToUse.reduce((total, service) => {
         const originalPrice = parseFloat(service.price);
-        const discountPrice = service.discount_price
-          ? parseFloat(service.discount_price)
-          : originalPrice;
+        const discountPrice = service.discount_price ? parseFloat(service.discount_price) : originalPrice;
         return total + (originalPrice - discountPrice);
       }, 0);
 
@@ -160,7 +138,7 @@ const BookingReview = ({
         service_id: serviceIds,
         appointment_date: bookingData.selectedDate,
         appointment_time: bookingData.selectedTime,
-        notes: bookingData.specialNotes || "",
+        notes: bookingData.specialNotes || '',
         quantity: servicesToUse.length,
         price: totalPrice,
         discount_price: totalDiscount > 0 ? totalDiscount : undefined,
@@ -178,51 +156,41 @@ const BookingReview = ({
       // Call API
       const response = await bookAppointment(payload);
       console.log("Booking response:", response);
-
+      
       // Clear cart
-
-      // Redirect to thank you page with response data
-      // Try multiple shapes for order number
-      const possibleOrderNumber =
-        response?.data?.order_number ||
-        response?.data?.appointment?.order_number ||
-        null;
-
-      const params = new URLSearchParams();
-      console.log("params:>>>>> ", params, possibleOrderNumber);
       clearCart();
-      if (possibleOrderNumber)
-        params.set("orderNumber", String(possibleOrderNumber));
-
-      router.push(`/thank-you?${params.toString()}`);
+      
+      // Redirect to thank you page with response data
+      // Fix: Access response data correctly with safety checks
+      let orderNumber = "Unknown";
+      
+      if (response?.data?.order_number) {
+        orderNumber = response.data.order_number;
+      } else if (response?.data?.appointment?.order_number) {
+        orderNumber = response.data.appointment.order_number;
+      }
+      
+      // Use a simple success message instead of the complex HTML from API
+      const message = "Booking successful! We'll contact you shortly to confirm your appointment.";
+      
+      router.push(`/thank-you?orderNumber=${orderNumber}&message=${encodeURIComponent(message)}`);
+      
     } catch (error: any) {
       console.error("Booking error:", error);
-
+      
       // Show more detailed error message
       let errorMessage = "Failed to book appointment. Please try again.";
-
+      
       if (error?.response?.data?.message) {
         errorMessage = error.response.data.message;
       } else if (error?.message) {
         errorMessage = error.message;
       }
-
+      
       alert(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleAgreeGuidelines = async () => {
-    if (isSubmitting) return;
-    // Show loader on Agree button and keep modal open during processing
-    setIsSubmitting(true);
-    await handleConfirmBooking(true);
-  };
-
-  const handleOpenGuidelines = () => {
-    if (isSubmitting) return;
-    setShowGuidelines(true);
   };
 
   return (
@@ -265,33 +233,26 @@ const BookingReview = ({
                       {service.name}
                     </p>
                     <p className="text-sm text-foreground/60">
-                      {service.category_name} •{" "}
-                      {formatDuration(parseDurationToMinutes(service.duration))}
+                      {service.category_name} • {service.duration}
                     </p>
                   </div>
                   {/* <p className="font-bold text-foreground">₹{service.price}</p> */}
                   <div className="text-right self-start">
-                    {service?.discount_price ? (
-                      <div className="flex flex-row gap-1 self-start items-end">
-                        <span className="font-bold text-foreground">
-                          ₹{service?.discount_price}
-                        </span>
-                        <span className="text-sm text-foreground/60 line-through">
-                          ₹{service.price}
-                        </span>
-                      </div>
-                    ) : (
-                      <>
-                        <span className="mr-1">
-                          {" "}
-                          {getSetting("service_price_start_text")}
-                        </span>
-                        <span className="font-bold text-foreground">
-                          ₹{service.price}
-                        </span>
-                      </>
-                    )}
-                  </div>
+          {service?.discount_price ? (
+            <div className="flex flex-row gap-1 self-start items-end">
+              <span className="font-bold text-foreground">
+                Start ₹{service?.discount_price}
+              </span>
+              <span className="text-sm text-foreground/60 line-through">
+                ₹{service.price}
+              </span>
+            </div>
+          ) : (
+            <span className="font-bold text-foreground">
+              Start ₹{service.price}
+            </span>
+          )}
+        </div>
                 </div>
               ))}
             </div>
@@ -409,7 +370,7 @@ const BookingReview = ({
               <div className="flex justify-between items-center">
                 <span className="text-foreground/70">Estimated Duration</span>
                 <span className="font-semibold text-foreground">
-                  {formatDuration(getTotalDuration())}
+                  {getTotalDuration()} min
                 </span>
               </div>
               {/* <div className="flex justify-between items-center border-t border-primary/20 pt-3">
@@ -453,7 +414,7 @@ const BookingReview = ({
 
             {/* Confirm Button */}
             <Button
-              onClick={handleOpenGuidelines}
+              onClick={handleConfirmBooking}
               disabled={isSubmitting}
               className="w-full bg-gradient-to-r from-primary to-secondary text-white py-4 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mb-4"
             >
@@ -489,82 +450,6 @@ const BookingReview = ({
           Previous
         </Button>
       </div>
-
-      {/* Safety & Service Guidelines Modal */}
-      {showGuidelines && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => {
-              if (!isSubmitting) setShowGuidelines(false);
-            }}
-          />
-          <div className="relative z-10 w-full h-full bg-white sm:w-[560px] sm:h-auto sm:max-h-[75vh] sm:mx-4 sm:my-6 sm:rounded-3xl rounded-none shadow-2xl border border-primary/10 overflow-hidden flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
-            <div className="px-5 sm:px-8 py-5 sm:py-6 bg-gradient-to-r from-primary/5 to-secondary/5 border-b border-primary/10 flex items-center gap-3 shrink-0">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <HiShieldCheck className="w-6 h-6 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-lg sm:text-xl font-bold text-foreground">BeautyDen — Safety & Service Guidelines</h3>
-                <p className="text-foreground/60 text-sm">Please review and agree to continue</p>
-              </div>
-            </div>
-
-            <div className="px-5 sm:px-8 py-5 sm:py-6 space-y-4 overflow-y-auto flex-1">
-              <p className="text-foreground/70 text-sm sm:text-base">
-                BeautyDen is committed to ensuring the safety and comfort of both our customers and beauticians.
-                Please follow these simple guidelines:
-              </p>
-
-              <ul className="list-disc pl-5 space-y-2 text-foreground/80 text-sm sm:text-base">
-                <li>Kindly do not exchange personal phone numbers or social media details with the beautician.</li>
-                <li>For children aged 6–18, parental supervision is required during the service.</li>
-                <li>Please avoid booking services for children under 6 years of age.</li>
-                <li>Only avail services listed in your booking cart.</li>
-              </ul>
-
-              <div className="mt-4 p-4 rounded-2xl bg-muted/40 border border-primary/10">
-                <p className="text-sm text-foreground/70 mb-3">If you face any issue or concern, please contact BeautyDen Support immediately:</p>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
-                  <a href="tel:+919574758282" className="inline-flex items-center gap-2 text-foreground hover:text-primary transition-colors">
-                    <HiPhone className="w-5 h-5 text-primary" />
-                    <span className="font-medium">+91 9574758282‬</span>
-                  </a>
-                  <a href="mailto:contact@beautyden.in" className="inline-flex items-center gap-2 text-foreground hover:text-primary transition-colors">
-                    <HiEnvelope className="w-5 h-5 text-primary" />
-                    <span className="font-medium">contact@beautyden.in</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            <div className="px-5 sm:px-8 py-4 sm:py-5 bg-white border-t border-primary/10 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-end shrink-0">
-              <Button
-                variant="outline"
-                onClick={() => setShowGuidelines(false)}
-                className="w-full sm:w-auto border-2 border-primary/20 text-primary hover:bg-primary/5"
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleAgreeGuidelines}
-                className="w-full sm:w-auto bg-gradient-to-r from-primary to-secondary text-white"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <div className="flex items-center justify-center gap-3">
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Processing...
-                  </div>
-                ) : (
-                  "I Agree"
-                )}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

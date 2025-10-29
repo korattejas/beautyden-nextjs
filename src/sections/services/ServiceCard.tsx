@@ -8,7 +8,6 @@ import Image from "next/image";
 import { Service } from "@/services/services.service";
 import { useState } from "react";
 import { useSettings } from "@/hooks/useApi";
-import { formatDuration, parseDurationToMinutes } from "@/utils/time";
 
 interface ServiceCardProps {
   service: Service;
@@ -161,17 +160,15 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
     return settings.find((setting) => setting.key === key)?.value || "";
   };
 
-  // Check if mobile screen for conditional animations
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   return (
     <>
     <motion.div
-      initial={isMobile ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-      whileInView={isMobile ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
-      transition={isMobile ? { duration: 0 } : { duration: 0.6, delay: index * 0.05 }}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: index * 0.05 }}
       viewport={{ once: true }}
-      whileHover={isMobile ? {} : { y: -5 }}
+      whileHover={{ y: -5 }}
       className="group bg-white/80 backdrop-blur-md rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 border border-primary/10 hover:border-primary/20 h-full flex flex-col"
     >
       {/* Service Image */}
@@ -215,7 +212,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
 
         {/* Description */}
 
-        <div className="mb-3 text-sm text-foreground/70 leading-relaxed min-h-[56px]">
+        <div className="mb-3 text-sm text-foreground/70 leading-relaxed">
   {showFull || (service.description?.length ?? 0) < 100 ? (
     <span>{service.description}</span>
   ) : (
@@ -234,11 +231,10 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
 
 
         {/* Duration and Reviews */}
-        <div className="flex items-center justify-between mb-3 text-xs text-foreground/60 min-h-[20px]">
+        <div className="flex items-center justify-between mb-3 text-xs text-foreground/60">
           <div className="flex items-center gap-1">
             <HiClock className="w-3 h-3" />
-            {/* <span>{formatDuration(parseDurationToMinutes(service.duration))}</span> */}
-            <span>{formatDuration(parseDurationToMinutes(service.duration))}</span>
+            <span>{service.duration}</span>
           </div>
           <span>{service.reviews || 0} reviews</span>
         </div>
@@ -311,7 +307,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
 </div>
 
           {/* Action Buttons */}
-          <div className="space-y-2 pb-2">
+          <div className="space-y-2">
             {/* View Service Button */}
             <Button
               onClick={() => setShowModal(true)}

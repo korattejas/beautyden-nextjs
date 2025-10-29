@@ -149,13 +149,13 @@ const ServiceAreaSection = () => {
             className="relative flex justify-center lg:justify-end"
           >
             {/* Main Image with rounded-3xl */}
-            <div className="relative overflow-visible -mx-4 sm:mx-0">
-              <div className="w-screen sm:w-80 h-64 sm:h-80 md:w-96 md:h-96 rounded-none sm:rounded-3xl overflow-hidden shadow-none sm:shadow-xl border-0 sm:border-4 border-white">
+            <div className="relative overflow-hidden">
+              <div className="w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 rounded-3xl overflow-hidden shadow-xl border-4 border-white">
                 <Image
                   src={heroImage}
                   alt="Professional beauty service"
-                  width={800}
-                  height={600}
+                  width={400}
+                  height={400}
                   className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                   priority
                   unoptimized

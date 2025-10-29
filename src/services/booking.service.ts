@@ -1,6 +1,5 @@
 import api from "@/api/api";
 import { endpoints } from "@/api/endpoints";
-import { decryptData } from "@/utils/encryption";
 
 export interface BookAppointmentPayload {
   first_name: string;
@@ -48,23 +47,8 @@ export interface BookAppointmentResponse {
   };
 }
 
-export const bookAppointment = async (
-  payload: BookAppointmentPayload
-): Promise<BookAppointmentResponse> => {
-  // const response = await api.post(endpoints.BOOK_APPOINTMENT, payload);
-  // console.log("response----",response)
-  // return response.data;
-
-  try {
-    const response = await api.post(endpoints.BOOK_APPOINTMENT, payload);
-
-    if (typeof response.data === "string" && response.data.includes(":")) {
-      return decryptData(response.data);
-    }
-
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching blog categories:", error);
-    throw error;
-  }
+export const bookAppointment = async (payload: BookAppointmentPayload): Promise<BookAppointmentResponse> => {
+  const response = await api.post(endpoints.BOOK_APPOINTMENT, payload);
+  console.log("response----",response)
+  return response.data;
 };

@@ -27,8 +27,6 @@ export interface Blog {
   tags: string[];
   icon: string | null;
   featured: number;
-  meta_description?: string;
-  meta_keywords?: string;
 }
 
 export interface PaginationLink {

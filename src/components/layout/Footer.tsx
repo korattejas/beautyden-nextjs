@@ -7,6 +7,7 @@ import {
   HiEnvelope,
   HiMapPin,
   HiHeart,
+  HiArrowRight,
 } from "react-icons/hi2";
 import { HiCode } from "react-icons/hi";
 import { FaFacebook, FaInstagram, FaYoutube, FaWhatsapp } from "react-icons/fa";
@@ -111,7 +112,6 @@ const Footer = () => {
               {/* Logo */}
               <div>
                 <div className="mb-6">
-                <Link href="/" className="flex items-center">
                   <Image
                     src="/logo.png"
                     alt="BeautyDen Logo"
@@ -119,7 +119,6 @@ const Footer = () => {
                     width={120}
                     className="object-contain h-12 invert"
                   />
-                  </Link>
                 </div>
 
                 <p className="text-gray-300 text-lg leading-relaxed max-w-md mb-6">
@@ -298,15 +297,16 @@ const Footer = () => {
           <div className="flex flex-col lg:flex-row justify-between items-center gap-4 text-gray-400 text-sm">
             <div className="flex flex-col lg:flex-row items-center gap-4">
               <span>© {currentYear} BeautyDen. All rights reserved.</span>
+              
             </div>
             <div className="flex items-center gap-2">
-              <span>Made with</span>
-              <HiHeart className="w-4 h-4 text-red-400 animate-pulse" />
-              <span>for beauty</span>
-            </div>
+                <span>Made with</span>
+                <HiHeart className="w-4 h-4 text-red-400 animate-pulse" />
+                <span>for beauty</span>
+              </div>
 
             {/* Developer Credit */}
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
               <HiCode className="w-4 h-4 text-white" />
               <span>Designed & Developed by</span>
               <a
@@ -315,9 +315,9 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 className="text-white hover:text-gray-300 font-semibold transition-colors duration-200"
               >
-                Vrushik
+                Vrushik Visavadiya
               </a>
-            </div>
+            </div> */}
           </div>
         </motion.div>
       </Container>

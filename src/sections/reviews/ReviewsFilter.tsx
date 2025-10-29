@@ -8,7 +8,7 @@ import {
   HiVideoCamera,
 } from "react-icons/hi2";
 import CustomSelect, { SelectOption } from "@/components/ui/CustomSelect";
-import { useServices, useServiceCategories } from "@/hooks/useApi";
+import { useServices } from "@/hooks/useApi";
 import { ReviewsFilters } from "@/types/reviews";
 
 interface ReviewsFilterProps {
@@ -17,8 +17,10 @@ interface ReviewsFilterProps {
 }
 
 const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
-  const { data: categoriesData } = useServiceCategories();
-  const categories = categoriesData?.data ?? [];
+  const { data: servicesData } = useServices();
+
+  // Fix: Access the nested data structure correctly
+  const services = servicesData?.data?.data ?? [];
 
   // Rating options with star icons
   const ratingOptions: SelectOption[] = [
@@ -29,11 +31,11 @@ const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
     { value: "1", label: "1+ Stars" },
   ];
 
-  // Category options
-  const categoryOptions: SelectOption[] = [
-    ...categories.map((category: any) => ({
-      value: category.id.toString(),
-      label: category.name,
+  // Service options - Fixed: Now services is properly an array
+  const serviceOptions: SelectOption[] = [
+    ...services.map((service) => ({
+      value: service.id.toString(),
+      label: service.name,
     })),
   ];
 
@@ -77,13 +79,17 @@ const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
           </div>
         </div>
 
-        {/* Category Filter */}
+        {/* Service Filter */}
         <div>
           <CustomSelect
-            options={categoryOptions}
-            value={filters.service_id || ""}
+            options={serviceOptions}
+            value={
+              serviceOptions.find(
+                (option) => option.value === filters.service_id
+              ) || null
+            }
             onChange={(value) => handleFilterChange("service_id", value)}
-            placeholder="All Categories"
+            placeholder="All Services"
           />
         </div>
 
@@ -91,7 +97,10 @@ const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
         <div>
           <CustomSelect
             options={ratingOptions}
-            value={filters.rating || ""}
+            value={
+              ratingOptions.find((option) => option.value === filters.rating) ||
+              null
+            }
             onChange={(value) => handleFilterChange("rating", value)}
             placeholder="All Ratings"
           />
@@ -174,8 +183,11 @@ const ReviewsFilter = ({ filters, onFiltersChange }: ReviewsFilterProps) => {
               animate={{ opacity: 1, scale: 1 }}
               className="inline-flex items-center gap-2 bg-secondary/10 text-secondary px-3 py-1.5 rounded-full text-sm font-medium"
             >
-              Category:{" "}
-              {categoryOptions.find((c) => c.value === filters.service_id)?.label}
+              Service:{" "}
+              {
+                serviceOptions.find((s) => s.value === filters.service_id)
+                  ?.label
+              }
               <button
                 onClick={() => handleFilterChange("service_id", "")}
                 className="hover:bg-secondary/20 rounded-full p-0.5 transition-colors"

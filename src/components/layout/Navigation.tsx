@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   HiBars3,
@@ -14,14 +14,15 @@ import {
   HiBriefcase,
   HiInformationCircle,
   HiShoppingBag,
-  HiChevronRight,
+  HiUser,
+  HiArrowRightOnRectangle,
   // HiChatBubbleLeftRightEllipsis,
 } from "react-icons/hi2";
 import Image from "next/image";
 import { useCityContext } from "@/contexts/CityContext";
 import { useCart } from "@/contexts/CartContext";
 import { useServiceCategories } from "@/hooks/useApi";
-import { formatDuration, parseDurationToMinutes } from "@/utils/time";
+import AuthModal from "@/components/ui/AuthModal";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,8 +30,9 @@ const Navigation = () => {
   const [showCityDropdown, setShowCityDropdown] = useState(false);
   const [showServicesMenu, setShowServicesMenu] = useState(false);
   const [showAboutMenu, setShowAboutMenu] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const pathname = usePathname();
-  const router = useRouter();
 
   const servicesRef = useRef<HTMLDivElement>(null);
   const aboutRef = useRef<HTMLDivElement>(null);
@@ -127,6 +129,24 @@ const Navigation = () => {
   }, []);
 
   useEffect(() => {
+    try {
+      setIsLoggedIn(localStorage.getItem("bd_isLoggedIn") === "true");
+    } catch {}
+    const onStorage = () => {
+      try {
+        setIsLoggedIn(localStorage.getItem("bd_isLoggedIn") === "true");
+      } catch {}
+    };
+    const onCustom = () => onStorage();
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("bd-auth-changed", onCustom as EventListener);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("bd-auth-changed", onCustom as EventListener);
+    };
+  }, []);
+
+  useEffect(() => {
     setIsOpen(false);
     setShowServicesMenu(false);
     setShowAboutMenu(false);
@@ -149,22 +169,6 @@ const Navigation = () => {
     setIsOpen(false);
   };
 
-  const handleContinueToBooking = () => {
-    setShowCartDropdown(false);
-    // If user is already on booking page, scroll to top to trigger step navigation
-    if (pathname === '/book') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      // Trigger a small delay to ensure the page is ready
-      setTimeout(() => {
-        // Dispatch a custom event that the booking page can listen to
-        window.dispatchEvent(new CustomEvent('navigateToNextStep'));
-      }, 100);
-    } else {
-      // If not on booking page, navigate to booking page
-      router.push('/book');
-    }
-  };
-
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   return (
@@ -185,7 +189,7 @@ const Navigation = () => {
                 alt="BeautyDen Logo"
                 height={50}
                 width={120}
-                className="object-contain h-12"
+                className="object-contain h-13"
               />
             </Link>
 
@@ -353,7 +357,19 @@ const Navigation = () => {
             </div>
 
             {/* Desktop Right Section */}
-            <div className="hidden lg:flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-3">
+              {/* Login/Profile */}
+              <button
+                onClick={() => (isLoggedIn ? (window.location.href = "/customer/account") : setAuthOpen(true))}
+                className="relative p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+                aria-label={isLoggedIn ? "Account" : "Login"}
+              >
+                {isLoggedIn ? (
+                  <HiUser className="w-5 h-5 text-primary" />
+                ) : (
+                  <HiArrowRightOnRectangle className="w-5 h-5 text-primary" />
+                )}
+              </button>
               {/* City Selector */}
               <div ref={cityRef} className="relative">
                 <button
@@ -460,7 +476,7 @@ const Navigation = () => {
                                 <div className="min-w-0 flex-1">
                                   <div className="text-sm font-medium text-gray-900 truncate">{it.name}</div>
                                   <div className="text-xs text-gray-500 truncate">{it.category_name}</div>
-                                  <div className="text-xs text-gray-500">{formatDuration(parseDurationToMinutes(it.duration))}</div>
+                                  <div className="text-xs text-gray-500">{it.duration}</div>
                                 </div>
                               </div>
                               <div className="text-right flex-shrink-0">
@@ -476,12 +492,8 @@ const Navigation = () => {
                         <div className="text-sm font-bold text-primary">₹{totalPrice.toLocaleString()}</div>
                       </div> */}
                       <div className="mt-3 grid grid-cols-1 gap-2">
-                        <button 
-                          onClick={handleContinueToBooking}
-                          className="text-center text-sm px-3 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors"
-                        >
-                          Continue to Date & Time
-                        </button>
+                        <Link href="/book" className="text-center text-sm px-3 py-2 rounded-lg bg-primary text-white hover:bg-primary/90" onClick={() => setShowCartDropdown(false)}>View</Link>
+                        {/* <Link href="/book" className="text-center text-sm px-3 py-2 rounded-lg bg-primary text-white hover:bg-primary/90" onClick={() => setShowCartDropdown(false)}>Continue</Link> */}
                       </div>
                     </motion.div>
                   )}
@@ -500,7 +512,19 @@ const Navigation = () => {
             </div>
 
             {/* Mobile Cart + Menu Buttons */}
-            <div className="lg:hidden flex items-center gap-2">
+            <div className="md:hidden flex items-center gap-2">
+              {/* Mobile Login/Profile */}
+              <button
+                onClick={() => (isLoggedIn ? (window.location.href = "/customer/account") : setAuthOpen(true))}
+                className="p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+                aria-label={isLoggedIn ? "Account" : "Login"}
+              >
+                {isLoggedIn ? (
+                  <HiUser className="w-5 h-5 text-primary" />
+                ) : (
+                  <HiArrowRightOnRectangle className="w-5 h-5 text-primary" />
+                )}
+              </button>
               <div ref={cartRef} className="relative">
                 <button
                   onClick={() => setShowCartDropdown((s) => !s)}
@@ -521,91 +545,63 @@ const Navigation = () => {
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 8 }}
-                      className="fixed left-1/2 -translate-x-1/2 top-16 w-[92vw] max-w-sm bg-white rounded-2xl shadow-2xl border border-gray-200 z-[100] max-h-[80vh] flex flex-col"
+                      className="absolute top-full right-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-gray-200 p-4 z-50"
                     >
-                      {/* Header */}
-                      <div className="p-4 border-b border-gray-100">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <HiShoppingBag className="w-5 h-5 text-primary" />
-                            <div className="text-lg font-bold text-gray-900">Your Cart</div>
-                          </div>
-                          <div className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                            {totalItems} item{totalItems !== 1 ? "s" : ""}
-                          </div>
-                        </div>
+                      <div className="mb-3 flex items-center justify-between">
+                        <div className="text-sm font-semibold text-gray-900">Your Cart</div>
+                        <div className="text-xs text-gray-500">{totalItems} item{totalItems !== 1 ? "s" : ""}</div>
                       </div>
-
-                      {/* Cart Items */}
-                      <div className="flex-1 overflow-y-auto p-4">
-                        {items.length === 0 ? (
-                          <div className="text-center py-8">
-                            <div className="text-4xl mb-3">🛍️</div>
-                            <div className="text-sm text-gray-500 mb-2">Your cart is empty</div>
-                            <div className="text-xs text-gray-400">Add services to get started</div>
-                          </div>
-                        ) : (
-                          <div className="space-y-3">
-                            {items.map((it) => (
-                              <div key={it.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-                                <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-white flex items-center justify-center shadow-sm">
+                      {items.length === 0 ? (
+                        <div className="text-sm text-gray-500 py-6 text-center">Your cart is empty</div>
+                      ) : (
+                        <div className="max-h-56 overflow-auto space-y-3">
+                          {items.map((it) => (
+                            <div key={it.id} className="flex items-start justify-between gap-3 border-b border-gray-100 pb-3 last:border-b-0">
+                              <div className="flex items-start gap-3 min-w-0 flex-1">
+                                <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 flex items-center justify-center">
                                   {it.icon ? (
                                     <Image
                                       src={it.icon}
                                       alt={it.name}
-                                      width={48}
-                                      height={48}
+                                      width={40}
+                                      height={40}
                                       className="object-cover w-full h-full"
                                       unoptimized
                                     />
                                   ) : (
-                                    <HiSparkles className="w-6 h-6 text-gray-400" />
+                                    <HiSparkles className="w-5 h-5 text-gray-400" />
                                   )}
                                 </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="text-sm font-semibold text-gray-900 truncate">{it.name}</div>
+                                <div className="min-w-0 flex-1">
+                                  <div className="text-sm font-medium text-gray-900 truncate">{it.name}</div>
                                   <div className="text-xs text-gray-500 truncate">{it.category_name}</div>
-                                  <div className="text-xs text-gray-500">{formatDuration(parseDurationToMinutes(it.duration))}</div>
-                                  <div className="text-sm font-bold text-primary mt-1">₹{(it.discount_price ?? it.price).toLocaleString()}</div>
+                                  <div className="text-xs text-gray-500">{it.duration}</div>
                                 </div>
-                                <button 
-                                  onClick={() => removeItem(it.id)} 
-                                  className="text-red-500 hover:text-red-700 transition-colors p-1"
-                                >
-                                  <HiXMark className="w-4 h-4" />
-                                </button>
                               </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Footer with Continue Button */}
-                      {items.length > 0 && (
-                        <div className="p-4 border-t border-gray-100 bg-gray-50 rounded-b-2xl">
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="text-sm text-gray-600">Total Duration:</div>
-                            <div className="text-sm font-semibold text-gray-900">
-                              {formatDuration(items.reduce((total, item) => total + parseDurationToMinutes(item.duration), 0))}
+                              <div className="text-right flex-shrink-0">
+                                <div className="text-sm font-semibold text-gray-900">₹{(it.discount_price ?? it.price).toLocaleString()}</div>
+                                <button onClick={() => removeItem(it.id)} className="text-xs text-red-500 hover:underline mt-1">Remove</button>
+                              </div>
                             </div>
-                          </div>
-                          <button 
-                            onClick={handleContinueToBooking}
-                            className="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-xl font-semibold text-center flex items-center justify-center gap-2 hover:shadow-lg transition-all duration-300"
-                          >
-                            <HiChevronRight className="w-4 h-4" />
-                            Continue to Date & Time
-                          </button>
+                          ))}
                         </div>
                       )}
+                      <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+                        <div className="text-sm font-semibold text-gray-900">Total</div>
+                        <div className="text-sm font-bold text-primary">₹{totalPrice.toLocaleString()}</div>
+                      </div>
+                      <div className="mt-3 grid grid-cols-2 gap-2">
+                        <Link href="/book" className="text-center text-sm px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-50" onClick={() => setShowCartDropdown(false)}>View</Link>
+                        <Link href="/book" className="text-center text-sm px-3 py-2 rounded-lg bg-primary text-white hover:bg-primary/90" onClick={() => setShowCartDropdown(false)}>Continue</Link>
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
 
               <button
-                onClick={() => setIsOpen(!isOpen)} aria-label="Open menu"
-                className="lg:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+                onClick={() => setIsOpen(!isOpen)}
+                className="md:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200"
               >
                 {isOpen ? (
                   <HiXMark className="w-5 h-5" />
@@ -626,7 +622,7 @@ const Navigation = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/20 z-40 lg:hidden"
+              className="fixed inset-0 bg-black/20 z-40 md:hidden"
               onClick={() => setIsOpen(false)}
             />
 
@@ -635,7 +631,7 @@ const Navigation = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.2 }}
-              className="fixed top-16 left-4 right-4 bg-white rounded-xl shadow-xl border border-gray-200 z-50 lg:hidden"
+              className="fixed top-16 left-4 right-4 bg-white rounded-xl shadow-xl border border-gray-200 z-50 md:hidden"
             >
               <div className="p-4">
                 {/* City Selector - Mobile */}
@@ -706,6 +702,11 @@ const Navigation = () => {
           </>
         )}
       </AnimatePresence>
+      <AuthModal
+        open={authOpen}
+        onClose={() => setAuthOpen(false)}
+        onLoggedIn={() => setIsLoggedIn(true)}
+      />
     </>
   );
 };
