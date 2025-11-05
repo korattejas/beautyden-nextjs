@@ -16,6 +16,8 @@ import { BookingService } from "@/types/booking";
 interface ServiceCardProps {
   service: Service;
   index: number;
+  animated?: boolean;
+  priorityImage?: boolean;
 }
 
 const FALLBACK_IMAGE = "/images/services/beauty-default.jpg";
@@ -142,7 +144,7 @@ const ServiceModal = ({
 
 
 
-const ServiceCard = ({ service, index }: ServiceCardProps) => {
+const ServiceCard = ({ service, index, animated = true, priorityImage = false }: ServiceCardProps) => {
   const searchParams = useSearchParams();
   const subcategoryParam = searchParams.get('subcategory');
   
@@ -168,10 +170,11 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
   return (
     <>
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: index * 0.05 }}
-      viewport={{ once: true }}
+      initial={animated ? { opacity: 0, y: 30 } : undefined}
+      whileInView={animated ? { opacity: 1, y: 0 } : undefined}
+      animate={!animated ? { opacity: 1, y: 0 } : undefined}
+      transition={animated ? { duration: 0.6, delay: Math.min(index * 0.05, 0.4) } : undefined}
+      viewport={animated ? { once: true } : undefined}
       whileHover={{ y: -5 }}
       className="group bg-white/80 backdrop-blur-md rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 border border-primary/10 hover:border-primary/20 h-full flex flex-col"
     >
@@ -183,7 +186,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
           className="object-cover group-hover:scale-110 transition-transform duration-700"
-          unoptimized
+          priority={priorityImage}
           onError={() => setCardImgError(true)}
         />
 
@@ -387,4 +390,6 @@ function defaultImageForCategory(category: string): string {
   return categoryMap[category] || "/images/services/beauty-default.jpg";
 }
 
-export default ServiceCard;
+import React from "react";
+
+export default React.memo(ServiceCard);

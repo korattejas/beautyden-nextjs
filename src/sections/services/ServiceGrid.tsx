@@ -14,7 +14,13 @@ const ServiceGrid = ({ services }: ServiceGridProps) => {
       <Container>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {services?.map((service, index) => (
-            <ServiceCard key={service.id} service={service} index={index} />
+            <ServiceCard
+              key={service.id}
+              service={service}
+              index={index}
+              animated={index < 12}
+              priorityImage={index < 4}
+            />
           ))}
         </div>
       </Container>
