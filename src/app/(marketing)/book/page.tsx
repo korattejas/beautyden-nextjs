@@ -30,6 +30,17 @@ const BookingPageContent = () => {
 
   const searchParams = useSearchParams();
   const serviceId = searchParams.get("service");
+  const categoryId = searchParams.get("category");
+  const subcategoryId = searchParams.get("subcategory");
+
+  // Initialize bookingData.services from cart items on mount (only once)
+  const [hasInitialized, setHasInitialized] = useState(false);
+  useEffect(() => {
+    if (!hasInitialized && items.length > 0 && bookingData.services.length === 0) {
+      updateBookingData({ services: items });
+      setHasInitialized(true);
+    }
+  }, [items, hasInitialized, bookingData.services.length]);
 
   const steps = [
     {
@@ -70,22 +81,28 @@ const BookingPageContent = () => {
           <ServiceSelection
             selectedServices={bookingData.services}
             onServicesChange={(services) => {
-              // sync to local booking state
+              // sync to local booking state immediately
               updateBookingData({ services });
-              // sync to global cart
+              // sync to global cart immediately
               const newIds = new Set(services.map((s) => s.id));
               const oldIds = new Set(items.map((i) => i.id));
-              // add new
+              // add new services immediately
               services.forEach((s) => {
-                if (!oldIds.has(s.id)) addItem(s);
+                if (!oldIds.has(s.id)) {
+                  addItem(s);
+                }
               });
-              // remove deselected
+              // remove deselected services immediately
               items.forEach((i) => {
-                if (!newIds.has(i.id)) removeItem(i.id);
+                if (!newIds.has(i.id)) {
+                  removeItem(i.id);
+                }
               });
             }}
             onNext={nextStep}
             preSelectedServiceId={serviceId}
+            preSelectedCategoryId={categoryId}
+            preSelectedSubCategoryId={subcategoryId}
           />
         );
       case 2:

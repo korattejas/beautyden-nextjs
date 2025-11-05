@@ -46,17 +46,17 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [items]);
 
-  const addItem = (service: BookingService) => {
+  const addItem = React.useCallback((service: BookingService) => {
     setItems((prev) => {
       const exists = prev.find((i) => i.id === service.id);
       if (exists) return prev; // avoid duplicates for services; they are unique selections
       return [...prev, { ...service, quantity: 1 }];
     });
-  };
+  }, []);
 
-  const removeItem = (serviceId: string) => {
+  const removeItem = React.useCallback((serviceId: string) => {
     setItems((prev) => prev.filter((i) => i.id !== serviceId));
-  };
+  }, []);
 
   const clearCart = () => setItems([]);
 

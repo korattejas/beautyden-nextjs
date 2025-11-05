@@ -18,7 +18,7 @@ import {
   HiSquares2X2,
   HiStar,
 } from "react-icons/hi2";
-import { useServices, useServiceCategories, useSettings } from "@/hooks/useApi";
+import { useServices, useServiceCategories, useSettings, useService } from "@/hooks/useApi";
 import { BookingService } from "@/types/booking";
 import Button from "@/components/ui/Button";
 import MobileCartHeader from "./MobileCardHeader";
@@ -29,6 +29,8 @@ interface ServiceSelectionProps {
   onServicesChange: (services: BookingService[]) => void;
   onNext: () => void;
   preSelectedServiceId?: string | null;
+  preSelectedCategoryId?: string | null;
+  preSelectedSubCategoryId?: string | null;
 }
 
 const FALLBACK_IMAGE = "/images/services/beauty-default.jpg";
@@ -176,6 +178,8 @@ const ServiceSelection = ({
   onServicesChange,
   onNext,
   preSelectedServiceId,
+  preSelectedCategoryId,
+  preSelectedSubCategoryId,
 }: ServiceSelectionProps) => {
   const [selectedCategories, setSelectedCategories] = useState<any[]>([]);
   const [selectedSubCategories,setSelectedSubCategory]= useState<any>(null);
@@ -183,9 +187,20 @@ const ServiceSelection = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [selectedService, setSelectedService] = useState<any>(null);
+  const [hasProcessedPreSelected, setHasProcessedPreSelected] = useState(false);
   
   // Use cart context for localStorage management
   const { items: cartItems, addItem, removeItem, totalItems, totalPrice } = useCart();
+  
+  // Initialize category and subcategory from URL params
+  useEffect(() => {
+    if (preSelectedCategoryId) {
+      setSelectedCategories([preSelectedCategoryId]);
+    }
+    if (preSelectedSubCategoryId) {
+      setSelectedSubCategory(preSelectedSubCategoryId);
+    }
+  }, [preSelectedCategoryId, preSelectedSubCategoryId]);
 
   // Build filters for API call
   const filters = {
@@ -221,32 +236,54 @@ console.log("selectedServices----",selectedServices)
     (c) => c.id.toString() === selectedCategories[0]
   ) ;
 
-  // Pre-select service if coming from service page
+  // Pre-select service if coming from service page - fetch directly if not on current page
+  const { data: preSelectedServiceData, isLoading: isServiceLoading } = useService(preSelectedServiceId || "");
+  
   useEffect(() => {
-    if (preSelectedServiceId && services.length > 0) {
-      const preSelectedService = services.find(
-        (s) => s.id.toString() === preSelectedServiceId
-      );
-      if (
-        preSelectedService &&
-        !cartItems.find((s) => s.id === preSelectedService.id.toString())
-      ) {
-        const bookingService: BookingService = {
-          id: preSelectedService.id.toString(),
-          name: preSelectedService.name,
-          price: preSelectedService.price || "0",
-          duration: preSelectedService.duration || "60 min",
-          category_id: preSelectedService.category_id.toString(),
-          category_name: preSelectedService.category_name,
-          description: preSelectedService.description,
-          discount_price: preSelectedService?.discount_price,
-          icon: preSelectedService.icon || undefined,
-        };
-        addItem(bookingService);
+    if (!preSelectedServiceId || isServiceLoading || hasProcessedPreSelected) return;
+
+    // Mark as processed to avoid re-adding on user removal
+    setHasProcessedPreSelected(true);
+
+    // If already in cart, sync to selected and exit
+    const alreadyInCart = cartItems.find((s) => s.id === preSelectedServiceId);
+    if (alreadyInCart) {
+      const isInSelected = selectedServices.find((s) => s.id === preSelectedServiceId);
+      if (!isInSelected) {
+        onServicesChange([...selectedServices, alreadyInCart]);
+      }
+      return;
+    }
+
+    // Try to use currently loaded services first
+    const preSelectedService = services.find(
+      (s) => s.id.toString() === preSelectedServiceId
+    );
+
+    let serviceToUse = preSelectedService;
+    if (!serviceToUse && preSelectedServiceData) {
+      serviceToUse = (preSelectedServiceData as any)?.data || preSelectedServiceData;
+    }
+
+    if (serviceToUse && serviceToUse.id) {
+      const bookingService: BookingService = {
+        id: serviceToUse.id.toString(),
+        name: serviceToUse.name,
+        price: serviceToUse.price || "0",
+        duration: serviceToUse.duration || "60 min",
+        category_id: serviceToUse.category_id.toString(),
+        category_name: serviceToUse.category_name,
+        description: serviceToUse.description,
+        discount_price: serviceToUse?.discount_price,
+        icon: serviceToUse.icon || undefined,
+      };
+      addItem(bookingService);
+      const isInSelected = selectedServices.find((s) => s.id === bookingService.id);
+      if (!isInSelected) {
         onServicesChange([...selectedServices, bookingService]);
       }
     }
-  }, [preSelectedServiceId, services, cartItems, selectedServices, onServicesChange, addItem]);
+  }, [preSelectedServiceId, preSelectedServiceData, isServiceLoading, hasProcessedPreSelected, cartItems, selectedServices, onServicesChange, addItem, services]);
 
   const toggleCategory = (categoryId: string,subcategories?: any) => {
     setSelectedCategories([categoryId]); // Single category selection for API
@@ -290,19 +327,27 @@ console.log("selectedServices----",selectedServices)
     const isSelected = cartItems.find((s) => s.id === bookingService.id);
 
     if (isSelected) {
+      // Remove from cart immediately
       removeItem(bookingService.id);
-      onServicesChange(
-        selectedServices.filter((s) => s.id !== bookingService.id)
-      );
+      // Remove from selected services - ensure state is synced immediately
+      const updatedServices = selectedServices.filter((s) => s.id !== bookingService.id);
+      onServicesChange(updatedServices);
     } else {
+      // Add to cart immediately
       addItem(bookingService);
-      onServicesChange([...selectedServices, bookingService]);
+      // Add to selected services - ensure state is synced immediately
+      const updatedServices = [...selectedServices, bookingService];
+      onServicesChange(updatedServices);
     }
   };
 
   const removeService = (serviceId: string) => {
+    // Remove from cart first
     removeItem(serviceId);
-    onServicesChange(selectedServices.filter((s) => s.id !== serviceId));
+    // Remove from selected services
+    const updatedServices = selectedServices.filter((s) => s.id !== serviceId);
+    // Update selected services state - this will also sync with cart via onServicesChange
+    onServicesChange(updatedServices);
   };
 
   // Helper function to extract minimum price from price string (e.g., "20-50" -> 20)
@@ -668,7 +713,13 @@ console.log("selectedServices----",selectedServices)
                           
                           {/* Add/Remove Service Button */}
                           <Button
-                            onClick={() => toggleService(service)}
+                            onClick={(e) => {
+                              if (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                              }
+                              toggleService(service);
+                            }}
                             className={`w-full flex items-center justify-center gap-2 h-10 rounded-xl font-medium text-sm transition-all duration-300 bg-gradient-to-r from-primary to-secondary hover:scale-105`}
                           >
                             {isSelected ? (
@@ -883,8 +934,13 @@ console.log("selectedServices----",selectedServices)
                         </p>
                       </div>
                       <button
-                        onClick={() => removeService(service.id)}
-                        className="text-red-500 hover:text-red-700 transition-colors p-1"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          removeService(service.id);
+                        }}
+                        className="text-red-500 hover:text-red-700 transition-colors p-1 flex-shrink-0"
+                        aria-label="Remove service"
                       >
                         <HiXMark className="w-4 h-4" />
                       </button>
@@ -934,13 +990,54 @@ console.log("selectedServices----",selectedServices)
                   </div> */}
                 </div>
 
+                {/* Validation Message */}
+                {(() => {
+                  const minService = parseInt(getSetting("min_service_book") || "1");
+                  const maxService = parseInt(getSetting("max_service_book") || "100");
+                  const isBelowMin = cartItems.length < minService;
+                  const isAboveMax = cartItems.length > maxService;
+                  
+                  if (isBelowMin || isAboveMax) {
+                    return (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200"
+                      >
+                        <p className="text-sm font-medium text-amber-800 flex items-center gap-2">
+                          <HiSparkles className="w-4 h-4 flex-shrink-0" />
+                          {isBelowMin 
+                            ? `Minimum ${minService} service${minService > 1 ? 's' : ''} need to be selected.`
+                            : `Maximum ${maxService} service${maxService > 1 ? 's' : ''} can be selected.`
+                          }
+                        </p>
+                      </motion.div>
+                    );
+                  }
+                  return null;
+                })()}
+                
                 <Button
                   onClick={() => {
+                    // Get min and max service limits from settings
+                    const minService = parseInt(getSetting("min_service_book") || "1");
+                    const maxService = parseInt(getSetting("max_service_book") || "100");
+                    
+                    // Validate service count
+                    if (cartItems.length < minService || cartItems.length > maxService) {
+                      return; // Don't proceed if validation fails
+                    }
+                    
                     // Sync cart items to selectedServices before proceeding
                     onServicesChange([...cartItems]);
                     onNext();
                   }}
-                  className="w-full bg-primary text-white py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+                  disabled={(() => {
+                    const minService = parseInt(getSetting("min_service_book") || "1");
+                    const maxService = parseInt(getSetting("max_service_book") || "100");
+                    return cartItems.length < minService || cartItems.length > maxService;
+                  })()}
+                  className="w-full bg-primary text-white py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
                   Continue to Date & Time
                   <HiArrowRight className="w-4 h-4" />

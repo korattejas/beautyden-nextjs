@@ -101,7 +101,7 @@ export default function AuthModal({ open, onClose, onLoggedIn }: AuthModalProps)
         } catch {}
         onLoggedIn();
         onClose();
-        router.push("/customer/account");
+        router.push("/account/orders");
       } else {
         setError(response.message || "Invalid OTP. Please try again.");
       }
@@ -138,7 +138,7 @@ export default function AuthModal({ open, onClose, onLoggedIn }: AuthModalProps)
               if (e.target === e.currentTarget) onClose();
             }}
           >
-            <div className="relative w-full max-w-2xl grid grid-cols-1 md:grid-cols-2 bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 my-auto">
+            <div className="relative w-full max-w-5xl max-h-[98vh] grid grid-cols-1 md:grid-cols-2 bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 my-auto">
               {/* Left promo panel (desktop) */}
               <div className="hidden md:flex flex-col gap-6 bg-black text-white p-8">
                 <div className="flex items-center gap-3">

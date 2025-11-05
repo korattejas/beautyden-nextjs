@@ -8,6 +8,10 @@ import Image from "next/image";
 import { Service } from "@/services/services.service";
 import { useState } from "react";
 import { useSettings } from "@/hooks/useApi";
+import { useSearchParams } from "next/navigation";
+import { useCart } from "@/contexts/CartContext";
+import { useRouter } from "next/navigation";
+import { BookingService } from "@/types/booking";
 
 interface ServiceCardProps {
   service: Service;
@@ -19,9 +23,11 @@ const FALLBACK_IMAGE = "/images/services/beauty-default.jpg";
 const ServiceModal = ({
   service,
   onClose,
+  subcategoryParam,
 }: {
   service: Service;
   onClose: () => void;
+  subcategoryParam?: string | null;
 }) => {
   const [imgError, setImgError] = useState(false);
   const { data: settingsData } = useSettings();
@@ -127,12 +133,7 @@ const ServiceModal = ({
 
         {/* Book Button - fixed bottom */}
         <div className="p-4 border-t border-gray-100">
-          <Button
-            href={`/book?service=${service.id}`}
-            className="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 font-semibold rounded-xl"
-          >
-            Book Now
-          </Button>
+          <InstantBookButton service={service} subcategoryParam={subcategoryParam} onDone={onClose} />
         </div>
       </motion.div>
     </motion.div>
@@ -142,6 +143,9 @@ const ServiceModal = ({
 
 
 const ServiceCard = ({ service, index }: ServiceCardProps) => {
+  const searchParams = useSearchParams();
+  const subcategoryParam = searchParams.get('subcategory');
+  
   // Calculate pricing display
   const hasDiscount =
     service.discount_price 
@@ -320,23 +324,54 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
             </Button>
             
             {/* Book Button */}
-            <Button
-              href={`/book?service=${service.id}`}
-              size="sm"
-              className="w-full flex items-center justify-center gap-2 h-10 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg"
-            >
-              Book Now
-              <HiArrowRight className="w-4 h-4" />
-            </Button>
+            <InstantBookButton service={service} subcategoryParam={subcategoryParam} />
           </div>
         </div>
       </div>
     </motion.div>
      {/* Modal */}
-     {showModal && <ServiceModal service={service} onClose={() => setShowModal(false)} />}
+     {showModal && <ServiceModal service={service} onClose={() => setShowModal(false)} subcategoryParam={subcategoryParam} />}
      </>
   );
 };
+
+function InstantBookButton({ service, subcategoryParam, onDone }: { service: Service; subcategoryParam?: string | null; onDone?: () => void; }) {
+  const router = useRouter();
+  const { addItem, items } = useCart();
+
+  const handleClick = () => {
+    const bookingService: BookingService = {
+      id: service.id.toString(),
+      name: service.name,
+      price: service.price || "0",
+      duration: service.duration || "60 min",
+      category_id: service.category_id?.toString?.() || "",
+      category_name: service.category_name,
+      description: service.description,
+      discount_price: service?.discount_price,
+      icon: service.icon || undefined,
+    };
+    // Add instantly if not in cart
+    if (!items.find((i) => i.id === bookingService.id)) {
+      addItem(bookingService);
+    }
+    // Navigate
+    const target = `/book?service=${service.id}${service.category_id ? `&category=${service.category_id}` : ''}${subcategoryParam ? `&subcategory=${subcategoryParam}` : ''}`;
+    if (onDone) onDone();
+    router.push(target);
+  };
+
+  return (
+    <Button
+      onClick={handleClick}
+      size="sm"
+      className="w-full flex items-center justify-center gap-2 h-10 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg"
+    >
+      Book Now
+      <HiArrowRight className="w-4 h-4" />
+    </Button>
+  );
+}
 
 // Default fallback images based on category
 function defaultImageForCategory(category: string): string {

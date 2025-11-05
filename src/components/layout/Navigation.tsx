@@ -360,7 +360,7 @@ const Navigation = () => {
             <div className="hidden md:flex items-center gap-3">
               {/* Login/Profile */}
               <button
-                onClick={() => (isLoggedIn ? (window.location.href = "/customer/account") : setAuthOpen(true))}
+                onClick={() => (isLoggedIn ? (window.location.href = "/account/orders") : setAuthOpen(true))}
                 className="relative p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200"
                 aria-label={isLoggedIn ? "Account" : "Login"}
               >
@@ -515,7 +515,7 @@ const Navigation = () => {
             <div className="md:hidden flex items-center gap-2">
               {/* Mobile Login/Profile */}
               <button
-                onClick={() => (isLoggedIn ? (window.location.href = "/customer/account") : setAuthOpen(true))}
+                onClick={() => (isLoggedIn ? (window.location.href = "/account") : setAuthOpen(true))}
                 className="p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200"
                 aria-label={isLoggedIn ? "Account" : "Login"}
               >

@@ -3,9 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { HiBars3, HiXMark } from "react-icons/hi2";
 
-export default function AccountPage() {
+export default function AccountLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -71,35 +74,11 @@ export default function AccountPage() {
           </nav>
         </aside>
 
-        <section className="md:col-span-3 space-y-6">
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-            <h3 className="text-xl font-semibold">Welcome back!</h3>
-            <p className="text-sm text-gray-600 mt-1">Manage your account and explore recent activity.</p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-              <h4 className="font-semibold">Orders</h4>
-              <p className="text-sm text-gray-600">View your orders</p>
-              <Link href="/account/orders" className="mt-3 inline-block text-sm px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50">
-                View Orders
-              </Link>
-            </div>
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-              <h4 className="font-semibold">Wishlist</h4>
-              <p className="text-sm text-gray-600">5 items in your wishlist</p>
-              <button className="mt-3 text-sm px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50">View Wishlist</button>
-            </div>
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-              <h4 className="font-semibold">Saved Addresses</h4>
-              <p className="text-sm text-gray-600">2 addresses saved</p>
-              <button className="mt-3 text-sm px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50">Manage Addresses</button>
-            </div>
-          </div>
+        <section className="md:col-span-3">
+          {children}
         </section>
       </div>
     </main>
   );
 }
-
 

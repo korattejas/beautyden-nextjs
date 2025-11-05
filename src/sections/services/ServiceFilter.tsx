@@ -129,12 +129,14 @@ const ServiceFilter = ({
                   transition={{ duration: 0.4, delay: index * 0.05 }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => {
-                   const cat =  categories.find(
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const cat =  categories.find(
                       (c) => c.id.toString() === categoryId
                     );
                     const subIds= cat?.subcategories?.map((i: any)=> i?.id) || [];
-                    onCategoryChange(categoryId, subIds)
+                    onCategoryChange(categoryId, subIds);
                   }}
                   className={`shrink-0 flex items-center gap-3 px-6 py-4 rounded-full text-base font-medium transition-all duration-200 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 ${
                     isActive
@@ -184,7 +186,11 @@ const ServiceFilter = ({
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => onSubCategoryChange(subId)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onSubCategoryChange(subId);
+                  }}
                   className={`shrink-0 flex items-center gap-3 px-6 py-4 rounded-full text-base font-medium transition-all duration-200 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 ${
                     isActive
                       ? "bg-primary text-white shadow-md shadow-primary/25 border border-primary/20"

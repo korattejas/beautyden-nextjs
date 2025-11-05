@@ -3,13 +3,15 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export default function CustomerAccountPage() {
+export default function CustomerAccountProfilePage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Redirect to /account
-    router.replace("/account");
+    // Redirect to /account/profile
+    router.replace("/account/profile");
   }, [router]);
 
   return null;
 }
+
+
