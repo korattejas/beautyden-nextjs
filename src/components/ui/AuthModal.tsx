@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import Button from "@/components/ui/Button";
 import { HiXMark, HiDevicePhoneMobile, HiCheckCircle, HiShieldCheck } from "react-icons/hi2";
@@ -138,36 +139,58 @@ export default function AuthModal({ open, onClose, onLoggedIn }: AuthModalProps)
               if (e.target === e.currentTarget) onClose();
             }}
           >
-            <div className="relative w-full max-w-5xl max-h-[98vh] grid grid-cols-1 md:grid-cols-2 bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 my-auto">
+            <div className="relative w-full max-w-6xl max-h-[98vh] grid grid-cols-1 md:grid-cols-2 bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 my-auto">
               {/* Left promo panel (desktop) */}
-              <div className="hidden md:flex flex-col gap-6 bg-black text-white p-8">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gray-200 rounded-2xl flex items-center justify-center flex-shrink-0">
-                    <HiShieldCheck className="w-6 h-6 text-black" />
+              <div className="hidden md:flex flex-col gap-6 bg-black text-white p-10 min-h-[500px] justify-center">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-14 h-14 bg-gray-200 rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <HiShieldCheck className="w-7 h-7 text-black" />
                   </div>
                   <div>
-                    <p className="text-base font-semibold text-white">Hello again!</p>
-                    <p className="text-xs text-white/80">Exciting offer waiting for you</p>
+                    <p className="text-lg font-bold text-white">Welcome Back!</p>
+                    <p className="text-sm text-white/80">Exciting offers and exclusive deals waiting for you</p>
                   </div>
                 </div>
-                <ul className="mt-4 space-y-5 text-sm text-white">
-                  <li className="flex gap-3">
-                    <span className="mt-1 text-white/60">•</span>
-                    <span>Enjoy hassle-free shopping with the best offers applied for you</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="mt-1 text-white/60">•</span>
-                    <span>Explore unbeatable prices and unmatchable value</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="mt-1 text-white/60">•</span>
-                    <span>100% secure & spam free, we will not annoy you</span>
-                  </li>
-                </ul>
+                
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-base font-semibold text-white mb-3">Why Choose BeautyDen?</h3>
+                    <ul className="space-y-4 text-sm text-white/90">
+                      <li className="flex gap-3">
+                        <span className="mt-1 text-primary flex-shrink-0">✓</span>
+                        <span>Enjoy hassle-free shopping with the best offers automatically applied for you</span>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="mt-1 text-primary flex-shrink-0">✓</span>
+                        <span>Explore unbeatable prices and unmatchable value on all services</span>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="mt-1 text-primary flex-shrink-0">✓</span>
+                        <span>100% secure & spam free - we respect your privacy and won't annoy you</span>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="mt-1 text-primary flex-shrink-0">✓</span>
+                        <span>Track your orders and manage your bookings in one place</span>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="mt-1 text-primary flex-shrink-0">✓</span>
+                        <span>Get personalized recommendations based on your preferences</span>
+                      </li>
+                      
+                    </ul>
+                  </div>
+                  
+                  <div className="pt-4 border-t border-white/10">
+                    <p className="text-xs text-white/70 leading-relaxed">
+                      Join thousands of satisfied customers who trust BeautyDen for their beauty and wellness needs. 
+                      Experience premium service at your doorstep with just a few clicks!
+                    </p>
+                  </div>
+                </div>
               </div>
 
               {/* Right form panel */}
-              <div className="relative p-6 md:p-8 flex flex-col">
+              <div className="relative p-6 md:p-10 flex flex-col min-h-[500px]">
                 <button
                   onClick={onClose}
                   className="absolute right-3 top-3 p-2 rounded-md text-gray-500 hover:bg-gray-100 transition-colors z-10"
@@ -217,7 +240,7 @@ export default function AuthModal({ open, onClose, onLoggedIn }: AuthModalProps)
 
                     <p className="text-[11px] text-gray-500 leading-relaxed">
                       By Proceeding, I agree to my data being processed as per BeautyDen's
-                      <span className="text-primary"> Privacy Policy</span>.
+                      <Link href="/privacy-policy" onClick={(e) => e.stopPropagation()} className="text-primary hover:underline"> Privacy Policy</Link>.
                     </p>
                   </div>
                 )}

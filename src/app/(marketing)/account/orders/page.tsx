@@ -6,6 +6,17 @@ import { HiCalendar, HiClock, HiMapPin, HiXMark } from "react-icons/hi2";
 import { AnimatePresence, motion } from "framer-motion";
 import { getTotalBookService, getBookServiceDetails, GetBookServiceDetailsResponse } from "@/services/customer.service";
 
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center py-12">
+    <div className="relative">
+      <div className="w-12 h-12 border-4 border-gray-200 border-t-primary rounded-full animate-spin"></div>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="w-6 h-6 bg-primary/10 rounded-full"></div>
+      </div>
+    </div>
+  </div>
+);
+
 export default function OrdersPage() {
   const router = useRouter();
   const [mobileNumber, setMobileNumber] = useState<string>("");
@@ -17,15 +28,32 @@ export default function OrdersPage() {
   const [hasFetched, setHasFetched] = useState(false);
 
   useEffect(() => {
-    const isLoggedIn = typeof window !== "undefined" && localStorage.getItem("bd_isLoggedIn") === "true";
-    const storedMobile = typeof window !== "undefined" ? localStorage.getItem("bd_mobile_number") : null;
-    if (!isLoggedIn) {
-      router.push("/");
-      return;
-    }
-    if (storedMobile) {
-      setMobileNumber(storedMobile);
-    }
+    const checkAuth = () => {
+      const isLoggedIn = typeof window !== "undefined" && localStorage.getItem("bd_isLoggedIn") === "true";
+      const storedMobile = typeof window !== "undefined" ? localStorage.getItem("bd_mobile_number") : null;
+      
+      if (!isLoggedIn) {
+        router.push("/");
+        return;
+      }
+      
+      if (storedMobile) {
+        setMobileNumber(storedMobile);
+      }
+    };
+
+    checkAuth();
+    
+    // Listen for auth changes
+    const handleAuthChange = () => {
+      checkAuth();
+    };
+    
+    window.addEventListener("bd-auth-changed", handleAuthChange);
+    
+    return () => {
+      window.removeEventListener("bd-auth-changed", handleAuthChange);
+    };
   }, [router]);
 
   useEffect(() => {
@@ -89,8 +117,9 @@ export default function OrdersPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-          <div className="text-center py-8">Loading orders...</div>
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 md:p-6">
+          <h2 className="text-2xl font-bold mb-4">My Orders</h2>
+          <LoadingSpinner />
         </div>
       </div>
     );

@@ -32,11 +32,13 @@ const Navigation = () => {
   const [showAboutMenu, setShowAboutMenu] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const pathname = usePathname();
 
   const servicesRef = useRef<HTMLDivElement>(null);
   const aboutRef = useRef<HTMLDivElement>(null);
   const cityRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
 
   // City context
   const { selectedCity, setShowCityPopup } = useCityContext();
@@ -117,6 +119,9 @@ const Navigation = () => {
       if (cartRef.current && !cartRef.current.contains(event.target as Node)) {
         setShowCartDropdown(false);
       }
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setShowProfileDropdown(false);
+      }
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -181,9 +186,9 @@ const Navigation = () => {
         }`}
       >
         <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center h-16 gap-4 justify-between">
             {/* Logo */}
-            <Link href="/" className="flex items-center">
+            <Link href="/" className="flex items-center flex-shrink-0">
               <Image
                 src="/logo.png"
                 alt="BeautyDen Logo"
@@ -193,8 +198,8 @@ const Navigation = () => {
               />
             </Link>
 
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center space-x-1">
+            {/* Desktop/Tablet Navigation - Right of Logo */}
+            <div className="hidden md:flex items-center space-x-1 flex-1">
               {navItems.map((item) => {
                 const isActive =
                   pathname === item.href ||
@@ -356,21 +361,8 @@ const Navigation = () => {
               })}
             </div>
 
-            {/* Desktop Right Section */}
-            <div className="hidden md:flex items-center gap-3">
-              {/* Login/Profile */}
-              <button
-                onClick={() => (isLoggedIn ? (window.location.href = "/account/orders") : setAuthOpen(true))}
-                className="relative p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200"
-                aria-label={isLoggedIn ? "Account" : "Login"}
-              >
-                {isLoggedIn ? (
-                  <HiUser className="w-5 h-5 text-primary" />
-                ) : (
-                  <HiArrowRightOnRectangle className="w-5 h-5 text-primary" />
-                )}
-              </button>
-              {/* City Selector */}
+            {/* City Dropdown - Center (md and up) */}
+            <div className="hidden md:flex items-center justify-center flex-1">
               <div ref={cityRef} className="relative">
                 <button
                   onClick={() => setShowCityDropdown(!showCityDropdown)}
@@ -425,7 +417,10 @@ const Navigation = () => {
                   )}
                 </AnimatePresence>
               </div>
+            </div>
 
+            {/* Desktop Right Section */}
+            <div className="hidden md:flex items-center gap-3 ml-auto">
               {/* Desktop Cart */}
               <div ref={cartRef} className="relative">
                 <button
@@ -500,31 +495,52 @@ const Navigation = () => {
                 </AnimatePresence>
               </div>
 
-              {/* Book Now Button */}
-              <Link
-                href="/book"
-                className="bg-primary hover:bg-primary/90 text-white px-5 py-2 rounded-lg font-medium text-sm transition-colors duration-200"
-              >
-                Book Now
-              </Link>
+              {/* Profile Icon with Dropdown */}
+              <div ref={profileRef} className="relative">
+                <button
+                  onClick={() => {
+                    if (isLoggedIn) {
+                      window.location.href = "/account/orders";
+                    } else {
+                      setShowProfileDropdown(!showProfileDropdown);
+                    }
+                  }}
+                  className="relative p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+                  aria-label={isLoggedIn ? "Account" : "Profile"}
+                >
+                  <HiUser className="w-5 h-5 text-primary" />
+                </button>
 
-              
+                {/* Profile Dropdown - Only show when not logged in */}
+                <AnimatePresence>
+                  {showProfileDropdown && !isLoggedIn && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 8 }}
+                      className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50"
+                    >
+                      <button
+                        onClick={() => {
+                          setAuthOpen(true);
+                          setShowProfileDropdown(false);
+                        }}
+                        className="w-full px-4 py-2.5 text-sm text-left text-gray-700 hover:bg-gray-50 transition-colors duration-200 flex items-center gap-2"
+                      >
+                        <HiArrowRightOnRectangle className="w-4 h-4 text-primary" />
+                        <span>Login</span>
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
+
+            {/* Fixed Book Now Button moved outside header */}
 
             {/* Mobile Cart + Menu Buttons */}
             <div className="md:hidden flex items-center gap-2">
-              {/* Mobile Login/Profile */}
-              <button
-                onClick={() => (isLoggedIn ? (window.location.href = "/account") : setAuthOpen(true))}
-                className="p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200"
-                aria-label={isLoggedIn ? "Account" : "Login"}
-              >
-                {isLoggedIn ? (
-                  <HiUser className="w-5 h-5 text-primary" />
-                ) : (
-                  <HiArrowRightOnRectangle className="w-5 h-5 text-primary" />
-                )}
-              </button>
+              {/* Mobile Cart */}
               <div ref={cartRef} className="relative">
                 <button
                   onClick={() => setShowCartDropdown((s) => !s)}
@@ -599,6 +615,46 @@ const Navigation = () => {
                 </AnimatePresence>
               </div>
 
+              {/* Mobile Profile */}
+              <div ref={profileRef} className="relative">
+                <button
+                  onClick={() => {
+                    if (isLoggedIn) {
+                      window.location.href = "/account";
+                    } else {
+                      setShowProfileDropdown(!showProfileDropdown);
+                    }
+                  }}
+                  className="p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+                  aria-label={isLoggedIn ? "Account" : "Profile"}
+                >
+                  <HiUser className="w-5 h-5 text-primary" />
+                </button>
+
+                {/* Mobile Profile Dropdown */}
+                <AnimatePresence>
+                  {showProfileDropdown && !isLoggedIn && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 8 }}
+                      className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50"
+                    >
+                      <button
+                        onClick={() => {
+                          setAuthOpen(true);
+                          setShowProfileDropdown(false);
+                        }}
+                        className="w-full px-4 py-2.5 text-sm text-left text-gray-700 hover:bg-gray-50 transition-colors duration-200 flex items-center gap-2"
+                      >
+                        <HiArrowRightOnRectangle className="w-4 h-4 text-primary" />
+                        <span>Login</span>
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
               <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="md:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200"
@@ -613,6 +669,15 @@ const Navigation = () => {
           </div>
         </nav>
       </header>
+
+      {/* Fixed Book Now Button - responsive position */}
+      <Link
+        href="/book"
+        className="fixed right-4 bottom-6 md:right-6 md:bottom-auto md:top-1/2 md:-translate-y-1/2 z-40 bg-primary hover:bg-primary/90 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center group"
+        aria-label="Book Now"
+      >
+        <HiSparkles className="w-5 h-5 group-hover:rotate-12 transition-transform duration-200" />
+      </Link>
 
       {/* Mobile Menu */}
       <AnimatePresence>

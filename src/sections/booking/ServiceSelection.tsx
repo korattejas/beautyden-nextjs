@@ -21,6 +21,7 @@ import {
 import { useServices, useServiceCategories, useSettings, useService } from "@/hooks/useApi";
 import { BookingService } from "@/types/booking";
 import Button from "@/components/ui/Button";
+import AuthModal from "@/components/ui/AuthModal";
 import MobileCartHeader from "./MobileCardHeader";
 import { useCart } from "@/contexts/CartContext";
 
@@ -188,6 +189,7 @@ const ServiceSelection = ({
   const [showModal, setShowModal] = useState(false);
   const [selectedService, setSelectedService] = useState<any>(null);
   const [hasProcessedPreSelected, setHasProcessedPreSelected] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
   
   // Use cart context for localStorage management
   const { items: cartItems, addItem, removeItem, totalItems, totalPrice } = useCart();
@@ -201,6 +203,13 @@ const ServiceSelection = ({
       setSelectedSubCategory(preSelectedSubCategoryId);
     }
   }, [preSelectedCategoryId, preSelectedSubCategoryId]);
+
+  // Listen to auth change events (for safety)
+  useEffect(() => {
+    const onAuthChanged = () => {};
+    window.addEventListener("bd-auth-changed", onAuthChanged as EventListener);
+    return () => window.removeEventListener("bd-auth-changed", onAuthChanged as EventListener);
+  }, []);
 
   // Build filters for API call
   const filters = {
@@ -1027,7 +1036,13 @@ console.log("selectedServices----",selectedServices)
                     if (cartItems.length < minService || cartItems.length > maxService) {
                       return; // Don't proceed if validation fails
                     }
-                    
+                    // Auth gate
+                    const isLoggedIn = typeof window !== "undefined" && localStorage.getItem("bd_isLoggedIn") === "true";
+                    if (!isLoggedIn) {
+                      setAuthOpen(true);
+                      return;
+                    }
+
                     // Sync cart items to selectedServices before proceeding
                     onServicesChange([...cartItems]);
                     onNext();
@@ -1070,6 +1085,17 @@ console.log("selectedServices----",selectedServices)
           }} 
         />
       )}
+
+      {/* Auth Modal for gating Continue */}
+      <AuthModal
+        open={authOpen}
+        onClose={() => setAuthOpen(false)}
+        onLoggedIn={() => {
+          setAuthOpen(false);
+          onServicesChange([...cartItems]);
+          onNext();
+        }}
+      />
     </div>
   );
 };
