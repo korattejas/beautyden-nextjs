@@ -1,5 +1,6 @@
 import Navigation from "@/components/layout/Navigation";
 import Footer from "@/components/layout/Footer";
+import "yet-another-react-lightbox/styles.css";
 
 export default function MarketingLayout({
   children,

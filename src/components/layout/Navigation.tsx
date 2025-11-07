@@ -361,8 +361,9 @@ const Navigation = () => {
               })}
             </div>
 
-            {/* City Dropdown - Center (md and up) */}
-            <div className="hidden md:flex items-center justify-center flex-1">
+            {/* Desktop Right Section */}
+            <div className="hidden md:flex items-center gap-3 ml-auto">
+              {/* City Dropdown - Left of Cart */}
               <div ref={cityRef} className="relative">
                 <button
                   onClick={() => setShowCityDropdown(!showCityDropdown)}
@@ -395,12 +396,6 @@ const Navigation = () => {
                               {selectedCity.state}
                             </div>
                           </div>
-                          {/* <button
-                            onClick={handleCitySelect}
-                            className="w-full px-4 py-2 text-sm text-left text-primary hover:bg-gray-50 transition-colors duration-200"
-                          >
-                            Change City
-                          </button> */}
                         </>
                       ) : (
                         <button
@@ -417,10 +412,7 @@ const Navigation = () => {
                   )}
                 </AnimatePresence>
               </div>
-            </div>
 
-            {/* Desktop Right Section */}
-            <div className="hidden md:flex items-center gap-3 ml-auto">
               {/* Desktop Cart */}
               <div ref={cartRef} className="relative">
                 <button
