@@ -41,8 +41,8 @@ const generatePortfolioItems = () => {
   for (let i = 1; i <= 97; i++) {
     items.push({
       src: `/images/portfolio/p-${i}.jpg`,
-      title: titles[(i - 1) % titles.length] + ` ${i}`,
-      description: descriptions[(i - 1) % descriptions.length],
+      // title: titles[(i - 1) % titles.length] + ` ${i}`,
+      // description: descriptions[(i - 1) % descriptions.length],
     });
   }
   return items;
@@ -118,7 +118,7 @@ export default function PortfolioPage() {
                 <div className="relative h-64 w-full">
                   <Image
                     src={item.src}
-                    alt={item.title}
+                    alt={`Portfolio image ${localIndex + 1}`}
                     fill
                     className="object-cover transition duration-500 group-hover:scale-105"
                     loading={localIndex < 12 ? "eager" : "lazy"}
@@ -126,10 +126,10 @@ export default function PortfolioPage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-0 transition group-hover:opacity-100" />
                 </div>
-                <div className="absolute inset-x-0 bottom-0 z-10 p-4 text-left text-white">
+                {/* <div className="absolute inset-x-0 bottom-0 z-10 p-4 text-left text-white">
                   <h3 className="text-base font-semibold">{item.title}</h3>
                   <p className="text-xs text-white/80">{item.description}</p>
-                </div>
+                </div> */}
               </button>
               );
             })}
@@ -144,7 +144,7 @@ export default function PortfolioPage() {
           index={activeIndex}
           slides={portfolioItems.map((item) => ({
             src: item.src,
-            description: item.description,
+            // description: item.description,
           }))}
         />
       )}

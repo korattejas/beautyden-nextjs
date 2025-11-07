@@ -1000,7 +1000,7 @@ console.log("selectedServices----",selectedServices)
                 </div>
 
                 {/* Validation Message */}
-                {(() => {
+                {/* {(() => {
                   const minService = parseInt(getSetting("min_service_book") || "1");
                   const maxService = parseInt(getSetting("max_service_book") || "100");
                   const isBelowMin = cartItems.length < minService;
@@ -1024,34 +1024,34 @@ console.log("selectedServices----",selectedServices)
                     );
                   }
                   return null;
-                })()}
+                })()} */}
                 
                 <Button
                   onClick={() => {
                     // Get min and max service limits from settings
-                    const minService = parseInt(getSetting("min_service_book") || "1");
-                    const maxService = parseInt(getSetting("max_service_book") || "100");
+                    // const minService = parseInt(getSetting("min_service_book") || "1");
+                    // const maxService = parseInt(getSetting("max_service_book") || "100");
                     
                     // Validate service count
-                    if (cartItems.length < minService || cartItems.length > maxService) {
-                      return; // Don't proceed if validation fails
-                    }
+                    // if (cartItems.length < minService || cartItems.length > maxService) {
+                    //   return; // Don't proceed if validation fails
+                    // }
                     // Auth gate
-                    const isLoggedIn = typeof window !== "undefined" && localStorage.getItem("bd_isLoggedIn") === "true";
-                    if (!isLoggedIn) {
-                      setAuthOpen(true);
-                      return;
-                    }
+                    // const isLoggedIn = typeof window !== "undefined" && localStorage.getItem("bd_isLoggedIn") === "true";
+                    // if (!isLoggedIn) {
+                    //   setAuthOpen(true);
+                    //   return;
+                    // }
 
                     // Sync cart items to selectedServices before proceeding
                     onServicesChange([...cartItems]);
                     onNext();
                   }}
-                  disabled={(() => {
-                    const minService = parseInt(getSetting("min_service_book") || "1");
-                    const maxService = parseInt(getSetting("max_service_book") || "100");
-                    return cartItems.length < minService || cartItems.length > maxService;
-                  })()}
+                  // disabled={(() => {
+                  //   const minService = parseInt(getSetting("min_service_book") || "1");
+                  //   const maxService = parseInt(getSetting("max_service_book") || "100");
+                  //   return cartItems.length < minService || cartItems.length > maxService;
+                  // })()}
                   className="w-full bg-primary text-white py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
                   Continue to Date & Time

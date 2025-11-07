@@ -488,7 +488,7 @@ const Navigation = () => {
               </div>
 
               {/* Profile Icon with Dropdown */}
-              <div ref={profileRef} className="relative">
+              {/* <div ref={profileRef} className="relative">
                 <button
                   onClick={() => {
                     if (isLoggedIn) {
@@ -504,7 +504,7 @@ const Navigation = () => {
                 </button>
 
                 {/* Profile Dropdown - Only show when not logged in */}
-                <AnimatePresence>
+                {/* <AnimatePresence>
                   {showProfileDropdown && !isLoggedIn && (
                     <motion.div
                       initial={{ opacity: 0, y: 8 }}
@@ -524,8 +524,8 @@ const Navigation = () => {
                       </button>
                     </motion.div>
                   )}
-                </AnimatePresence>
-              </div>
+                </AnimatePresence> */}
+              {/* </div> */}
             </div>
 
             {/* Fixed Book Now Button moved outside header */}
@@ -608,7 +608,7 @@ const Navigation = () => {
               </div>
 
               {/* Mobile Profile */}
-              <div ref={profileRef} className="relative">
+              {/* <div ref={profileRef} className="relative">
                 <button
                   onClick={() => {
                     if (isLoggedIn) {
@@ -624,7 +624,7 @@ const Navigation = () => {
                 </button>
 
                 {/* Mobile Profile Dropdown */}
-                <AnimatePresence>
+                {/* <AnimatePresence>
                   {showProfileDropdown && !isLoggedIn && (
                     <motion.div
                       initial={{ opacity: 0, y: 8 }}
@@ -644,8 +644,8 @@ const Navigation = () => {
                       </button>
                     </motion.div>
                   )}
-                </AnimatePresence>
-              </div>
+                </AnimatePresence> */}
+              {/* </div> */}
 
               <button
                 onClick={() => setIsOpen(!isOpen)}
