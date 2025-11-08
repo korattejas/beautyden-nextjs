@@ -53,6 +53,7 @@ export interface ServicesFilters {
   subcategory_id?:string | null;
   page?: number;
   city_id?: number | string;
+  service_id?: string;
 }
 
 const buildQueryString = (filters: ServicesFilters): string => {
@@ -73,6 +74,9 @@ params.append("sub_category_id",filters?.subcategory_id)
   }
   if(filters.city_id ){
     params.append("city_id", filters.city_id.toString());
+  }
+  if(filters.service_id){
+    params.append("service_id", filters.service_id);
   }
 
   return params.toString();
@@ -105,14 +109,27 @@ export const getServices = async (
 
 export const getServiceById = async (id: string): Promise<Service> => {
   try {
-    const response = await api.get(endpoints.SERVICE_BY_ID(id));
+    const queryString = `service_id=${id}`;
+    const url = `${endpoints.SERVICES}?${queryString}`;
 
+    const response = await api.post(url);
+
+    // Check if response is encrypted (production)
     if (typeof response.data === "string" && response.data.includes(":")) {
       const decryptedData = decryptData(response.data);
-      return decryptedData.data;
+      const services = decryptedData.data?.data || [];
+      if (services.length === 0) {
+        throw new Error(`Service with id ${id} not found`);
+      }
+      return services[0];
     }
 
-    return response.data.data;
+    // Return as-is for test environment
+    const services = response.data.data?.data || [];
+    if (services.length === 0) {
+      throw new Error(`Service with id ${id} not found`);
+    }
+    return services[0];
   } catch (error) {
     console.error("Error fetching service:", error);
     throw error;
