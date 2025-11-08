@@ -108,9 +108,9 @@ const ContactSection = () => {
   };
 
   return (
-    <section className="py-12 sm:py-16 md:py-20 bg-muted/20">
+    <section className="py-20 bg-muted/20">
       <Container>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-10 lg:gap-16 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           {/* Left Side - Content */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -126,14 +126,14 @@ const ContactSection = () => {
                 Get in Touch
               </div>
 
-              <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-foreground leading-tight">
+              <h2 className="font-heading text-4xl md:text-5xl font-bold text-foreground leading-tight">
                 Let&apos;s Create Your
                 <span className="block text-primary">
                   Beauty Story Together
                 </span>
               </h2>
 
-              <p className="text-base sm:text-lg text-foreground/70 leading-relaxed">
+              <p className="text-xl text-foreground/70 leading-relaxed">
                 Ready to experience professional beauty services at your
                 doorstep? Our certified experts are here to help you look and
                 feel your absolute best.
@@ -173,8 +173,8 @@ const ContactSection = () => {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-warning/10 rounded-2xl flex items-center justify-center flex-shrink-0">
-                  <HiStar className="w-6 h-6 text-warning" />
+                <div className="w-12 h-12 bg-secondary/10 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <HiStar className="w-6 h-6 text-black" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground mb-2">
@@ -189,7 +189,7 @@ const ContactSection = () => {
             </div>
 
             {/* Contact Information - Dynamic from API */}
-            <div className="bg-card backdrop-blur-md rounded-3xl p-6 sm:p-8 border border-border shadow-lg">
+            <div className="bg-card backdrop-blur-md rounded-3xl p-8 border border-border shadow-lg">
               <h3 className="font-heading text-xl font-bold text-foreground mb-6">
                 Contact Information
               </h3>
@@ -288,7 +288,7 @@ const ContactSection = () => {
             ) : (
               <form
                 onSubmit={handleSubmit(onSubmit)}
-                className="bg-card backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-xl border border-border space-y-6"
+                className="bg-card backdrop-blur-md rounded-3xl p-8 shadow-xl border border-border space-y-6"
               >
                 <div className="text-center mb-8">
                   <h3 className="font-heading text-2xl font-bold text-foreground mb-2">

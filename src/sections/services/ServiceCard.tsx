@@ -8,11 +8,16 @@ import Image from "next/image";
 import { Service } from "@/services/services.service";
 import { useState } from "react";
 import { useSettings } from "@/hooks/useApi";
-import { formatDuration, parseDurationToMinutes } from "@/utils/time";
+import { useSearchParams } from "next/navigation";
+import { useCart } from "@/contexts/CartContext";
+import { useRouter } from "next/navigation";
+import { BookingService } from "@/types/booking";
 
 interface ServiceCardProps {
   service: Service;
   index: number;
+  animated?: boolean;
+  priorityImage?: boolean;
 }
 
 const FALLBACK_IMAGE = "/images/services/beauty-default.jpg";
@@ -20,9 +25,11 @@ const FALLBACK_IMAGE = "/images/services/beauty-default.jpg";
 const ServiceModal = ({
   service,
   onClose,
+  subcategoryParam,
 }: {
   service: Service;
   onClose: () => void;
+  subcategoryParam?: string | null;
 }) => {
   const [imgError, setImgError] = useState(false);
   const { data: settingsData } = useSettings();
@@ -128,12 +135,7 @@ const ServiceModal = ({
 
         {/* Book Button - fixed bottom */}
         <div className="p-4 border-t border-gray-100">
-          <Button
-            href={`/book?service=${service.id}`}
-            className="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 font-semibold rounded-xl"
-          >
-            Book Now
-          </Button>
+          <InstantBookButton service={service} subcategoryParam={subcategoryParam} onDone={onClose} />
         </div>
       </motion.div>
     </motion.div>
@@ -142,7 +144,10 @@ const ServiceModal = ({
 
 
 
-const ServiceCard = ({ service, index }: ServiceCardProps) => {
+const ServiceCard = ({ service, index, animated = true, priorityImage = false }: ServiceCardProps) => {
+  const searchParams = useSearchParams();
+  const subcategoryParam = searchParams.get('subcategory');
+  
   // Calculate pricing display
   const hasDiscount =
     service.discount_price 
@@ -161,17 +166,16 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
     return settings.find((setting) => setting.key === key)?.value || "";
   };
 
-  // Check if mobile screen for conditional animations
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   return (
     <>
     <motion.div
-      initial={isMobile ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-      whileInView={isMobile ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
-      transition={isMobile ? { duration: 0 } : { duration: 0.6, delay: index * 0.05 }}
-      viewport={{ once: true }}
-      whileHover={isMobile ? {} : { y: -5 }}
+      initial={animated ? { opacity: 0, y: 30 } : undefined}
+      whileInView={animated ? { opacity: 1, y: 0 } : undefined}
+      animate={!animated ? { opacity: 1, y: 0 } : undefined}
+      transition={animated ? { duration: 0.6, delay: Math.min(index * 0.05, 0.4) } : undefined}
+      viewport={animated ? { once: true } : undefined}
+      whileHover={{ y: -5 }}
       className="group bg-white/80 backdrop-blur-md rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 border border-primary/10 hover:border-primary/20 h-full flex flex-col"
     >
       {/* Service Image */}
@@ -182,7 +186,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
           className="object-cover group-hover:scale-110 transition-transform duration-700"
-          unoptimized
+          priority={priorityImage}
           onError={() => setCardImgError(true)}
         />
 
@@ -215,7 +219,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
 
         {/* Description */}
 
-        <div className="mb-3 text-sm text-foreground/70 leading-relaxed min-h-[56px]">
+        <div className="mb-3 text-sm text-foreground/70 leading-relaxed">
   {showFull || (service.description?.length ?? 0) < 100 ? (
     <span>{service.description}</span>
   ) : (
@@ -234,11 +238,10 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
 
 
         {/* Duration and Reviews */}
-        <div className="flex items-center justify-between mb-3 text-xs text-foreground/60 min-h-[20px]">
+        <div className="flex items-center justify-between mb-3 text-xs text-foreground/60">
           <div className="flex items-center gap-1">
             <HiClock className="w-3 h-3" />
-            {/* <span>{formatDuration(parseDurationToMinutes(service.duration))}</span> */}
-            <span>{formatDuration(parseDurationToMinutes(service.duration))}</span>
+            <span>{service.duration}</span>
           </div>
           <span>{service.reviews || 0} reviews</span>
         </div>
@@ -311,7 +314,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
 </div>
 
           {/* Action Buttons */}
-          <div className="space-y-2 pb-2">
+          <div className="space-y-2">
             {/* View Service Button */}
             <Button
               onClick={() => setShowModal(true)}
@@ -324,23 +327,54 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
             </Button>
             
             {/* Book Button */}
-            <Button
-              href={`/book?service=${service.id}`}
-              size="sm"
-              className="w-full flex items-center justify-center gap-2 h-10 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg"
-            >
-              Book Now
-              <HiArrowRight className="w-4 h-4" />
-            </Button>
+            <InstantBookButton service={service} subcategoryParam={subcategoryParam} />
           </div>
         </div>
       </div>
     </motion.div>
      {/* Modal */}
-     {showModal && <ServiceModal service={service} onClose={() => setShowModal(false)} />}
+     {showModal && <ServiceModal service={service} onClose={() => setShowModal(false)} subcategoryParam={subcategoryParam} />}
      </>
   );
 };
+
+function InstantBookButton({ service, subcategoryParam, onDone }: { service: Service; subcategoryParam?: string | null; onDone?: () => void; }) {
+  const router = useRouter();
+  const { addItem, items } = useCart();
+
+  const handleClick = () => {
+    const bookingService: BookingService = {
+      id: service.id.toString(),
+      name: service.name,
+      price: service.price || "0",
+      duration: service.duration || "60 min",
+      category_id: service.category_id?.toString?.() || "",
+      category_name: service.category_name,
+      description: service.description,
+      discount_price: service?.discount_price,
+      icon: service.icon || undefined,
+    };
+    // Add instantly if not in cart
+    if (!items.find((i) => i.id === bookingService.id)) {
+      addItem(bookingService);
+    }
+    // Navigate
+    const target = `/book?service=${service.id}${service.category_id ? `&category=${service.category_id}` : ''}${subcategoryParam ? `&subcategory=${subcategoryParam}` : ''}`;
+    if (onDone) onDone();
+    router.push(target);
+  };
+
+  return (
+    <Button
+      onClick={handleClick}
+      size="sm"
+      className="w-full flex items-center justify-center gap-2 h-10 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg"
+    >
+      Book Now
+      <HiArrowRight className="w-4 h-4" />
+    </Button>
+  );
+}
 
 // Default fallback images based on category
 function defaultImageForCategory(category: string): string {
@@ -356,4 +390,6 @@ function defaultImageForCategory(category: string): string {
   return categoryMap[category] || "/images/services/beauty-default.jpg";
 }
 
-export default ServiceCard;
+import React from "react";
+
+export default React.memo(ServiceCard);

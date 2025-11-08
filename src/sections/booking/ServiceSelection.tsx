@@ -18,18 +18,20 @@ import {
   HiSquares2X2,
   HiStar,
 } from "react-icons/hi2";
-import { useServices, useServiceCategories, useSettings } from "@/hooks/useApi";
+import { useServices, useServiceCategories, useSettings, useService } from "@/hooks/useApi";
 import { BookingService } from "@/types/booking";
 import Button from "@/components/ui/Button";
+import AuthModal from "@/components/ui/AuthModal";
 import MobileCartHeader from "./MobileCardHeader";
 import { useCart } from "@/contexts/CartContext";
-import { formatDuration, parseDurationToMinutes } from "@/utils/time";
 
 interface ServiceSelectionProps {
   selectedServices: BookingService[];
   onServicesChange: (services: BookingService[]) => void;
   onNext: () => void;
   preSelectedServiceId?: string | null;
+  preSelectedCategoryId?: string | null;
+  preSelectedSubCategoryId?: string | null;
 }
 
 const FALLBACK_IMAGE = "/images/services/beauty-default.jpg";
@@ -177,6 +179,8 @@ const ServiceSelection = ({
   onServicesChange,
   onNext,
   preSelectedServiceId,
+  preSelectedCategoryId,
+  preSelectedSubCategoryId,
 }: ServiceSelectionProps) => {
   const [selectedCategories, setSelectedCategories] = useState<any[]>([]);
   const [selectedSubCategories,setSelectedSubCategory]= useState<any>(null);
@@ -184,9 +188,28 @@ const ServiceSelection = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [selectedService, setSelectedService] = useState<any>(null);
+  const [hasProcessedPreSelected, setHasProcessedPreSelected] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
   
   // Use cart context for localStorage management
   const { items: cartItems, addItem, removeItem, totalItems, totalPrice } = useCart();
+  
+  // Initialize category and subcategory from URL params
+  useEffect(() => {
+    if (preSelectedCategoryId) {
+      setSelectedCategories([preSelectedCategoryId]);
+    }
+    if (preSelectedSubCategoryId) {
+      setSelectedSubCategory(preSelectedSubCategoryId);
+    }
+  }, [preSelectedCategoryId, preSelectedSubCategoryId]);
+
+  // Listen to auth change events (for safety)
+  useEffect(() => {
+    const onAuthChanged = () => {};
+    window.addEventListener("bd-auth-changed", onAuthChanged as EventListener);
+    return () => window.removeEventListener("bd-auth-changed", onAuthChanged as EventListener);
+  }, []);
 
   // Build filters for API call
   const filters = {
@@ -222,32 +245,54 @@ console.log("selectedServices----",selectedServices)
     (c) => c.id.toString() === selectedCategories[0]
   ) ;
 
-  // Pre-select service if coming from service page
+  // Pre-select service if coming from service page - fetch directly if not on current page
+  const { data: preSelectedServiceData, isLoading: isServiceLoading } = useService(preSelectedServiceId || "");
+  
   useEffect(() => {
-    if (preSelectedServiceId && services.length > 0) {
-      const preSelectedService = services.find(
-        (s) => s.id.toString() === preSelectedServiceId
-      );
-      if (
-        preSelectedService &&
-        !cartItems.find((s) => s.id === preSelectedService.id.toString())
-      ) {
-        const bookingService: BookingService = {
-          id: preSelectedService.id.toString(),
-          name: preSelectedService.name,
-          price: preSelectedService.price || "0",
-          duration: preSelectedService.duration || "60 min",
-          category_id: preSelectedService.category_id.toString(),
-          category_name: preSelectedService.category_name,
-          description: preSelectedService.description,
-          discount_price: preSelectedService?.discount_price,
-          icon: preSelectedService.icon || undefined,
-        };
-        addItem(bookingService);
+    if (!preSelectedServiceId || isServiceLoading || hasProcessedPreSelected) return;
+
+    // Mark as processed to avoid re-adding on user removal
+    setHasProcessedPreSelected(true);
+
+    // If already in cart, sync to selected and exit
+    const alreadyInCart = cartItems.find((s) => s.id === preSelectedServiceId);
+    if (alreadyInCart) {
+      const isInSelected = selectedServices.find((s) => s.id === preSelectedServiceId);
+      if (!isInSelected) {
+        onServicesChange([...selectedServices, alreadyInCart]);
+      }
+      return;
+    }
+
+    // Try to use currently loaded services first
+    const preSelectedService = services.find(
+      (s) => s.id.toString() === preSelectedServiceId
+    );
+
+    let serviceToUse = preSelectedService;
+    if (!serviceToUse && preSelectedServiceData) {
+      serviceToUse = (preSelectedServiceData as any)?.data || preSelectedServiceData;
+    }
+
+    if (serviceToUse && serviceToUse.id) {
+      const bookingService: BookingService = {
+        id: serviceToUse.id.toString(),
+        name: serviceToUse.name,
+        price: serviceToUse.price || "0",
+        duration: serviceToUse.duration || "60 min",
+        category_id: serviceToUse.category_id.toString(),
+        category_name: serviceToUse.category_name,
+        description: serviceToUse.description,
+        discount_price: serviceToUse?.discount_price,
+        icon: serviceToUse.icon || undefined,
+      };
+      addItem(bookingService);
+      const isInSelected = selectedServices.find((s) => s.id === bookingService.id);
+      if (!isInSelected) {
         onServicesChange([...selectedServices, bookingService]);
       }
     }
-  }, [preSelectedServiceId, services, cartItems, selectedServices, onServicesChange, addItem]);
+  }, [preSelectedServiceId, preSelectedServiceData, isServiceLoading, hasProcessedPreSelected, cartItems, selectedServices, onServicesChange, addItem, services]);
 
   const toggleCategory = (categoryId: string,subcategories?: any) => {
     setSelectedCategories([categoryId]); // Single category selection for API
@@ -268,13 +313,11 @@ console.log("selectedServices----",selectedServices)
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    // Smooth scroll to services section - disabled on mobile screens
-    if (typeof window !== "undefined" && window.innerWidth >= 768) {
-      document.getElementById("services-section")?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
+    // Smooth scroll to services section
+    document.getElementById("services-section")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
   };
 
   const toggleService = (service: any) => {
@@ -293,19 +336,27 @@ console.log("selectedServices----",selectedServices)
     const isSelected = cartItems.find((s) => s.id === bookingService.id);
 
     if (isSelected) {
+      // Remove from cart immediately
       removeItem(bookingService.id);
-      onServicesChange(
-        selectedServices.filter((s) => s.id !== bookingService.id)
-      );
+      // Remove from selected services - ensure state is synced immediately
+      const updatedServices = selectedServices.filter((s) => s.id !== bookingService.id);
+      onServicesChange(updatedServices);
     } else {
+      // Add to cart immediately
       addItem(bookingService);
-      onServicesChange([...selectedServices, bookingService]);
+      // Add to selected services - ensure state is synced immediately
+      const updatedServices = [...selectedServices, bookingService];
+      onServicesChange(updatedServices);
     }
   };
 
   const removeService = (serviceId: string) => {
+    // Remove from cart first
     removeItem(serviceId);
-    onServicesChange(selectedServices.filter((s) => s.id !== serviceId));
+    // Remove from selected services
+    const updatedServices = selectedServices.filter((s) => s.id !== serviceId);
+    // Update selected services state - this will also sync with cart via onServicesChange
+    onServicesChange(updatedServices);
   };
 
   // Helper function to extract minimum price from price string (e.g., "20-50" -> 20)
@@ -329,8 +380,8 @@ console.log("selectedServices----",selectedServices)
 
   const getTotalDuration = () => {
     return cartItems.reduce((total, service) => {
-      const minutes = parseDurationToMinutes(service.duration);
-      return total + minutes;
+      const duration = parseInt(service.duration) || 60;
+      return total + duration;
     }, 0);
   };
 
@@ -378,7 +429,7 @@ console.log("selectedServices----",selectedServices)
       {/* Main Content - Left Right Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Section - Services Selection */}
-        <div className="lg:col-span-2 space-y-6 order-2 lg:order-1">
+        <div className="lg:col-span-2 space-y-6">
           {/* Search and Category Filters */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -418,17 +469,17 @@ console.log("selectedServices----",selectedServices)
             <h3 className="font-semibold text-foreground mb-4">
               Filter by Category
             </h3>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3">
               <button
                 onClick={() => toggleCategory("all")}
-                className={`flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-4 rounded-full font-medium transition-all duration-300 text-sm sm:text-base ${
+                className={`flex items-center gap-3 px-6 py-4 rounded-full font-medium transition-all duration-300 text-base ${
                   selectedCategories.length === 0 ||
                   selectedCategories[0] === "all"
                     ? "bg-primary text-white shadow-lg"
                     : "bg-background text-foreground/70 hover:text-primary hover:bg-primary/5 border border-border"
                 }`}
               >
-                <HiSparkles className="w-4 h-4 sm:w-5 sm:h-5" />
+                <HiSparkles className="w-5 h-5" />
                 All Services
               </button>
 
@@ -445,13 +496,13 @@ console.log("selectedServices----",selectedServices)
                     const subIds= cat?.subcategories?.map((i: any)=> i?.id) || [];
                     toggleCategory(category.id.toString(),subIds)
                   }}
-                  className={`flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-4 rounded-full font-medium transition-all duration-300 text-sm sm:text-base ${
+                  className={`flex items-center gap-3 px-6 py-4 rounded-full font-medium transition-all duration-300 text-base ${
                     selectedCategories.includes(category.id.toString())
                       ? "bg-primary text-white shadow-lg"
                       : "bg-background text-foreground/70 hover:text-primary hover:bg-primary/5 border border-border"
                   }`}
                 >
-                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full overflow-hidden flex items-center justify-center">
+                  <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center">
                     {category.icon ? (
                       <Image
                         src={category.icon}
@@ -462,7 +513,7 @@ console.log("selectedServices----",selectedServices)
                         unoptimized
                       />
                     ) : (
-                      <HiSquares2X2 className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                      <HiSquares2X2 className="w-5 h-5 text-primary" />
                     )}
                   </div>
                   {category.name}
@@ -484,13 +535,13 @@ console.log("selectedServices----",selectedServices)
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => toggleSubCategory(subId)}
-                  className={`flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-4 rounded-full text-sm sm:text-base font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-3 px-6 py-4 rounded-full text-base font-medium transition-all duration-200 ${
                     isActive
                       ? "bg-primary text-white shadow-md shadow-primary/25"
                       : "bg-background hover:bg-primary/10 text-foreground/70 hover:text-primary border border-border"
                   }`}
                 >
-                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full overflow-hidden flex items-center justify-center">
+                  <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center">
                     {sub.icon ? (
                       <Image
                         src={sub.icon}
@@ -502,7 +553,7 @@ console.log("selectedServices----",selectedServices)
                       />
                     ) : (
                       <HiSparkles
-                        className={`w-4 h-4 sm:w-5 sm:h-5 ${
+                        className={`w-5 h-5 ${
                           isActive ? "text-white" : "text-primary"
                         }`}
                       />
@@ -555,7 +606,6 @@ console.log("selectedServices----",selectedServices)
             )}
           </motion.div>
 
-
           {/* Services Grid */}
           <div id="services-section">
             <AnimatePresence mode="wait">
@@ -565,8 +615,14 @@ console.log("selectedServices----",selectedServices)
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.4 }}
-                className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+                className="grid grid-cols-1 md:grid-cols-2 gap-4"
               >
+                {/* cart header */}
+                           <MobileCartHeader
+  totalItems={totalItems}
+  totalPrice={getTotalPrice()}
+  onNext={onNext}
+/>
                 {services.map((service, index) => {
                   const isSelected = cartItems.find(
                     (s) => s.id === service.id.toString()
@@ -580,7 +636,7 @@ console.log("selectedServices----",selectedServices)
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.4, delay: index * 0.05 }}
-                      className={`bg-card backdrop-blur-md rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border-2 h-full flex flex-col ${
+                      className={`bg-card backdrop-blur-md rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border-2 ${
                         isSelected
                           ? "border-primary shadow-primary/20"
                           : "border-border hover:border-primary/30"
@@ -608,7 +664,7 @@ console.log("selectedServices----",selectedServices)
                       </div>
 
                         {/* Service Details */}
-                        <div className="p-4 flex flex-col flex-1">
+                        <div className="p-4">
                           <div className="flex items-start justify-between mb-3">
                             <div className="flex-1">
                               <h3 className="font-semibold text-foreground mb-2 text-sm line-clamp-2">
@@ -637,20 +693,20 @@ console.log("selectedServices----",selectedServices)
                                 </span>
                               </div>
                             )}
-            <div className="flex items-center gap-1 mt-1 text-xs text-foreground/60">
+                            <div className="flex items-center gap-1 mt-1 text-xs text-foreground/60">
                               <HiClock className="w-3 h-3" />
-                              {formatDuration(parseDurationToMinutes(service.duration || "60"))}
+                              {service.duration || "60 min"}
                             </div>
                           </div>
 
                         {service.description && (
-                          <p className="text-foreground/70 text-xs mb-3 line-clamp-2 min-h-[32px]">
+                          <p className="text-foreground/70 text-xs mb-3 line-clamp-2">
                             {service.description}
                           </p>
                         )}
 
-                        {/* Action Buttons - responsive: full width on mobile, 50/50 on sm+ */}
-                        <div className="flex gap-2 flex-col sm:flex-row mt-auto">
+                        {/* Action Buttons */}
+                        <div className="flex gap-2">
                           {/* View Service Button */}
                           <Button
                             variant="outline"
@@ -658,7 +714,7 @@ console.log("selectedServices----",selectedServices)
                               setSelectedService(service);
                               setShowModal(true);
                             }}
-                            className="w-full sm:flex-1 flex items-center justify-center gap-2 h-11 rounded-xl font-medium text-sm transition-all duration-300 min-h-[44px]"
+                            className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl font-medium text-sm transition-all duration-300 min-h-[40px]"
                           >
                             <HiSparkles className="w-3 h-3" />
                             View Service
@@ -666,8 +722,14 @@ console.log("selectedServices----",selectedServices)
                           
                           {/* Add/Remove Service Button */}
                           <Button
-                            onClick={() => toggleService(service)}
-                            className={`w-full sm:flex-1 flex items-center justify-center gap-2 h-11 rounded-xl font-semibold text-sm transition-all duration-300 bg-gradient-to-r from-primary to-secondary hover:scale-105`}
+                            onClick={(e) => {
+                              if (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                              }
+                              toggleService(service);
+                            }}
+                            className={`w-full flex items-center justify-center gap-2 h-10 rounded-xl font-medium text-sm transition-all duration-300 bg-gradient-to-r from-primary to-secondary hover:scale-105`}
                           >
                             {isSelected ? (
                               <>
@@ -698,7 +760,7 @@ console.log("selectedServices----",selectedServices)
                 className="flex flex-col items-center space-y-4 mt-8"
               >
                 {/* Results Info */}
-                <div className="hidden md:block text-sm text-foreground/60">
+                <div className="text-sm text-foreground/60">
                   Showing{" "}
                   <span className="font-medium text-foreground">
                     {paginationData.from}
@@ -713,8 +775,9 @@ console.log("selectedServices----",selectedServices)
                   </span>{" "}
                   services
                 </div>
+
                 {/* Pagination Controls */}
-                <div className="hidden md:flex items-center space-x-2">
+                <div className="flex items-center space-x-2">
                   {/* Previous Button */}
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
@@ -786,45 +849,6 @@ console.log("selectedServices----",selectedServices)
                     <HiChevronRight className="w-4 h-4 ml-1" />
                   </button>
                 </div>
-
-                {/* Mobile pagination summary */}
-                <div className="md:hidden w-full">
-                  <div className="flex items-center justify-between gap-2">
-                    <button
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className={`flex items-center justify-center w-10 h-10 rounded-full transition-colors ${
-                        currentPage === 1
-                          ? "bg-muted text-foreground/40 cursor-not-allowed"
-                          : "bg-card text-foreground hover:bg-primary hover:text-white border border-border"
-                      }`}
-                      aria-label="Previous page"
-                    >
-                      <HiChevronLeft className="w-5 h-5" />
-                    </button>
-
-                    <div className="text-sm text-foreground/70">
-                      <span className="font-medium text-foreground">{currentPage}</span> / {paginationData.last_page}
-                    </div>
-
-                    <button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === paginationData.last_page}
-                      className={`flex items-center justify-center w-10 h-10 rounded-full transition-colors ${
-                        currentPage === paginationData.last_page
-                          ? "bg-muted text-foreground/40 cursor-not-allowed"
-                          : "bg-card text-foreground hover:bg-primary hover:text-white border border-border"
-                      }`}
-                      aria-label="Next page"
-                    >
-                      <HiChevronRight className="w-5 h-5" />
-                    </button>
-                  </div>
-
-                  <div className="mt-3 text-center text-xs text-foreground/60">
-                    {paginationData.from}–{paginationData.to} of {paginationData.total}
-                  </div>
-                </div>
               </motion.div>
             )}
 
@@ -853,8 +877,8 @@ console.log("selectedServices----",selectedServices)
           </div>
         </div>
 
-        {/* Right Section - Selected Services & Summary - Shows at top on mobile, right on desktop */}
-        <div className="lg:col-span-1 order-1 lg:order-2">
+        {/* Right Section - Selected Services & Summary */}
+        <div className="lg:col-span-1">
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -912,15 +936,20 @@ console.log("selectedServices----",selectedServices)
                           {service.name}
                         </p>
                         <p className="text-xs text-foreground/60">
-                          {formatDuration(parseDurationToMinutes(service.duration))}
+                          {service.duration}
                         </p>
                         <p className="text-sm font-bold text-primary">
                           ₹{getDisplayPrice(service)}
                         </p>
                       </div>
                       <button
-                        onClick={() => removeService(service.id)}
-                        className="text-red-500 hover:text-red-700 transition-colors p-1"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          removeService(service.id);
+                        }}
+                        className="text-red-500 hover:text-red-700 transition-colors p-1 flex-shrink-0"
+                        aria-label="Remove service"
                       >
                         <HiXMark className="w-4 h-4" />
                       </button>
@@ -949,7 +978,7 @@ console.log("selectedServices----",selectedServices)
                       Duration:
                     </span>
                     <span className="font-medium text-foreground text-sm">
-                      {formatDuration(getTotalDuration())}
+                      {getTotalDuration()} min
                     </span>
                   </div>
                   <div className="flex justify-between items-center mb-4">
@@ -970,13 +999,60 @@ console.log("selectedServices----",selectedServices)
                   </div> */}
                 </div>
 
+                {/* Validation Message */}
+                {/* {(() => {
+                  const minService = parseInt(getSetting("min_service_book") || "1");
+                  const maxService = parseInt(getSetting("max_service_book") || "100");
+                  const isBelowMin = cartItems.length < minService;
+                  const isAboveMax = cartItems.length > maxService;
+                  
+                  if (isBelowMin || isAboveMax) {
+                    return (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200"
+                      >
+                        <p className="text-sm font-medium text-amber-800 flex items-center gap-2">
+                          <HiSparkles className="w-4 h-4 flex-shrink-0" />
+                          {isBelowMin 
+                            ? `Minimum ${minService} service${minService > 1 ? 's' : ''} need to be selected.`
+                            : `Maximum ${maxService} service${maxService > 1 ? 's' : ''} can be selected.`
+                          }
+                        </p>
+                      </motion.div>
+                    );
+                  }
+                  return null;
+                })()} */}
+                
                 <Button
                   onClick={() => {
+                    // Get min and max service limits from settings
+                    // const minService = parseInt(getSetting("min_service_book") || "1");
+                    // const maxService = parseInt(getSetting("max_service_book") || "100");
+                    
+                    // Validate service count
+                    // if (cartItems.length < minService || cartItems.length > maxService) {
+                    //   return; // Don't proceed if validation fails
+                    // }
+                    // Auth gate
+                    // const isLoggedIn = typeof window !== "undefined" && localStorage.getItem("bd_isLoggedIn") === "true";
+                    // if (!isLoggedIn) {
+                    //   setAuthOpen(true);
+                    //   return;
+                    // }
+
                     // Sync cart items to selectedServices before proceeding
                     onServicesChange([...cartItems]);
                     onNext();
                   }}
-                  className="w-full bg-primary text-white py-2.5 sm:py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 text-sm"
+                  // disabled={(() => {
+                  //   const minService = parseInt(getSetting("min_service_book") || "1");
+                  //   const maxService = parseInt(getSetting("max_service_book") || "100");
+                  //   return cartItems.length < minService || cartItems.length > maxService;
+                  // })()}
+                  className="w-full bg-primary text-white py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
                   Continue to Date & Time
                   <HiArrowRight className="w-4 h-4" />
@@ -1009,6 +1085,17 @@ console.log("selectedServices----",selectedServices)
           }} 
         />
       )}
+
+      {/* Auth Modal for gating Continue */}
+      <AuthModal
+        open={authOpen}
+        onClose={() => setAuthOpen(false)}
+        onLoggedIn={() => {
+          setAuthOpen(false);
+          onServicesChange([...cartItems]);
+          onNext();
+        }}
+      />
     </div>
   );
 };

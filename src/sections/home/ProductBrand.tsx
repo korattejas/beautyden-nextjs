@@ -43,13 +43,13 @@ const ProductBrand = () => {
             <div className="marquee__inner">
               {brands.concat(brands).map((brand, index) => (
                 <div key={index} className="flex-shrink-0 text-center px-4">
-                  <div className="w-28 h-28 md:w-32 md:h-32 mx-auto overflow-hidden">
+                  <div className="w-16 h-16 md:w-20 md:h-20 mx-auto overflow-hidden">
                     {brand.icon ? (
                       <Image
                         src={brand.icon}
                         alt={brand.name}
-                        width={120}
-                        height={120}
+                        width={80}
+                        height={80}
                         className="w-full h-full object-contain"
                         unoptimized
                       />

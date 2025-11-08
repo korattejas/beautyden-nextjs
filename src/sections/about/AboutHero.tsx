@@ -38,7 +38,7 @@ const AboutHero = () => {
       <div className="absolute bottom-20 left-20 w-36 h-36 bg-accent/10 rounded-full blur-3xl" />
 
       <Container>
-        <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
           <div>
             <motion.div
@@ -133,13 +133,13 @@ const AboutHero = () => {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="relative"
           >
-            <div className="relative -mx-4 sm:mx-0">
+            <div className="relative">
               <Image
                 src={firstSlideImage}
                 alt="Professional beauty services"
-                width={1200}
-                height={800}
-                className="w-screen sm:w-auto h-64 sm:h-auto rounded-none sm:rounded-3xl shadow-none sm:shadow-2xl object-cover"
+                width={600}
+                height={400}
+                className="rounded-3xl shadow-2xl object-cover"
                 unoptimized
               />
 
@@ -169,27 +169,19 @@ const AboutHero = () => {
               </motion.div>
 
               <motion.div
-                initial={{ opacity: 0, scale: 0.8, y: 20 }}
-                animate={{ 
-                  opacity: 1, 
-                  scale: 1, 
-                  y: [0, -8, 0] 
-                }}
-                transition={{ 
-                  opacity: { duration: 0.6, delay: 1.2 },
-                  scale: { duration: 0.6, delay: 1.2 },
-                  y: { duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1.5 }
+                animate={{ y: [10, -10] }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 1,
                 }}
                 className="absolute -bottom-4 -right-4 bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-xl"
               >
                 <div className="flex items-center gap-3">
-                  <motion.div 
-                    className="w-12 h-12 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full flex items-center justify-center"
-                    animate={{ rotate: [0, 360] }}
-                    transition={{ duration: 8, repeat: Infinity, ease: "linear", delay: 2 }}
-                  >
+                  <div className="w-12 h-12 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full flex items-center justify-center">
                     <HiSparkles className="w-6 h-6 text-white" />
-                  </motion.div>
+                  </div>
                   <div>
                     <div className="font-semibold text-foreground">
                       Premium Quality

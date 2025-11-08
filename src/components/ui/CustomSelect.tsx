@@ -2,6 +2,7 @@
 
 import React from "react";
 import Select, {
+  Props as SelectProps,
   SingleValue,
   ActionMeta,
   StylesConfig,
@@ -15,14 +16,11 @@ export interface SelectOption {
   icon?: string;
 }
 
-interface CustomSelectProps {
-  options?: SelectOption[];
-  value?: string | { value: string; label: string } | null;
+interface CustomSelectProps
+  extends Omit<SelectProps<SelectOption, false>, "onChange"> {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
-  isClearable?: boolean;
-  isSearchable?: boolean;
 }
 
 const CustomSelect: React.FC<CustomSelectProps> = ({
@@ -31,8 +29,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   onChange,
   placeholder = "Select an option",
   className,
-  isClearable = true,
-  isSearchable = true,
+  ...rest
 }) => {
   // Custom styles with proper border colors
   const customStyles: StylesConfig<SelectOption, false> = {
@@ -133,9 +130,8 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   };
 
   // Find the current selected option
-  const currentValue = typeof value === "string" ? value : (value as any)?.value ?? "";
   const selectedOption = Array.isArray(options)
-    ? options.find((option) => option.value === currentValue) || null
+    ? options.find((option) => option.value === value)
     : null;
 
   // Custom components
@@ -164,21 +160,22 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
       value={selectedOption}
       onChange={handleChange}
       placeholder={placeholder}
-      isClearable={isClearable}
-      isSearchable={isSearchable}
+      isClearable
+      isSearchable
       styles={customStyles}
       components={{
         DropdownIndicator: CustomDropdownIndicator,
         Option: CustomOption,
         IndicatorSeparator: () => null,
       }}
-      className={`react-select-container ${className || ""}`}
+      className={`react-select-container ${className}`}
       classNamePrefix="react-select"
       menuPlacement="auto"
       menuPosition="absolute"
       menuPortalTarget={
         typeof window !== "undefined" ? document.body : undefined
       }
+      {...rest}
     />
   );
 };

@@ -80,7 +80,7 @@ const CustomerInformation = ({
   };
 
   return (
-    <div className="max-w-3xl mx-auto sm:px-0">
+    <div className="max-w-3xl mx-auto">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -100,7 +100,7 @@ const CustomerInformation = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
         onSubmit={handleSubmit(onSubmit)}
-        className="bg-white/80 backdrop-blur-md rounded-2xl sm:rounded-3xl p-4 md:p-6 shadow-lg border border-primary/10 space-y-6"
+        className="bg-white/80 backdrop-blur-md rounded-3xl p-8 shadow-lg border border-primary/10 space-y-6"
       >
         {/* Name Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -113,7 +113,7 @@ const CustomerInformation = ({
               <input
                 {...register("firstName")}
                 type="text"
-                className={`w-full pl-12 pr-4 py-3 sm:py-4 bg-white/60 backdrop-blur-sm border-2 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 ${
+                className={`w-full pl-12 pr-4 py-4 bg-white/60 backdrop-blur-sm border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 ${
                   errors.firstName
                     ? "border-red-500"
                     : "border-primary/20 focus:border-primary"
@@ -138,7 +138,7 @@ const CustomerInformation = ({
               <input
                 {...register("lastName")}
                 type="text"
-                className={`w-full pl-12 pr-4 py-3 sm:py-4 bg-white/60 backdrop-blur-sm border-2 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 ${
+                className={`w-full pl-12 pr-4 py-4 bg-white/60 backdrop-blur-sm border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 ${
                   errors.lastName
                     ? "border-red-500"
                     : "border-primary/20 focus:border-primary"
@@ -166,7 +166,7 @@ const CustomerInformation = ({
               <input
                 {...register("email")}
                 type="email"
-                className={`w-full pl-12 pr-4 py-3 sm:py-4 bg-white/60 backdrop-blur-sm border-2 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 ${
+                className={`w-full pl-12 pr-4 py-4 bg-white/60 backdrop-blur-sm border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 ${
                   errors.email
                     ? "border-red-500"
                     : "border-primary/20 focus:border-primary"
@@ -191,7 +191,7 @@ const CustomerInformation = ({
               <input
                 {...register("phone")}
                 type="tel"
-                className={`w-full pl-12 pr-4 py-3 sm:py-4 bg-white/60 backdrop-blur-sm border-2 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 ${
+                className={`w-full pl-12 pr-4 py-4 bg-white/60 backdrop-blur-sm border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 ${
                   errors.phone
                     ? "border-red-500"
                     : "border-primary/20 focus:border-primary"
@@ -218,7 +218,7 @@ const CustomerInformation = ({
             <textarea
               {...register("address")}
               rows={3}
-              className={`w-full pl-12 pr-4 py-3 sm:py-4 bg-white/60 backdrop-blur-sm border-2 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 resize-none ${
+              className={`w-full pl-12 pr-4 py-4 bg-white/60 backdrop-blur-sm border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 resize-none ${
                 errors.address
                   ? "border-red-500"
                   : "border-primary/20 focus:border-primary"
@@ -244,7 +244,7 @@ const CustomerInformation = ({
             <textarea
               {...register("specialNotes")}
               rows={3}
-              className="w-full pl-12 pr-4 py-3 sm:py-4 bg-white/60 backdrop-blur-sm border-2 border-primary/20 focus:border-primary rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 resize-none"
+              className="w-full pl-12 pr-4 py-4 bg-white/60 backdrop-blur-sm border-2 border-primary/20 focus:border-primary rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 resize-none"
               placeholder="Any specific requirements, allergies, or preferences you'd like our team to know about..."
               onChange={(e) => onDataChange({ specialNotes: e.target.value })}
             />
@@ -252,12 +252,12 @@ const CustomerInformation = ({
         </div>
 
         {/* Navigation Buttons */}
-        <div className="flex items-center justify-between pt-6 gap-3 flex-col-reverse sm:flex-row">
+        <div className="flex items-center justify-between pt-6">
           <Button
             type="button"
             onClick={onPrev}
             variant="outline"
-            className="w-full sm:w-auto border-2 border-primary/20 text-primary hover:bg-primary/5 px-6 sm:px-8 py-3 rounded-full font-semibold flex items-center justify-center gap-2"
+            className="border-2 border-primary/20 text-primary hover:bg-primary/5 px-8 py-3 rounded-full font-semibold flex items-center gap-2"
           >
             <HiArrowLeft className="w-4 h-4" />
             Previous
@@ -266,7 +266,7 @@ const CustomerInformation = ({
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full sm:w-auto bg-gradient-to-r from-primary to-secondary text-white px-6 sm:px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="bg-gradient-to-r from-primary to-secondary text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             Continue
             <HiArrowRight className="w-4 h-4" />
