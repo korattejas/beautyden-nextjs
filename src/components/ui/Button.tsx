@@ -7,7 +7,7 @@ interface ButtonProps {
   variant?: "primary" | "secondary" | "outline" | "ghost";
   size?: "sm" | "md" | "lg";
   href?: string;
-  onClick?: () => void;
+  onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
   className?: string;
   type?: "button" | "submit" | "reset";
@@ -40,13 +40,20 @@ const Button = ({
       bg-muted text-primary border border-primary/20
       hover:bg-primary/10 hover:border-primary/40
     `,
-    outline: `
-      border-2 border-primary text-primary bg-transparent
-      hover:bg-primary hover:text-white
+outline: `
+      border-2 border-primary text-gray-700 bg-transparent
+      hover:bg-gradient-to-r hover:from-primary/90 hover:to-secondary/90
+      hover:text-white hover:border-transparent
+      hover:scale-105 shadow-lg hover:shadow-xl
     `,
     ghost: `
       text-primary bg-transparent
       hover:bg-primary/10
+    `,
+    transparent: `
+      bg-transparent text-black
+      hover:bg-primary/90 hover:text-white
+      hover:scale-105 shadow-lg hover:shadow-xl
     `,
   };
 

@@ -27,7 +27,7 @@ const HiringFilters = ({ filters, onFiltersChange }: HiringFiltersProps) => {
     { value: "", label: "All Cities" },
     ...cities.map((city) => ({
       value: city.name,
-      label: `${city.name}, ${city.state}`,
+      label: `${city.name}`,
     })),
   ];
 
@@ -89,7 +89,7 @@ const HiringFilters = ({ filters, onFiltersChange }: HiringFiltersProps) => {
         </div>
 
         {/* City Filter - Custom Dropdown */}
-        <div className="lg:w-64">
+        {/* <div className="lg:w-64">
           <CustomSelect
             options={cityOptions}
             value={
@@ -100,10 +100,10 @@ const HiringFilters = ({ filters, onFiltersChange }: HiringFiltersProps) => {
             placeholder="All Cities"
             // icon={<HiMapPin className="w-5 h-5 text-primary" />}
           />
-        </div>
+        </div> */}
 
         {/* Experience Level Filter - Custom Dropdown */}
-        <div className="lg:w-72">
+        <div className="lg:w-90">
           <CustomSelect
             options={experienceLevels}
             value={

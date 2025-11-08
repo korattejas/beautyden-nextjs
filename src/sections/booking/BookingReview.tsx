@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import {
   HiArrowLeft,
   HiCheckCircle,
@@ -13,6 +14,8 @@ import {
 } from "react-icons/hi2";
 import Button from "@/components/ui/Button";
 import { BookingFormData } from "@/types/booking";
+import { bookAppointment } from "@/services/booking.service";
+import { useCart } from "@/contexts/CartContext";
 
 interface BookingReviewProps {
   bookingData: BookingFormData;
@@ -27,17 +30,64 @@ const BookingReview = ({
 }: BookingReviewProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentMethod] = useState("pay_after_service"); // For now, only pay after service
+  const router = useRouter();
+  const { clearCart, items: cartItems } = useCart();
+
+  // Debug logging
+  console.log("BookingReview - bookingData:", bookingData);
+  console.log("BookingReview - services:", bookingData.services);
+  console.log("BookingReview - services length:", bookingData.services?.length);
+  console.log("BookingReview - cartItems:", cartItems);
+  console.log("BookingReview - cartItems length:", cartItems?.length);
+
+  // Use cart items as fallback if bookingData.services is empty
+  const servicesToUse = bookingData.services?.length > 0 ? bookingData.services : cartItems;
+  
+  // Final safety check - if still no services, show error
+  if (!servicesToUse || servicesToUse.length === 0) {
+    console.error("No services found in booking data or cart");
+    return (
+      <div className="container mx-auto text-center py-20">
+        <h2 className="text-2xl font-bold text-foreground mb-4">
+          No Services Selected
+        </h2>
+        <p className="text-foreground/60 mb-8">
+          Please go back and select at least one service before booking.
+        </p>
+        <Button
+          onClick={onPrev}
+          variant="outline"
+          className="border-2 border-primary/20 text-primary hover:bg-primary/5 px-8 py-3 rounded-full font-semibold flex items-center gap-2"
+        >
+          <HiArrowLeft className="w-4 h-4" />
+          Go Back to Select Services
+        </Button>
+      </div>
+    );
+  }
+
+  // Helper function to extract minimum price from price string (e.g., "20-50" -> 20)
+  const getMinPrice = (priceString: string): number => {
+    if (!priceString) return 0;
+    const priceMatch = priceString.match(/(\d+)/);
+    return priceMatch ? parseInt(priceMatch[1]) : 0;
+  };
+
+  // Helper function to get display price (use discount_price if available, otherwise original price)
+  const getDisplayPrice = (service: any): string => {
+    return service.discount_price || service.price;
+  };
 
   const getTotalPrice = () => {
-    return bookingData.services.reduce(
-      (total, service) => total + service.price,
-      0
-    );
+    return servicesToUse.reduce((total, service) => {
+      const displayPrice = getDisplayPrice(service);
+      return total + getMinPrice(displayPrice);
+    }, 0);
   };
 
   const getTotalDuration = () => {
     // Simple duration calculation - sum all service durations
-    return bookingData.services.length * 60; // Assuming 60 minutes per service
+    return servicesToUse.length * 60; // Assuming 60 minutes per service
   };
 
   const formatDate = (dateString: string) => {
@@ -62,11 +112,82 @@ const BookingReview = ({
   const handleConfirmBooking = async () => {
     setIsSubmitting(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      onConfirm();
-    } catch (error) {
+      // Validate that services exist
+      if (!servicesToUse || servicesToUse.length === 0) {
+        alert("Please select at least one service before booking.");
+        return;
+      }
+      console.log("servicesToUse",servicesToUse)
+
+      // Prepare payload
+      const serviceIds = servicesToUse.map(service => service.id).join(',');
+      const serviceCategoryId = servicesToUse[0]?.category_id || '1';
+      const totalPrice = getTotalPrice();
+      const totalDiscount = servicesToUse.reduce((total, service) => {
+        const originalPrice = parseFloat(service.price);
+        const discountPrice = service.discount_price ? parseFloat(service.discount_price) : originalPrice;
+        return total + (originalPrice - discountPrice);
+      }, 0);
+
+      const payload = {
+        first_name: bookingData.firstName,
+        last_name: bookingData.lastName,
+        email: bookingData.email,
+        phone: bookingData.phone,
+        service_category_id: serviceCategoryId,
+        service_id: serviceIds,
+        appointment_date: bookingData.selectedDate,
+        appointment_time: bookingData.selectedTime,
+        notes: bookingData.specialNotes || '',
+        quantity: servicesToUse.length,
+        price: totalPrice,
+        discount_price: totalDiscount > 0 ? totalDiscount : undefined,
+        service_address: bookingData.address,
+        service_sub_category_id: undefined,
+      };
+
+      console.log("Booking payload:", payload);
+      console.log("Services data:", servicesToUse);
+      console.log("Service IDs being sent:", serviceIds);
+      console.log("Service category ID:", serviceCategoryId);
+      console.log("Total price:", totalPrice);
+      console.log("Quantity:", servicesToUse.length);
+
+      // Call API
+      const response = await bookAppointment(payload);
+      console.log("Booking response:", response);
+      
+      // Clear cart
+      clearCart();
+      
+      // Redirect to thank you page with response data
+      // Fix: Access response data correctly with safety checks
+      let orderNumber = "Unknown";
+      
+      if (response?.data?.order_number) {
+        orderNumber = response.data.order_number;
+      } else if (response?.data?.appointment?.order_number) {
+        orderNumber = response.data.appointment.order_number;
+      }
+      
+      // Use a simple success message instead of the complex HTML from API
+      const message = "Booking successful! We'll contact you shortly to confirm your appointment.";
+      
+      router.push(`/thank-you?orderNumber=${orderNumber}&message=${encodeURIComponent(message)}`);
+      
+    } catch (error: any) {
       console.error("Booking error:", error);
+      
+      // Show more detailed error message
+      let errorMessage = "Failed to book appointment. Please try again.";
+      
+      if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
+      alert(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -102,7 +223,7 @@ const BookingReview = ({
               ✨ Selected Services
             </h3>
             <div className="space-y-4">
-              {bookingData?.services.map((service, index) => (
+              {servicesToUse?.map((service, index) => (
                 <div
                   key={service.id}
                   className="flex items-center justify-between py-3 border-b border-primary/10 last:border-b-0"
@@ -119,7 +240,6 @@ const BookingReview = ({
                   <div className="text-right self-start">
           {service?.discount_price ? (
             <div className="flex flex-row gap-1 self-start items-end">
-              
               <span className="font-bold text-foreground">
                 Start ₹{service?.discount_price}
               </span>
@@ -244,7 +364,7 @@ const BookingReview = ({
               <div className="flex justify-between items-center">
                 <span className="text-foreground/70">Services</span>
                 <span className="font-semibold text-foreground">
-                  {bookingData.services.length}
+                  {servicesToUse.length}
                 </span>
               </div>
               <div className="flex justify-between items-center">
@@ -266,7 +386,7 @@ const BookingReview = ({
             </div>
 
             {/* Total */}
-            <div className="border-t border-primary/20 pt-6 mb-6">
+            {/* <div className="border-t border-primary/20 pt-6 mb-6">
               <div className="flex justify-between items-center">
                 <span className="text-lg font-bold text-foreground">
                   Total Amount
@@ -275,7 +395,7 @@ const BookingReview = ({
                   ₹{getTotalPrice()}
                 </span>
               </div>
-            </div>
+            </div> */}
 
             {/* Payment Method */}
             <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 mb-6 border border-primary/10">

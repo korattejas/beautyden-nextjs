@@ -194,6 +194,7 @@ const PopularServicesSection = () => {
               >
                 View All Services
               </Button>
+            
             </div>
 
             {/* Stats Card */}

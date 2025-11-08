@@ -5,8 +5,30 @@ import Button from "@/components/ui/Button";
 import { motion } from "framer-motion";
 import { HiSparkles, HiHeart, HiStar } from "react-icons/hi2";
 import Image from "next/image";
+import { useSettings } from "@/hooks/useApi";
 
 const AboutHero = () => {
+  const { data: settingsData } = useSettings();
+  const settings = settingsData?.data || [];
+
+  const getSetting = (key: string): string => {
+    return settings.find((s: any) => s.key === key)?.value || "";
+  };
+
+  const ratingFromSettings = getSetting("rating");
+  const ratingDisplay = (() => {
+    const parsed = parseFloat(ratingFromSettings || "");
+    if (isNaN(parsed)) return "4.9";
+    return parsed.toFixed(1);
+  })();
+
+  const happyClients = getSetting("happy_clients") || "10K+";
+  const experts = getSetting("experts") || "50+";
+
+  // Use first image from settings homePageSlides if available
+  const firstSlideImage = (settingsData?.homePageSlides?.[0]?.image as string) ||
+    "https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+
   return (
     <section className="pt-24 pb-20 relative overflow-hidden">
       {/* Background Elements */}
@@ -85,18 +107,18 @@ const AboutHero = () => {
               className="grid grid-cols-3 gap-6"
             >
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">10K+</div>
+                <div className="text-3xl font-bold text-primary mb-2">{happyClients}</div>
                 <div className="text-sm text-foreground/60">Happy Clients</div>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center mb-2">
-                  <span className="text-3xl font-bold text-primary">4.9</span>
+                  <span className="text-3xl font-bold text-primary">{ratingDisplay}</span>
                   <HiStar className="w-6 h-6 text-yellow-400 ml-1" />
                 </div>
                 <div className="text-sm text-foreground/60">Average Rating</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">50+</div>
+                <div className="text-3xl font-bold text-primary mb-2">{experts}</div>
                 <div className="text-sm text-foreground/60">
                   Expert Professionals
                 </div>
@@ -113,11 +135,12 @@ const AboutHero = () => {
           >
             <div className="relative">
               <Image
-                src="https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                src={firstSlideImage}
                 alt="Professional beauty services"
                 width={600}
                 height={400}
                 className="rounded-3xl shadow-2xl object-cover"
+                unoptimized
               />
 
               {/* Floating elements */}

@@ -17,7 +17,7 @@ interface BookingStepperProps {
 const BookingStepper = ({ steps, currentStep }: BookingStepperProps) => {
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2 sm:gap-4">
         {steps.map((step, index) => {
           const isActive = currentStep === step.id;
           const isCompleted = currentStep > step.id;
@@ -31,7 +31,7 @@ const BookingStepper = ({ steps, currentStep }: BookingStepperProps) => {
                   initial={{ scale: 0.8 }}
                   animate={{ scale: isActive ? 1.1 : 1 }}
                   transition={{ duration: 0.3 }}
-                  className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
+                  className={`w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
                     isCompleted
                       ? "bg-green-500 border-green-500 text-white"
                       : isActive
@@ -40,16 +40,16 @@ const BookingStepper = ({ steps, currentStep }: BookingStepperProps) => {
                   }`}
                 >
                   {isCompleted ? (
-                    <HiCheck className="w-6 h-6" />
+                    <HiCheck className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
                   ) : (
-                    <span className="font-bold">{step.id}</span>
+                    <span className="font-bold text-xs sm:text-sm md:text-base">{step.id}</span>
                   )}
                 </motion.div>
 
                 {/* Step Text */}
-                <div className="mt-3 text-center">
+                <div className="mt-2 sm:mt-3 text-center">
                   <p
-                    className={`font-semibold text-sm ${
+                    className={`font-semibold text-[10px] sm:text-xs md:text-sm ${
                       isActive || isCompleted
                         ? "text-foreground"
                         : "text-foreground/60"
@@ -57,7 +57,7 @@ const BookingStepper = ({ steps, currentStep }: BookingStepperProps) => {
                   >
                     {step.title}
                   </p>
-                  <p className="text-xs text-foreground/50 mt-1">
+                  <p className="hidden sm:block text-xs text-foreground/50 mt-1">
                     {step.description}
                   </p>
                 </div>
@@ -65,7 +65,7 @@ const BookingStepper = ({ steps, currentStep }: BookingStepperProps) => {
 
               {/* Connecting Line */}
               {!isLast && (
-                <div className="flex-1 mx-4">
+                <div className="flex-1 mx-2 sm:mx-3 md:mx-4">
                   <motion.div
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: isCompleted ? 1 : 0 }}

@@ -81,7 +81,8 @@ Thank you! 🙏`;
               {getExperienceLevelIcon(job.experience_level)}
             </span>
             <span className="text-xs font-medium text-foreground/70">
-              {experienceText}
+              {/* {experienceText} */}
+              {job.experience_level_text || experienceText}
             </span>
           </div>
         </div>

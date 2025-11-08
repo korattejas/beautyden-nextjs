@@ -139,7 +139,7 @@ const AboutMission = () => {
                 {item.title}
               </h3>
 
-              <p className="text-foreground/70 leading-relaxed text-base">
+              <p className="text-left text-foreground/70 leading-relaxed text-base">
                 {item.description}
               </p>
             </motion.div>

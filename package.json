@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
+    "@next/third-parties": "^15.5.4",
     "@tanstack/react-query": "^5.85.5",
     "@tanstack/react-query-devtools": "^5.85.5",
     "@types/react-datepicker": "^6.2.0",
@@ -33,6 +34,7 @@
     "remark-gfm": "^4.0.1",
     "swiper": "^11.2.10",
     "tailwind-merge": "^3.3.1",
+    "yet-another-react-lightbox": "^3.25.0",
     "yup": "^1.7.0"
   },
   "devDependencies": {

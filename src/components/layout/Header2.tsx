@@ -5,11 +5,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "@/components/ui/Button";
-import { HiSparkles, HiBars3, HiXMark } from "react-icons/hi2";
+import { HiSparkles, HiBars3, HiXMark, HiUser, HiArrowRightOnRectangle } from "react-icons/hi2";
+import AuthModal from "@/components/ui/AuthModal";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const pathname = usePathname();
 
   const navItems = [
@@ -27,6 +30,12 @@ const Navigation = () => {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    try {
+      setIsLoggedIn(localStorage.getItem("bd_isLoggedIn") === "true");
+    } catch {}
   }, []);
 
   useEffect(() => {
@@ -93,8 +102,15 @@ const Navigation = () => {
               })}
             </div>
 
-            {/* CTA Button */}
+            {/* Right actions */}
             <div className="hidden md:flex items-center space-x-4">
+              <button
+                onClick={() => (isLoggedIn ? (window.location.href = "/account") : setAuthOpen(true))}
+                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors duration-200"
+                aria-label={isLoggedIn ? "Account" : "Login"}
+              >
+                {isLoggedIn ? <HiUser className="w-5 h-5" /> : <HiArrowRightOnRectangle className="w-5 h-5" />}
+              </button>
               <Button
                 href="/booking"
                 className="bg-primary hover:bg-primary/90 text-white px-6 py-2 text-sm font-medium rounded-lg transition-colors duration-200"
@@ -141,6 +157,16 @@ const Navigation = () => {
               className="fixed top-16 left-4 right-4 bg-white rounded-xl shadow-lg border border-gray-100 z-50 md:hidden"
             >
               <div className="p-4 space-y-2">
+                {/* Mobile auth/icon */}
+                <div className="flex items-center justify-between pb-2">
+                  <button
+                    onClick={() => (isLoggedIn ? (window.location.href = "/account") : setAuthOpen(true))}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50 text-gray-700"
+                  >
+                    {isLoggedIn ? <HiUser className="w-5 h-5" /> : <HiArrowRightOnRectangle className="w-5 h-5" />}
+                    <span className="text-sm font-medium">{isLoggedIn ? "My Account" : "Login"}</span>
+                  </button>
+                </div>
                 {navItems.map((item, index) => {
                   const isActive = pathname === item.href;
                   return (
@@ -180,6 +206,16 @@ const Navigation = () => {
           </>
         )}
       </AnimatePresence>
+
+      {/* Auth Modal */}
+      <AuthModal
+        open={authOpen}
+        onClose={() => setAuthOpen(false)}
+        onLoggedIn={() => {
+          setIsLoggedIn(true);
+          // no navigation here; header icon changes, user can click to go to account
+        }}
+      />
     </>
   );
 };

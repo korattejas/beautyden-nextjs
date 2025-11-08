@@ -68,26 +68,26 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="mb-8"
+          className="mb-2"
         >
           {/* Large Logo Container */}
-          <div className="relative mb-6">
+          <div className="relative mb-0">
             <motion.div
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="relative mx-auto w-32 h-32 md:w-36 md:h-36"
+              className="relative mx-auto"
             >
               {/* Logo Background */}
               {/* <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl shadow-xl border border-gray-200" /> */}
 
               {/* Logo */}
-              <div className="relative w-full h-full flex items-center justify-center">
+              <div className="relative flex items-center justify-center leading-none mb-5">
                 <Image
                   src="/logo.png"
                   alt="BeautyDen"
                   width={150}
-                  height={80}
+                  height={50}
                   className="object-contain"
                   priority
                 />
@@ -121,7 +121,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.8 }}
-          className="space-y-6"
+          className="space-y-3"
         >
           {/* Loading Step Text */}
           {/* <div className="h-6">

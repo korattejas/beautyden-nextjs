@@ -4,6 +4,7 @@ import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { HiHeart, HiSparkles } from "react-icons/hi2";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import { useSettings } from "@/hooks/useApi";
@@ -110,7 +111,7 @@ const HeroSection = () => {
   }
 
   return (
-    <section className="bg-white pt-20 pb-8 sm:pb-12 md:pb-20 lg:pb-24 min-h-[90vh] flex items-center">
+    <section className="bg-white pt-20 pb-8 sm:pb-12 md:pb-20 lg:pb-24 min-h-[90vh] flex items-center overflow-x-hidden">
       <Container size="xl">
         <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 xl:gap-16 items-center">
           {/* Left Content */}
@@ -193,11 +194,11 @@ const HeroSection = () => {
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             viewport={{ once: true }}
-            className="relative flex justify-center lg:justify-end order-1 lg:order-2"
+            className="relative flex justify-center lg:justify-end order-1 lg:order-2 overflow-hidden sm:overflow-visible"
           >
             <div className="relative">
               {/* Rounded 3xl Image Container */}
-              <div className="relative w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] lg:w-[450px] lg:h-[450px] xl:w-[500px] xl:h-[500px] rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-gray-100 to-gray-200 border-2 sm:border-4 border-white">
+              <div className="relative w-[300px] h-[300px] sm:w-[380px] sm:h-[380px] md:w-[430px] md:h-[430px] lg:w-[480px] lg:h-[480px] xl:w-[530px] xl:h-[530px] rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-gray-100 to-gray-200 border-2 sm:border-4 border-white">
                 <Swiper
                   modules={[Navigation, Pagination, Autoplay]}
                   slidesPerView={1}
@@ -241,7 +242,7 @@ const HeroSection = () => {
                 </Swiper>
 
                 {/* Custom Navigation */}
-                <div className="hero-swiper-button-prev absolute -left-4 sm:-left-6 lg:-left-8 top-1/2 transform -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white hover:bg-primary hover:text-white backdrop-blur-sm rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 shadow-lg border border-gray-200 hover:border-primary">
+                <div className="hero-swiper-button-prev absolute left-2 sm:left-4 lg:left-4 top-1/2 transform -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white hover:bg-primary hover:text-white backdrop-blur-sm rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 shadow-lg border border-gray-200 hover:border-primary">
                   <svg
                     className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6"
                     fill="none"
@@ -257,7 +258,7 @@ const HeroSection = () => {
                   </svg>
                 </div>
 
-                <div className="hero-swiper-button-next absolute -right-4 sm:-right-6 lg:-right-8 top-1/2 transform -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white hover:bg-primary hover:text-white backdrop-blur-sm rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 shadow-lg border border-gray-200 hover:border-primary">
+                <div className="hero-swiper-button-next absolute right-2 sm:right-4 lg:right-4 top-1/2 transform -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white hover:bg-primary hover:text-white backdrop-blur-sm rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 shadow-lg border border-gray-200 hover:border-primary">
                   <svg
                     className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6"
                     fill="none"
@@ -278,11 +279,52 @@ const HeroSection = () => {
               <motion.div
                 animate={{ rotate: [0, 360] }}
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 lg:-top-6 lg:-right-6 w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-primary/10 rounded-full blur-lg"
+                className="absolute top-0 right-0 sm:-top-4 sm:-right-4 lg:-top-6 lg:-right-6 w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-primary/10 rounded-full blur-lg"
               />
-              <div className="absolute -bottom-3 -left-3 sm:-bottom-4 sm:-left-4 lg:-bottom-6 lg:-left-6 w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 bg-gray-200/30 rounded-full blur-lg" />
-              <div className="absolute top-1/4 -left-6 sm:-left-8 lg:-left-12 w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-primary/5 rounded-full blur-sm" />
-              <div className="absolute bottom-1/4 -right-6 sm:-right-8 lg:-right-12 w-9 h-9 sm:w-11 sm:h-11 lg:w-14 lg:h-14 bg-gray-300/20 rounded-full blur-md" />
+              <div className="absolute bottom-0 left-0 sm:-bottom-4 sm:-left-4 lg:-bottom-6 lg:-left-6 w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 bg-gray-200/30 rounded-full blur-lg" />
+              <div className="absolute top-1/4 left-0 sm:-left-8 lg:-left-12 w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-primary/5 rounded-full blur-sm" />
+              <div className="absolute bottom-1/4 right-0 sm:-right-8 lg:-right-12 w-9 h-9 sm:w-11 sm:h-11 lg:w-14 lg:h-14 bg-gray-300/20 rounded-full blur-md" />
+
+              {/* Floating Info Badges */}
+              <motion.div
+                animate={{ y: [-10, 10] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute top-1 left-1 sm:-top-6 sm:-left-6 lg:-top-8 lg:-left-8 bg-white/90 backdrop-blur-md rounded-2xl p-3 sm:p-4 shadow-xl z-10"
+              >
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="w-9 h-9 sm:w-12 sm:h-12 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center">
+                    <HiHeart className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-foreground text-xs sm:text-sm">
+                      100% Satisfaction
+                    </div>
+                    <div className="text-[10px] sm:text-xs text-foreground/60">
+                      Guaranteed Results
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                animate={{ y: [10, -10] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                className="absolute bottom-1 right-1 sm:-bottom-6 sm:-right-6 lg:-bottom-8 lg:-right-8 bg-white/90 backdrop-blur-md rounded-2xl p-3 sm:p-4 shadow-xl z-10"
+              >
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="w-9 h-9 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full flex items-center justify-center">
+                    <HiSparkles className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-foreground text-xs sm:text-sm">
+                      Premium Quality
+                    </div>
+                    <div className="text-[10px] sm:text-xs text-foreground/60">
+                      Professional Products
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
             </div>
           </motion.div>
         </div>

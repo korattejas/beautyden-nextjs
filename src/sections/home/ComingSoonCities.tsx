@@ -8,6 +8,7 @@ import { HiMail } from "react-icons/hi";
 import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
 import { useCities } from "@/hooks/useHiring";
+import { useSettings } from "@/hooks/useApi";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
 import { useState } from "react";
@@ -18,12 +19,23 @@ import "swiper/css/navigation";
 
 const ComingSoonCities = () => {
   const { data: citiesData, isLoading, error } = useCities();
+  const { data: settingsData, isLoading: settingsLoading, error: settingsError } = useSettings();
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
 
   const cities = citiesData?.data ?? [];
   const upcomingCities = cities.filter((city) => city.status === 1);
 
-  if (isLoading) {
+  // Helper to read setting by key
+  const getSettingValue = (key: string): string => {
+    const settings = settingsData?.data || [];
+    const found = settings.find((s: any) => s.key === key);
+    return found?.value || "";
+  };
+
+  const emailId = getSettingValue("email_id");
+  const whatsappPhone = getSettingValue("whatsapp_phone_number");
+
+  if (isLoading || settingsLoading) {
     return (
       <section className="py-16">
         <Container>
@@ -35,12 +47,12 @@ const ComingSoonCities = () => {
     );
   }
 
-  if (error || cities.length === 0 || upcomingCities.length === 0) {
+  if (error || settingsError || cities.length === 0 || upcomingCities.length === 0) {
     return null;
   }
 
   return (
-    <section className="py-16">
+    <section className="py-16 md:py-24">
       <Container>
         {/* Header */}
         <div className="text-center mb-5">
@@ -183,7 +195,7 @@ const ComingSoonCities = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
-              href="mailto:expand@beautyden.com?subject=Request BeautyDen in My City"
+              href={`mailto:${emailId || "contact@beautyden.in"}?subject=Request BeautyDen in My City`}
               className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105 inline-flex items-center gap-2"
             >
               <HiMail className="w-4 h-4" />
@@ -191,9 +203,9 @@ const ComingSoonCities = () => {
             </Button>
 
             <Button
-              href="https://wa.me/919876543210?text=Hi%20BeautyDen!%20I%20want%20services%20in%20my%20city."
+              href={`https://wa.me/${whatsappPhone || "919876543210"}?text=Hi%20BeautyDen!%20I%20want%20services%20in%20my%20city.`}
               variant="outline"
-              className="border-2 border-green-500 text-green-600 hover:bg-green-50 px-6 py-3 rounded-full font-semibold transition-all duration-300 inline-flex items-center gap-2"
+              className="border-2 border-green-500 hover:bg-green-50 px-6 py-3 rounded-full font-semibold transition-all duration-300 inline-flex items-center gap-2"
             >
               <FaWhatsapp className="w-4 h-4" />
               WhatsApp

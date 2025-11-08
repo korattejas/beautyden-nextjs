@@ -14,29 +14,202 @@ import {
   HiXMark,
   HiChevronLeft,
   HiChevronRight,
+  HiPhoto,
+  HiSquares2X2,
+  HiStar,
 } from "react-icons/hi2";
-import { useServices, useServiceCategories, useSettings } from "@/hooks/useApi";
+import { useServices, useServiceCategories, useSettings, useService } from "@/hooks/useApi";
 import { BookingService } from "@/types/booking";
 import Button from "@/components/ui/Button";
+import AuthModal from "@/components/ui/AuthModal";
 import MobileCartHeader from "./MobileCardHeader";
+import { useCart } from "@/contexts/CartContext";
 
 interface ServiceSelectionProps {
   selectedServices: BookingService[];
   onServicesChange: (services: BookingService[]) => void;
   onNext: () => void;
   preSelectedServiceId?: string | null;
+  preSelectedCategoryId?: string | null;
+  preSelectedSubCategoryId?: string | null;
 }
+
+const FALLBACK_IMAGE = "/images/services/beauty-default.jpg";
+
+const ServiceModal = ({
+  service,
+  onClose,
+  addItem,
+}: {
+  service: any;
+  onClose: () => void;
+  addItem: (service: BookingService) => void;
+}) => {
+  const [imgError, setImgError] = useState(false);
+  const { data: settingsData } = useSettings();
+  const settings = settingsData?.data || [];
+
+  // Helper function to get setting value by key
+  const getSetting = (key: string) => {
+    return settings.find((setting) => setting.key === key)?.value || "";
+  };
+
+  const hasDiscount = service.discount_price;
+  const displayPrice = service.price;
+  const originalPrice = parseFloat(service.price);
+
+  return (
+    <motion.div
+      className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <motion.div
+        className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col relative"
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.8, opacity: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-white/50 hover:bg-white/70 rounded-full cursor-pointer transition-colors z-50"
+        >
+          <HiXMark className="w-5 h-5 text-foreground" />
+        </button>
+
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          {/* Service Image */}
+          <div className="relative w-full h-64 rounded-xl overflow-hidden">
+            <Image
+              src={imgError ? FALLBACK_IMAGE : (service.icon || FALLBACK_IMAGE)}
+              alt={service.name}
+              fill
+              className="object-cover"
+              unoptimized
+              onError={() => setImgError(true)}
+            />
+          </div>
+
+          <h3 className="text-2xl font-bold text-foreground">
+            {service.name}
+          </h3>
+
+          <div className="flex items-center gap-4 text-sm text-foreground/60">
+            <div className="flex items-center gap-1">
+              <HiClock className="w-4 h-4" />
+              <span>{service.duration}</span>
+            </div>
+            <span>{service.reviews || 0} reviews</span>
+          </div>
+
+          {/* Pricing Section */}
+          <div className="bg-gray-50 rounded-xl p-4">
+            <div className="flex items-baseline gap-2 align-middle" style={{alignItems:"center"}}>
+              <span className="text-sm font-medium text-foreground/70">{getSetting("service_price_start_text")}</span>
+              <span className="text-2xl font-bold text-primary">
+                ₹{displayPrice.toLocaleString()}
+              </span>
+            </div>
+            {hasDiscount && (
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">
+                  {hasDiscount}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Description with fixed height */}
+          <p className="text-foreground/80 leading-relaxed text-sm sm:text-base max-h-32 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+            {service.description}
+          </p>
+
+          {/* Includes with fixed height */}
+          {service.includes && service.includes.length > 0 && (
+            <div>
+              <h4 className="font-semibold text-foreground mb-2 text-sm sm:text-base">Includes:</h4>
+              <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                {service.includes.map((inc: any, idx: number) => (
+                  <span
+                    key={idx}
+                    className="bg-primary/10 text-primary text-xs px-2 py-1 sm:px-3 sm:py-1 rounded-full font-medium"
+                  >
+                    {inc}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Book Button - fixed bottom */}
+        <div className="p-4 border-t border-gray-100">
+          <Button
+            onClick={() => {
+              const bookingService: BookingService = {
+                id: service.id.toString(),
+                name: service.name,
+                price: service.price || "0",
+                duration: service.duration || "60 min",
+                category_id: service.category_id.toString(),
+                category_name: service.category_name,
+                description: service.description,
+                icon: service.icon,
+                discount_price: service?.discount_price
+              };
+              addItem(bookingService);
+              onClose();
+            }}
+            className="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 font-semibold rounded-xl"
+          >
+            Add to Cart
+          </Button>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
 
 const ServiceSelection = ({
   selectedServices,
   onServicesChange,
   onNext,
   preSelectedServiceId,
+  preSelectedCategoryId,
+  preSelectedSubCategoryId,
 }: ServiceSelectionProps) => {
   const [selectedCategories, setSelectedCategories] = useState<any[]>([]);
   const [selectedSubCategories,setSelectedSubCategory]= useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [selectedService, setSelectedService] = useState<any>(null);
+  const [hasProcessedPreSelected, setHasProcessedPreSelected] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  
+  // Use cart context for localStorage management
+  const { items: cartItems, addItem, removeItem, totalItems, totalPrice } = useCart();
+  
+  // Initialize category and subcategory from URL params
+  useEffect(() => {
+    if (preSelectedCategoryId) {
+      setSelectedCategories([preSelectedCategoryId]);
+    }
+    if (preSelectedSubCategoryId) {
+      setSelectedSubCategory(preSelectedSubCategoryId);
+    }
+  }, [preSelectedCategoryId, preSelectedSubCategoryId]);
+
+  // Listen to auth change events (for safety)
+  useEffect(() => {
+    const onAuthChanged = () => {};
+    window.addEventListener("bd-auth-changed", onAuthChanged as EventListener);
+    return () => window.removeEventListener("bd-auth-changed", onAuthChanged as EventListener);
+  }, []);
 
   // Build filters for API call
   const filters = {
@@ -48,7 +221,7 @@ const ServiceSelection = ({
       }),
     ...(searchQuery && { search: searchQuery }),
   };
-
+console.log("selectedServices----",selectedServices)
   const { data: servicesData, isLoading: servicesLoading } =
     useServices(filters);
   const { data: categoriesData, isLoading: categoriesLoading } =
@@ -72,31 +245,54 @@ const ServiceSelection = ({
     (c) => c.id.toString() === selectedCategories[0]
   ) ;
 
-  // Pre-select service if coming from service page
+  // Pre-select service if coming from service page - fetch directly if not on current page
+  const { data: preSelectedServiceData, isLoading: isServiceLoading } = useService(preSelectedServiceId || "");
+  
   useEffect(() => {
-    if (preSelectedServiceId && services.length > 0) {
-      const preSelectedService = services.find(
-        (s) => s.id.toString() === preSelectedServiceId
-      );
-      if (
-        preSelectedService &&
-        !selectedServices.find((s) => s.id === preSelectedService.id.toString())
-      ) {
-        const bookingService: BookingService = {
-          id: preSelectedService.id.toString(),
-          name: preSelectedService.name,
-          price: parseFloat(preSelectedService.price || "0"),
-          duration: preSelectedService.duration || "60 min",
-          category_id: preSelectedService.category_id.toString(),
-          category_name: preSelectedService.category_name,
-          description: preSelectedService.description,
-          discount_price:preSelectedService?.discount_price,
-          // icon: preSelectedService.icon,
-        };
+    if (!preSelectedServiceId || isServiceLoading || hasProcessedPreSelected) return;
+
+    // Mark as processed to avoid re-adding on user removal
+    setHasProcessedPreSelected(true);
+
+    // If already in cart, sync to selected and exit
+    const alreadyInCart = cartItems.find((s) => s.id === preSelectedServiceId);
+    if (alreadyInCart) {
+      const isInSelected = selectedServices.find((s) => s.id === preSelectedServiceId);
+      if (!isInSelected) {
+        onServicesChange([...selectedServices, alreadyInCart]);
+      }
+      return;
+    }
+
+    // Try to use currently loaded services first
+    const preSelectedService = services.find(
+      (s) => s.id.toString() === preSelectedServiceId
+    );
+
+    let serviceToUse = preSelectedService;
+    if (!serviceToUse && preSelectedServiceData) {
+      serviceToUse = (preSelectedServiceData as any)?.data || preSelectedServiceData;
+    }
+
+    if (serviceToUse && serviceToUse.id) {
+      const bookingService: BookingService = {
+        id: serviceToUse.id.toString(),
+        name: serviceToUse.name,
+        price: serviceToUse.price || "0",
+        duration: serviceToUse.duration || "60 min",
+        category_id: serviceToUse.category_id.toString(),
+        category_name: serviceToUse.category_name,
+        description: serviceToUse.description,
+        discount_price: serviceToUse?.discount_price,
+        icon: serviceToUse.icon || undefined,
+      };
+      addItem(bookingService);
+      const isInSelected = selectedServices.find((s) => s.id === bookingService.id);
+      if (!isInSelected) {
         onServicesChange([...selectedServices, bookingService]);
       }
     }
-  }, [preSelectedServiceId, services, selectedServices, onServicesChange]);
+  }, [preSelectedServiceId, preSelectedServiceData, isServiceLoading, hasProcessedPreSelected, cartItems, selectedServices, onServicesChange, addItem, services]);
 
   const toggleCategory = (categoryId: string,subcategories?: any) => {
     setSelectedCategories([categoryId]); // Single category selection for API
@@ -128,39 +324,62 @@ const ServiceSelection = ({
     const bookingService: BookingService = {
       id: service.id.toString(),
       name: service.name,
-      price: parseFloat(service.price || "0"),
+      price: service.price || "0",
       duration: service.duration || "60 min",
       category_id: service.category_id.toString(),
       category_name: service.category_name,
       description: service.description,
       icon: service.icon,
-discount_price:service?.discount_price
+      discount_price: service?.discount_price
     };
 
-    const isSelected = selectedServices.find((s) => s.id === bookingService.id);
+    const isSelected = cartItems.find((s) => s.id === bookingService.id);
 
     if (isSelected) {
-      onServicesChange(
-        selectedServices.filter((s) => s.id !== bookingService.id)
-      );
+      // Remove from cart immediately
+      removeItem(bookingService.id);
+      // Remove from selected services - ensure state is synced immediately
+      const updatedServices = selectedServices.filter((s) => s.id !== bookingService.id);
+      onServicesChange(updatedServices);
     } else {
-      onServicesChange([...selectedServices, bookingService]);
+      // Add to cart immediately
+      addItem(bookingService);
+      // Add to selected services - ensure state is synced immediately
+      const updatedServices = [...selectedServices, bookingService];
+      onServicesChange(updatedServices);
     }
   };
 
   const removeService = (serviceId: string) => {
-    onServicesChange(selectedServices.filter((s) => s.id !== serviceId));
+    // Remove from cart first
+    removeItem(serviceId);
+    // Remove from selected services
+    const updatedServices = selectedServices.filter((s) => s.id !== serviceId);
+    // Update selected services state - this will also sync with cart via onServicesChange
+    onServicesChange(updatedServices);
+  };
+
+  // Helper function to extract minimum price from price string (e.g., "20-50" -> 20)
+  const getMinPrice = (priceString: string): number => {
+    if (!priceString) return 0;
+    const priceMatch = priceString.match(/(\d+)/);
+    return priceMatch ? parseInt(priceMatch[1]) : 0;
+  };
+
+  // Helper function to get display price (use discount_price if available, otherwise original price)
+  const getDisplayPrice = (service: BookingService): string => {
+    return service.discount_price || service.price;
   };
 
   const getTotalPrice = () => {
-    return selectedServices.reduce(
-      (total, service) => total + Number(service.price),
-      0
-    );
+    return cartItems.reduce((total, service) => {
+      const displayPrice = getDisplayPrice(service);
+      return total + getMinPrice(displayPrice);
+    }, 0);
   };
 
   const getTotalDuration = () => {
-    return selectedServices.reduce((total, service) => {
+    return cartItems.reduce((total, service) => {
       const duration = parseInt(service.duration) || 60;
       return total + duration;
     }, 0);
@@ -253,14 +472,14 @@ discount_price:service?.discount_price
             <div className="flex flex-wrap gap-3">
               <button
                 onClick={() => toggleCategory("all")}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium transition-all duration-300 text-sm ${
+                className={`flex items-center gap-3 px-6 py-4 rounded-full font-medium transition-all duration-300 text-base ${
                   selectedCategories.length === 0 ||
                   selectedCategories[0] === "all"
                     ? "bg-primary text-white shadow-lg"
                     : "bg-background text-foreground/70 hover:text-primary hover:bg-primary/5 border border-border"
                 }`}
               >
-                <HiSparkles className="w-3 h-3" />
+                <HiSparkles className="w-5 h-5" />
                 All Services
               </button>
 
@@ -277,24 +496,26 @@ discount_price:service?.discount_price
                     const subIds= cat?.subcategories?.map((i: any)=> i?.id) || [];
                     toggleCategory(category.id.toString(),subIds)
                   }}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium transition-all duration-300 text-sm ${
+                  className={`flex items-center gap-3 px-6 py-4 rounded-full font-medium transition-all duration-300 text-base ${
                     selectedCategories.includes(category.id.toString())
                       ? "bg-primary text-white shadow-lg"
                       : "bg-background text-foreground/70 hover:text-primary hover:bg-primary/5 border border-border"
                   }`}
                 >
-                  {category.icon && (
-                    <div className="w-3 h-3 rounded-full overflow-hidden">
+                  <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center">
+                    {category.icon ? (
                       <Image
                         src={category.icon}
                         alt={category.name}
-                        width={12}
-                        height={12}
+                        width={24}
+                        height={24}
                         className="object-cover w-full h-full"
                         unoptimized
                       />
-                    </div>
-                  )}
+                    ) : (
+                      <HiSquares2X2 className="w-5 h-5 text-primary" />
+                    )}
+                  </div>
                   {category.name}
                 </motion.button>
               ))}
@@ -314,25 +535,25 @@ discount_price:service?.discount_price
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => toggleSubCategory(subId)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-3 px-6 py-4 rounded-full text-base font-medium transition-all duration-200 ${
                     isActive
                       ? "bg-primary text-white shadow-md shadow-primary/25"
                       : "bg-background hover:bg-primary/10 text-foreground/70 hover:text-primary border border-border"
                   }`}
                 >
-                  <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center">
-                    {selectedCategory?.icon ? (
+                  <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center">
+                    {sub.icon ? (
                       <Image
-                        src={selectedCategory.icon}
-                        alt={`${selectedCategory.name} icon`}
-                        width={20}
-                        height={20}
+                        src={sub.icon}
+                        alt={`${sub.name} icon`}
+                        width={24}
+                        height={24}
                         className="w-full h-full object-cover"
                         unoptimized
                       />
                     ) : (
                       <HiSparkles
-                        className={`w-4 h-4 ${
+                        className={`w-5 h-5 ${
                           isActive ? "text-white" : "text-primary"
                         }`}
                       />
@@ -398,20 +619,17 @@ discount_price:service?.discount_price
               >
                 {/* cart header */}
                            <MobileCartHeader
-  totalItems={selectedServices.length}
-  totalPrice={selectedServices.reduce((acc, s) => acc + Number(s.price), 0)}
+  totalItems={totalItems}
+  totalPrice={getTotalPrice()}
   onNext={onNext}
 />
                 {services.map((service, index) => {
-                  const isSelected = selectedServices.find(
+                  const isSelected = cartItems.find(
                     (s) => s.id === service.id.toString()
                   );
-                  const hasDiscount =
-                  service.discount_price
+                  const hasDiscount = service.discount_price
               
-                const displayPrice = service.price
-                  
-  const originalPrice = parseFloat(service.price);
+                  const displayPrice = service.price
                   return (
                     <motion.div
                       key={`service-${service.id}-${currentPage}`}
@@ -425,8 +643,8 @@ discount_price:service?.discount_price
                       }`}
                     >
                       {/* Service Image */}
-                      {service.icon && (
-                        <div className="relative h-32 overflow-hidden">
+                      <div className="relative h-32 overflow-hidden bg-muted flex items-center justify-center">
+                        {service.icon ? (
                           <Image
                             src={service.icon}
                             alt={service.name}
@@ -435,61 +653,51 @@ discount_price:service?.discount_price
                             className="object-cover"
                             unoptimized
                           />
-                          {isSelected && (
-                            <div className="absolute top-2 right-2 bg-primary text-white rounded-full p-1">
-                              <HiSparkles className="w-3 h-3" />
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Service Details */}
-                      <div className="p-4">
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-foreground mb-1 text-sm line-clamp-2">
-                              {service.name}
-                            </h3>
-                            <span className="inline-flex items-center gap-1 text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-                              <HiTag className="w-2 h-2" />
-                              {service.category_name}
-                            </span>
+                        ) : (
+                          <HiPhoto className="w-12 h-12 text-foreground/30" />
+                        )}
+                        {isSelected && (
+                          <div className="absolute top-2 right-2 bg-primary text-white rounded-full p-1">
+                            <HiSparkles className="w-3 h-3" />
                           </div>
-                          <div className="text-right ml-2">
-                            {/* <p className="text-lg font-bold text-primary">
-                              ₹{Number(service.price).toLocaleString()}
-                            </p> */}
-                            {/* Price Section */}
-<div className="mb-4 flex flex-col">
- 
-  <div className="flex items-center gap-2 mt-1">
-    {/* Final Price */}
-    <span className="text-xs font-medium text-foreground/70">{getSetting("service_price_start_text")}</span>
+                        )}
+                      </div>
 
-    <span className="text-[14px] font-bold text-primary">
-      ₹{displayPrice.toLocaleString()}
-    </span>
+                        {/* Service Details */}
+                        <div className="p-4">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex-1">
+                              <h3 className="font-semibold text-foreground mb-2 text-sm line-clamp-2">
+                                {service.name}
+                              </h3>
+                              <span className="inline-flex items-center gap-1 text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                                <HiTag className="w-2 h-2" />
+                                {service.category_name}
+                              </span>
+                            </div>
+                          </div>
 
-    {/* Strike-through original price */}
-    {hasDiscount && (
-      <>
-        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">
-        {/* {Math.round(((originalPrice - displayPrice) / originalPrice) * 100)}% OFF */}
-       { service.discount_price }
-      </span>
-    
-      </>
-    )}
-  </div>
-  <div className="flex items-center gap-1 self-end text-xs text-foreground/60">
-                              <HiClock className="w-2 h-2" />
+                          {/* Pricing Section - Improved Layout */}
+                          <div className="mb-4">
+                            <div className="flex items-baseline gap-2 mb-1" style={{alignItems:"center"}}>
+                              <span className="text-xs font-medium text-foreground/70">{getSetting("service_price_start_text")}</span>
+                              <span className="text-lg font-bold text-primary">
+                                ₹{displayPrice}
+                              </span>
+                            </div>
+                            {hasDiscount && (
+                              <div className="flex items-center gap-2">
+                               
+                                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">
+                                  {hasDiscount}
+                                </span>
+                              </div>
+                            )}
+                            <div className="flex items-center gap-1 mt-1 text-xs text-foreground/60">
+                              <HiClock className="w-3 h-3" />
                               {service.duration || "60 min"}
                             </div>
-</div>
-
-                          
                           </div>
-                        </div>
 
                         {service.description && (
                           <p className="text-foreground/70 text-xs mb-3 line-clamp-2">
@@ -497,26 +705,45 @@ discount_price:service?.discount_price
                           </p>
                         )}
 
-                        <button
-                          onClick={() => toggleService(service)}
-                          className={`w-full flex items-center justify-center gap-2 py-2 rounded-xl font-medium text-sm transition-all duration-300 ${
-                            isSelected
-                              ? "bg-primary text-white hover:bg-primary/90"
-                              : "bg-primary/10 text-primary hover:bg-primary/20"
-                          }`}
-                        >
-                          {isSelected ? (
-                            <>
-                              <HiMinus className="w-3 h-3" />
-                              Remove
-                            </>
-                          ) : (
-                            <>
-                              <HiPlus className="w-3 h-3" />
-                              Add Service
-                            </>
-                          )}
-                        </button>
+                        {/* Action Buttons */}
+                        <div className="flex gap-2">
+                          {/* View Service Button */}
+                          <Button
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedService(service);
+                              setShowModal(true);
+                            }}
+                            className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl font-medium text-sm transition-all duration-300 min-h-[40px]"
+                          >
+                            <HiSparkles className="w-3 h-3" />
+                            View Service
+                          </Button>
+                          
+                          {/* Add/Remove Service Button */}
+                          <Button
+                            onClick={(e) => {
+                              if (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                              }
+                              toggleService(service);
+                            }}
+                            className={`w-full flex items-center justify-center gap-2 h-10 rounded-xl font-medium text-sm transition-all duration-300 bg-gradient-to-r from-primary to-secondary hover:scale-105`}
+                          >
+                            {isSelected ? (
+                              <>
+                                <HiMinus className="w-3 h-3" />
+                                Remove
+                              </>
+                            ) : (
+                              <>
+                                <HiPlus className="w-3 h-3" />
+                                Add Service
+                              </>
+                            )}
+                          </Button>
+                        </div>
                       </div>
                     </motion.div>
                   );
@@ -558,7 +785,7 @@ discount_price:service?.discount_price
                     className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                       currentPage === 1
                         ? "bg-muted text-foreground/40 cursor-not-allowed"
-                        : "bg-card text-foreground hover:bg-primary hover:text-white border border-border"
+                        : "bg-card text-foreground hover:bg-primary hover:text-white border border-border cursor-pointer"
                     }`}
                   >
                     <HiChevronLeft className="w-4 h-4 mr-1" />
@@ -575,7 +802,7 @@ discount_price:service?.discount_price
                           <button
                             key={page}
                             onClick={() => handlePageChange(page)}
-                            className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                            className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer ${
                               currentPage === page
                                 ? "bg-primary text-white"
                                 : "bg-card text-foreground hover:bg-primary/10 border border-border"
@@ -596,7 +823,7 @@ discount_price:service?.discount_price
                           onClick={() =>
                             handlePageChange(paginationData.last_page)
                           }
-                          className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                          className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer ${
                             currentPage === paginationData.last_page
                               ? "bg-primary text-white"
                               : "bg-card text-foreground hover:bg-primary/10 border border-border"
@@ -615,7 +842,7 @@ discount_price:service?.discount_price
                     className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                       currentPage === paginationData.last_page
                         ? "bg-muted text-foreground/40 cursor-not-allowed"
-                        : "bg-card text-foreground hover:bg-primary hover:text-white border border-border"
+                        : "bg-card text-foreground hover:bg-primary hover:text-white border border-border cursor-pointer"
                     }`}
                   >
                     Next
@@ -670,18 +897,18 @@ discount_price:service?.discount_price
                   Your Cart
                 </h3>
                 <p className="text-xs text-foreground/60">
-                  {selectedServices.length} service
-                  {selectedServices.length !== 1 ? "s" : ""} selected
+                  {totalItems} service
+                  {totalItems !== 1 ? "s" : ""} selected
                 </p>
               </div>
             </div>
 
            
             {/* Selected Services */}
-            {selectedServices.length > 0 ? (
+            {cartItems.length > 0 ? (
               <div className="space-y-4 mb-6">
                 <AnimatePresence>
-                  {selectedServices.map((service, index) => (
+                  {cartItems.map((service, index) => (
                     <motion.div
                       key={`selected-${service.id}`}
                       initial={{ opacity: 0, x: 20 }}
@@ -690,8 +917,8 @@ discount_price:service?.discount_price
                       transition={{ duration: 0.3, delay: index * 0.05 }}
                       className="flex items-center gap-3 bg-card backdrop-blur-sm rounded-2xl p-3 border border-border"
                     >
-                      {service.icon && (
-                        <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
+                      <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 bg-muted flex items-center justify-center">
+                        {service.icon ? (
                           <Image
                             src={service.icon}
                             alt={service.name}
@@ -700,8 +927,10 @@ discount_price:service?.discount_price
                             className="object-cover w-full h-full"
                             unoptimized
                           />
-                        </div>
-                      )}
+                        ) : (
+                          <HiPhoto className="w-6 h-6 text-foreground/30" />
+                        )}
+                      </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-foreground text-sm truncate">
                           {service.name}
@@ -710,12 +939,17 @@ discount_price:service?.discount_price
                           {service.duration}
                         </p>
                         <p className="text-sm font-bold text-primary">
-                          ₹{Number(service.price).toLocaleString()}
+                          ₹{getDisplayPrice(service)}
                         </p>
                       </div>
                       <button
-                        onClick={() => removeService(service.id)}
-                        className="text-red-500 hover:text-red-700 transition-colors p-1"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          removeService(service.id);
+                        }}
+                        className="text-red-500 hover:text-red-700 transition-colors p-1 flex-shrink-0"
+                        aria-label="Remove service"
                       >
                         <HiXMark className="w-4 h-4" />
                       </button>
@@ -736,7 +970,7 @@ discount_price:service?.discount_price
             )}
 
             {/* Summary */}
-            {selectedServices.length > 0 && (
+            {cartItems.length > 0 && (
               <>
                 <div className="border-t border-border pt-4 mb-6">
                   <div className="flex justify-between items-center mb-2">
@@ -752,22 +986,73 @@ discount_price:service?.discount_price
                       Services:
                     </span>
                     <span className="font-medium text-foreground text-sm">
-                      {selectedServices.length}
+                      {totalItems}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
+                  {/* <div className="flex justify-between items-center">
                     <span className="font-semibold text-foreground">
                       Total:
                     </span>
                     <span className="text-xl font-bold text-primary">
                       ₹{getTotalPrice().toLocaleString()}
                     </span>
-                  </div>
+                  </div> */}
                 </div>
 
+                {/* Validation Message */}
+                {/* {(() => {
+                  const minService = parseInt(getSetting("min_service_book") || "1");
+                  const maxService = parseInt(getSetting("max_service_book") || "100");
+                  const isBelowMin = cartItems.length < minService;
+                  const isAboveMax = cartItems.length > maxService;
+                  
+                  if (isBelowMin || isAboveMax) {
+                    return (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200"
+                      >
+                        <p className="text-sm font-medium text-amber-800 flex items-center gap-2">
+                          <HiSparkles className="w-4 h-4 flex-shrink-0" />
+                          {isBelowMin 
+                            ? `Minimum ${minService} service${minService > 1 ? 's' : ''} need to be selected.`
+                            : `Maximum ${maxService} service${maxService > 1 ? 's' : ''} can be selected.`
+                          }
+                        </p>
+                      </motion.div>
+                    );
+                  }
+                  return null;
+                })()} */}
+                
                 <Button
-                  onClick={onNext}
-                  className="w-full bg-primary text-white py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+                  onClick={() => {
+                    // Get min and max service limits from settings
+                    // const minService = parseInt(getSetting("min_service_book") || "1");
+                    // const maxService = parseInt(getSetting("max_service_book") || "100");
+                    
+                    // Validate service count
+                    // if (cartItems.length < minService || cartItems.length > maxService) {
+                    //   return; // Don't proceed if validation fails
+                    // }
+                    // Auth gate
+                    // const isLoggedIn = typeof window !== "undefined" && localStorage.getItem("bd_isLoggedIn") === "true";
+                    // if (!isLoggedIn) {
+                    //   setAuthOpen(true);
+                    //   return;
+                    // }
+
+                    // Sync cart items to selectedServices before proceeding
+                    onServicesChange([...cartItems]);
+                    onNext();
+                  }}
+                  // disabled={(() => {
+                  //   const minService = parseInt(getSetting("min_service_book") || "1");
+                  //   const maxService = parseInt(getSetting("max_service_book") || "100");
+                  //   return cartItems.length < minService || cartItems.length > maxService;
+                  // })()}
+                  className="w-full bg-primary text-white py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
                   Continue to Date & Time
                   <HiArrowRight className="w-4 h-4" />
@@ -775,7 +1060,7 @@ discount_price:service?.discount_price
               </>
             )}
 
-            {selectedServices.length === 0 && (
+            {cartItems.length === 0 && (
               <div className="text-center">
                 <p className="text-foreground/60 text-sm mb-4">
                   Select services to continue
@@ -788,6 +1073,29 @@ discount_price:service?.discount_price
           </motion.div>
         </div>
       </div>
+
+      {/* Service Modal */}
+      {showModal && selectedService && (
+        <ServiceModal 
+          service={selectedService} 
+          addItem={addItem}
+          onClose={() => {
+            setShowModal(false);
+            setSelectedService(null);
+          }} 
+        />
+      )}
+
+      {/* Auth Modal for gating Continue */}
+      <AuthModal
+        open={authOpen}
+        onClose={() => setAuthOpen(false)}
+        onLoggedIn={() => {
+          setAuthOpen(false);
+          onServicesChange([...cartItems]);
+          onNext();
+        }}
+      />
     </div>
   );
 };

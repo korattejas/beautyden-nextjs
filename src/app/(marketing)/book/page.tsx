@@ -11,8 +11,10 @@ import DateTimeSelection from "@/sections/booking/DateTimeSelection";
 import CustomerInformation from "@/sections/booking/CustomerInformation";
 import BookingReview from "@/sections/booking/BookingReview";
 import BookingStepper from "@/sections/booking/BookingStepper";
+import { useCart } from "@/contexts/CartContext";
 
 const BookingPageContent = () => {
+  const { items, addItem, removeItem } = useCart();
   const [currentStep, setCurrentStep] = useState(1);
   const [bookingData, setBookingData] = useState<BookingFormData>({
     services: [],
@@ -28,6 +30,17 @@ const BookingPageContent = () => {
 
   const searchParams = useSearchParams();
   const serviceId = searchParams.get("service");
+  const categoryId = searchParams.get("category");
+  const subcategoryId = searchParams.get("subcategory");
+
+  // Initialize bookingData.services from cart items on mount (only once)
+  const [hasInitialized, setHasInitialized] = useState(false);
+  useEffect(() => {
+    if (!hasInitialized && items.length > 0 && bookingData.services.length === 0) {
+      updateBookingData({ services: items });
+      setHasInitialized(true);
+    }
+  }, [items, hasInitialized, bookingData.services.length]);
 
   const steps = [
     {
@@ -55,6 +68,11 @@ const BookingPageContent = () => {
       setCurrentStep(currentStep - 1);
     }
   };
+  console.log("bookingData----->>>",bookingData)
+  console.log("bookingData.services----->>>",bookingData.services)
+  console.log("bookingData.services.length----->>>",bookingData.services?.length)
+  console.log("cart items----->>>",items)
+  console.log("cart items.length----->>>",items?.length)
 
   const renderStep = () => {
     switch (currentStep) {
@@ -62,9 +80,29 @@ const BookingPageContent = () => {
         return (
           <ServiceSelection
             selectedServices={bookingData.services}
-            onServicesChange={(services) => updateBookingData({ services })}
+            onServicesChange={(services) => {
+              // sync to local booking state immediately
+              updateBookingData({ services });
+              // sync to global cart immediately
+              const newIds = new Set(services.map((s) => s.id));
+              const oldIds = new Set(items.map((i) => i.id));
+              // add new services immediately
+              services.forEach((s) => {
+                if (!oldIds.has(s.id)) {
+                  addItem(s);
+                }
+              });
+              // remove deselected services immediately
+              items.forEach((i) => {
+                if (!newIds.has(i.id)) {
+                  removeItem(i.id);
+                }
+              });
+            }}
             onNext={nextStep}
             preSelectedServiceId={serviceId}
+            preSelectedCategoryId={categoryId}
+            preSelectedSubCategoryId={subcategoryId}
           />
         );
       case 2:
@@ -104,7 +142,7 @@ const BookingPageContent = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 overflow-x-hidden">
       {/* Header */}
       <section className="pt-24 pb-12 bg-gradient-to-br from-primary/10 to-secondary/10">
         <Container>
@@ -134,7 +172,7 @@ const BookingPageContent = () => {
       </section>
 
       {/* Stepper */}
-      <section className="py-8">
+      <section className="py-4 sm:py-6 md:py-8">
         <Container>
           <BookingStepper steps={steps} currentStep={currentStep} />
         </Container>

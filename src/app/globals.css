@@ -217,3 +217,32 @@ body {
     scroll-snap-align: center;
   }
 }
+
+/* Ensure all native buttons show pointer cursor globally */
+button:not(:disabled) {
+  cursor: pointer !important;
+}
+
+button:disabled,
+button[aria-disabled="true"],
+button[disabled] {
+  cursor: not-allowed !important;
+}
+
+/* Marquee Animation */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}

@@ -1,10 +1,13 @@
+import CTASection from "@/components/CTASection";
 import CategoryServices from "@/sections/home/CategoryServices";
 import ComingSoonCities from "@/sections/home/ComingSoonCities";
 import HeroSection from "@/sections/home/HeroSection";
 import HowItWorksSection from "@/sections/home/HowItWorksSection";
+import ProductBrand from "@/sections/home/ProductBrand";
 // import PopularServicesSection from "@/sections/home/PopularServicesSection";
 import ServiceAreaSection from "@/sections/home/ServiceAreaSection";
 import TestimonialsSection from "@/sections/home/TestimonialsSection";
+import { HiHeart, HiSparkles } from "react-icons/hi2";
 // import WhyChooseUsSection from "@/sections/home/WhyChooseUsSection";
 // import WhyChooseUsSection from "@/sections/home/WhyChooseUsSection";
 
@@ -12,7 +15,7 @@ import TestimonialsSection from "@/sections/home/TestimonialsSection";
 
 export default function HomePage() {
   return (
-    <>
+    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
       <HeroSection />
       <CategoryServices />
       {/* <WhyChooseUsSection /> */}
@@ -21,8 +24,8 @@ export default function HomePage() {
       <TestimonialsSection />
       <ServiceAreaSection />
       <ComingSoonCities />
-
-      {/* <CTASection
+      <ProductBrand/>
+      <CTASection
         variant="gradient"
         title="Join Our Beauty Community"
         subtitle="Start Your Journey"
@@ -47,8 +50,8 @@ export default function HomePage() {
           "Satisfaction Guaranteed",
         ]}
         className="bg-white"
-      /> */}
+      />
       {/* <FeaturedServicesSection /> */}
-    </>
+    </div>
   );
 }

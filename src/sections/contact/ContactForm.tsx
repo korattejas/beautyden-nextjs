@@ -173,8 +173,8 @@ const ContactSection = () => {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-warning/10 rounded-2xl flex items-center justify-center flex-shrink-0">
-                  <HiStar className="w-6 h-6 text-warning" />
+                <div className="w-12 h-12 bg-secondary/10 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <HiStar className="w-6 h-6 text-black" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground mb-2">

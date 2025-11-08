@@ -1,13 +1,13 @@
 export interface BookingService {
   id: string;
   name: string;
-  price: number;
+  price: string; // Changed to string to handle price ranges like "20-50"
   duration: string;
   category_id: string;
   category_name: string;
   description?: string;
   icon?: string;
-  discount_price?:string;
+  discount_price?: string;
 }
 
 export interface BookingFormData {
