@@ -297,27 +297,26 @@ const Footer = () => {
           <div className="flex flex-col lg:flex-row justify-between items-center gap-4 text-gray-400 text-sm">
             <div className="flex flex-col lg:flex-row items-center gap-4">
               <span>© {currentYear} BeautyDen. All rights reserved.</span>
-              
             </div>
             <div className="flex items-center gap-2">
-                <span>Made with</span>
-                <HiHeart className="w-4 h-4 text-red-400 animate-pulse" />
-                <span>for beauty</span>
-              </div>
+              <span>Made with</span>
+              <HiHeart className="w-4 h-4 text-red-400 animate-pulse" />
+              <span>for beauty</span>
+            </div>
 
             {/* Developer Credit */}
-            {/* <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <HiCode className="w-4 h-4 text-white" />
               <span>Designed & Developed by</span>
               <a
                 href="https://www.vrushikvisavadiya.com/"
                 target="_blank"
-                rel="noopener noreferrer"
+                // rel="noopener noreferrer"
                 className="text-white hover:text-gray-300 font-semibold transition-colors duration-200"
               >
                 Vrushik Visavadiya
               </a>
-            </div> */}
+            </div>
           </div>
         </motion.div>
       </Container>

@@ -5,7 +5,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import Button from "@/components/ui/Button";
-import { HiXMark, HiDevicePhoneMobile, HiCheckCircle, HiShieldCheck } from "react-icons/hi2";
+import {
+  HiXMark,
+  HiDevicePhoneMobile,
+  HiCheckCircle,
+  HiShieldCheck,
+} from "react-icons/hi2";
 import { sendOtp, verifyOtp } from "@/services/customer.service";
 
 type AuthModalProps = {
@@ -16,11 +21,22 @@ type AuthModalProps = {
 
 const phonePattern = /^\d{10}$/;
 
-export default function AuthModal({ open, onClose, onLoggedIn }: AuthModalProps) {
+export default function AuthModal({
+  open,
+  onClose,
+  onLoggedIn,
+}: AuthModalProps) {
   const router = useRouter();
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [phone, setPhone] = useState("");
-  const [otpDigits, setOtpDigits] = useState<string[]>(["", "", "", "", "", ""]);
+  const [otpDigits, setOtpDigits] = useState<string[]>([
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+  ]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const phoneInputRef = useRef<HTMLInputElement | null>(null);
@@ -48,17 +64,20 @@ export default function AuthModal({ open, onClose, onLoggedIn }: AuthModalProps)
   }, [open, step]);
 
   const isPhoneValid = useMemo(() => phonePattern.test(phone), [phone]);
-  const isOtpValid = useMemo(() => otpDigits.join("").length === 6, [otpDigits]);
+  const isOtpValid = useMemo(
+    () => otpDigits.join("").length === 6,
+    [otpDigits]
+  );
 
   const handleRequestOtp = async () => {
     if (!isPhoneValid) return;
-    
+
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await sendOtp({ mobile_number: phone });
-      
+
       if (response.status && (response.code === 200 || response.code === 201)) {
         setStep("otp");
       } else {
@@ -66,7 +85,10 @@ export default function AuthModal({ open, onClose, onLoggedIn }: AuthModalProps)
       }
     } catch (err: any) {
       console.error("Error sending OTP:", err);
-      const errorMessage = err?.response?.data?.message || err?.message || "Failed to send OTP. Please try again.";
+      const errorMessage =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to send OTP. Please try again.";
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -75,18 +97,18 @@ export default function AuthModal({ open, onClose, onLoggedIn }: AuthModalProps)
 
   const handleVerifyOtp = async () => {
     if (!isOtpValid) return;
-    
+
     setIsLoading(true);
     setError(null);
-    
+
     const otp = otpDigits.join("");
-    
+
     try {
-      const response = await verifyOtp({ 
-        mobile_number: phone, 
-        otp: otp 
+      const response = await verifyOtp({
+        mobile_number: phone,
+        otp: otp,
       });
-      
+
       if (response.status && (response.code === 200 || response.code === 201)) {
         try {
           localStorage.setItem("bd_isLoggedIn", "true");
@@ -108,7 +130,10 @@ export default function AuthModal({ open, onClose, onLoggedIn }: AuthModalProps)
       }
     } catch (err: any) {
       console.error("Error verifying OTP:", err);
-      const errorMessage = err?.response?.data?.message || err?.message || "Invalid OTP. Please try again.";
+      const errorMessage =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Invalid OTP. Please try again.";
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -147,43 +172,74 @@ export default function AuthModal({ open, onClose, onLoggedIn }: AuthModalProps)
                     <HiShieldCheck className="w-7 h-7 text-black" />
                   </div>
                   <div>
-                    <p className="text-lg font-bold text-white">Welcome Back!</p>
-                    <p className="text-sm text-white/80">Exciting offers and exclusive deals waiting for you</p>
+                    <p className="text-lg font-bold text-white">
+                      Welcome Back!
+                    </p>
+                    <p className="text-sm text-white/80">
+                      Exciting offers and exclusive deals waiting for you
+                    </p>
                   </div>
                 </div>
-                
+
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-base font-semibold text-white mb-3">Why Choose BeautyDen?</h3>
+                    <h3 className="text-base font-semibold text-white mb-3">
+                      Why Choose BeautyDen?
+                    </h3>
                     <ul className="space-y-4 text-sm text-white/90">
                       <li className="flex gap-3">
-                        <span className="mt-1 text-primary flex-shrink-0">✓</span>
-                        <span>Enjoy hassle-free shopping with the best offers automatically applied for you</span>
+                        <span className="mt-1 text-primary flex-shrink-0">
+                          ✓
+                        </span>
+                        <span>
+                          Enjoy hassle-free shopping with the best offers
+                          automatically applied for you
+                        </span>
                       </li>
                       <li className="flex gap-3">
-                        <span className="mt-1 text-primary flex-shrink-0">✓</span>
-                        <span>Explore unbeatable prices and unmatchable value on all services</span>
+                        <span className="mt-1 text-primary flex-shrink-0">
+                          ✓
+                        </span>
+                        <span>
+                          Explore unbeatable prices and unmatchable value on all
+                          services
+                        </span>
                       </li>
                       <li className="flex gap-3">
-                        <span className="mt-1 text-primary flex-shrink-0">✓</span>
-                        <span>100% secure & spam free - we respect your privacy and won't annoy you</span>
+                        <span className="mt-1 text-primary flex-shrink-0">
+                          ✓
+                        </span>
+                        <span>
+                          100% secure & spam free - we respect your privacy and
+                          won&apos;t annoy you
+                        </span>
                       </li>
                       <li className="flex gap-3">
-                        <span className="mt-1 text-primary flex-shrink-0">✓</span>
-                        <span>Track your orders and manage your bookings in one place</span>
+                        <span className="mt-1 text-primary flex-shrink-0">
+                          ✓
+                        </span>
+                        <span>
+                          Track your orders and manage your bookings in one
+                          place
+                        </span>
                       </li>
                       <li className="flex gap-3">
-                        <span className="mt-1 text-primary flex-shrink-0">✓</span>
-                        <span>Get personalized recommendations based on your preferences</span>
+                        <span className="mt-1 text-primary flex-shrink-0">
+                          ✓
+                        </span>
+                        <span>
+                          Get personalized recommendations based on your
+                          preferences
+                        </span>
                       </li>
-                      
                     </ul>
                   </div>
-                  
+
                   <div className="pt-4 border-t border-white/10">
                     <p className="text-xs text-white/70 leading-relaxed">
-                      Join thousands of satisfied customers who trust BeautyDen for their beauty and wellness needs. 
-                      Experience premium service at your doorstep with just a few clicks!
+                      Join thousands of satisfied customers who trust BeautyDen
+                      for their beauty and wellness needs. Experience premium
+                      service at your doorstep with just a few clicks!
                     </p>
                   </div>
                 </div>
@@ -202,7 +258,9 @@ export default function AuthModal({ open, onClose, onLoggedIn }: AuthModalProps)
                 {step === "phone" && (
                   <div className="space-y-5 w-full max-w-sm mx-auto">
                     <div>
-                      <h2 className="text-xl font-bold text-gray-900 mb-1">Login with Phone</h2>
+                      <h2 className="text-xl font-bold text-gray-900 mb-1">
+                        Login with Phone
+                      </h2>
                       {error && (
                         <p className="text-xs text-red-600 mt-1">{error}</p>
                       )}
@@ -218,29 +276,48 @@ export default function AuthModal({ open, onClose, onLoggedIn }: AuthModalProps)
                         inputMode="numeric"
                         maxLength={10}
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
+                        onChange={(e) =>
+                          setPhone(e.target.value.replace(/\D/g, ""))
+                        }
                         placeholder="Enter phone number"
                         className="flex-1 rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 h-11 transition-all min-w-0"
                       />
                     </div>
 
                     <label className="flex items-center gap-2 text-xs text-gray-600 select-none cursor-pointer">
-                      <input type="checkbox" defaultChecked className="rounded border-gray-300 text-primary focus:ring-1 focus:ring-primary/20 cursor-pointer" />
+                      <input
+                        type="checkbox"
+                        defaultChecked
+                        className="rounded border-gray-300 text-primary focus:ring-1 focus:ring-primary/20 cursor-pointer"
+                      />
                       Send me offers and updates
                     </label>
 
                     <Button
                       onClick={handleRequestOtp}
                       disabled={!isPhoneValid || isLoading}
-                      className={`w-full flex items-center justify-center gap-2 h-11 text-sm ${isPhoneValid && !isLoading ? "" : "opacity-60 cursor-not-allowed"}`}
+                      className={`w-full flex items-center justify-center gap-2 h-11 text-sm ${
+                        isPhoneValid && !isLoading
+                          ? ""
+                          : "opacity-60 cursor-not-allowed"
+                      }`}
                     >
                       <HiDevicePhoneMobile className="w-4 h-4" />
                       {isLoading ? "Sending..." : "Login with Phone"}
                     </Button>
 
                     <p className="text-[11px] text-gray-500 leading-relaxed">
-                      By Proceeding, I agree to my data being processed as per BeautyDen's
-                      <Link href="/privacy-policy" onClick={(e) => e.stopPropagation()} className="text-primary hover:underline"> Privacy Policy</Link>.
+                      By Proceeding, I agree to my data being processed as per
+                      BeautyDen&apos;s
+                      <Link
+                        href="/privacy-policy"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-primary hover:underline"
+                      >
+                        {" "}
+                        Privacy Policy
+                      </Link>
+                      .
                     </p>
                   </div>
                 )}
@@ -248,8 +325,12 @@ export default function AuthModal({ open, onClose, onLoggedIn }: AuthModalProps)
                 {step === "otp" && (
                   <div className="space-y-5 w-full max-w-sm mx-auto">
                     <div className="text-center">
-                      <h2 className="text-xl font-bold text-gray-900 mb-1">Verify OTP</h2>
-                      <p className="text-xs text-gray-600">Sent to +91 {phone}</p>
+                      <h2 className="text-xl font-bold text-gray-900 mb-1">
+                        Verify OTP
+                      </h2>
+                      <p className="text-xs text-gray-600">
+                        Sent to +91 {phone}
+                      </p>
                       {error && (
                         <p className="text-xs text-red-600 mt-1">{error}</p>
                       )}
@@ -259,7 +340,7 @@ export default function AuthModal({ open, onClose, onLoggedIn }: AuthModalProps)
                       {otpDigits.map((d, i) => (
                         <input
                           key={i}
-                          ref={(el:any) => (otpRefs.current[i] = el)}
+                          ref={(el: any) => (otpRefs.current[i] = el)}
                           inputMode="numeric"
                           maxLength={1}
                           value={d}
@@ -271,7 +352,11 @@ export default function AuthModal({ open, onClose, onLoggedIn }: AuthModalProps)
                             if (val && i < 5) otpRefs.current[i + 1]?.focus();
                           }}
                           onKeyDown={(e) => {
-                            if (e.key === "Backspace" && !otpDigits[i] && i > 0) {
+                            if (
+                              e.key === "Backspace" &&
+                              !otpDigits[i] &&
+                              i > 0
+                            ) {
                               otpRefs.current[i - 1]?.focus();
                             }
                           }}
@@ -281,8 +366,8 @@ export default function AuthModal({ open, onClose, onLoggedIn }: AuthModalProps)
                     </div>
 
                     <div className="flex items-center justify-between text-xs text-gray-600">
-                      <button 
-                        className="text-primary hover:text-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" 
+                      <button
+                        className="text-primary hover:text-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={() => {
                           setStep("phone");
                           setError(null);
@@ -291,7 +376,7 @@ export default function AuthModal({ open, onClose, onLoggedIn }: AuthModalProps)
                       >
                         Change number
                       </button>
-                      <button 
+                      <button
                         className="hover:text-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={handleRequestOtp}
                         disabled={isLoading}
@@ -303,7 +388,11 @@ export default function AuthModal({ open, onClose, onLoggedIn }: AuthModalProps)
                     <Button
                       onClick={handleVerifyOtp}
                       disabled={!isOtpValid || isLoading}
-                      className={`w-full flex items-center justify-center gap-2 h-11 text-sm ${isOtpValid && !isLoading ? "" : "opacity-60 cursor-not-allowed"}`}
+                      className={`w-full flex items-center justify-center gap-2 h-11 text-sm ${
+                        isOtpValid && !isLoading
+                          ? ""
+                          : "opacity-60 cursor-not-allowed"
+                      }`}
                     >
                       <HiCheckCircle className="w-4 h-4" />
                       {isLoading ? "Verifying..." : "Verify & Continue"}
@@ -318,5 +407,3 @@ export default function AuthModal({ open, onClose, onLoggedIn }: AuthModalProps)
     </AnimatePresence>
   );
 }
-
-
