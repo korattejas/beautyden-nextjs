@@ -9,6 +9,7 @@ import { CartProvider } from "@/contexts/CartContext";
 import CitySelectionPopup from "@/components/ui/CitySelectionPopup";
 import SplashScreen from "@/components/SplashScreen";
 import { City } from "@/types/city";
+import WhatsAppWidget from "./WhatsAppWidget";
 
 interface RootWrapperProps {
   children: ReactNode;
@@ -105,6 +106,7 @@ export default function RootWrapper({ children }: RootWrapperProps) {
           </CartProvider>
         </CityProvider>
         <ReactQueryDevtools initialIsOpen={false} />
+        <WhatsAppWidget />
       </QueryClientProvider>
     </div>
   );

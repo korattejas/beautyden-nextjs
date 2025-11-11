@@ -83,7 +83,7 @@ const ServiceModal = ({
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {/* Service Image */}
-          <div className="relative w-full h-64 rounded-xl overflow-hidden">
+          <div className="relative w-full h-96 rounded-xl overflow-hidden">
             <Image
               src={imgError ? FALLBACK_IMAGE : (service.icon || FALLBACK_IMAGE)}
               alt={service.name}
@@ -643,7 +643,7 @@ console.log("selectedServices----",selectedServices)
                       }`}
                     >
                       {/* Service Image */}
-                      <div className="relative h-32 overflow-hidden bg-muted flex items-center justify-center">
+                      <div className="relative h-72 md:h-80 overflow-hidden bg-muted">
                         {service.icon ? (
                           <Image
                             src={service.icon}
