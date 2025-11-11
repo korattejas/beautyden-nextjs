@@ -14,50 +14,26 @@ import { FaWhatsapp } from "react-icons/fa";
 import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
 
-export default function ThankYouPageContent() {
+export default function ThankYouContent() {
   const searchParams = useSearchParams();
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [message, setMessage] = useState<string>("");
-  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
     const order = searchParams.get("orderNumber");
     const msg = searchParams.get("message");
 
     if (order) setOrderNumber(order);
-    // We no longer use message from URL for production safety
-    setMessage("");
+    if (msg) setMessage(decodeURIComponent(msg));
   }, [searchParams]);
 
-  // Prevent hydration mismatch by not rendering until client-side
-  if (!isClient) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-secondary/5 flex items-center justify-center py-16">
-        <Container>
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="w-24 h-24 bg-gradient-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-              <HiCheckCircle className="w-12 h-12 text-white" />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Thank You! 💖
-            </h1>
-            <p className="text-xl text-foreground/70 mb-6">
-              Loading your booking confirmation...
-            </p>
-          </div>
-        </Container>
-      </div>
-    );
-  }
-
   // Function to render HTML content safely
-  // const renderMessage = (htmlString: string) => {
-  //   return { __html: htmlString };
-  // };
+  const renderMessage = (htmlString: string) => {
+    return { __html: htmlString };
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary/10 via-white to-secondary/10 mt-16 py-16 sm:py-16">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-secondary/5 flex items-center justify-center py-12">
       <Container>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -66,7 +42,7 @@ export default function ThankYouPageContent() {
           className="max-w-4xl mx-auto"
         >
           {/* Success Icon */}
-          <div className="text-center mb-8 px-4">
+          <div className="text-center mb-8">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -80,7 +56,7 @@ export default function ThankYouPageContent() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-3xl md:text-5xl font-bold text-foreground mb-4"
+              className="text-4xl md:text-5xl font-bold text-foreground mb-4"
             >
               Thank You! 💖
             </motion.h1>
@@ -89,7 +65,7 @@ export default function ThankYouPageContent() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="text-lg md:text-xl text-foreground/70 mb-6"
+              className="text-xl text-foreground/70 mb-6"
             >
               Your appointment has been successfully booked
             </motion.p>
@@ -99,33 +75,47 @@ export default function ThankYouPageContent() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.5 }}
-                className="inline-flex max-w-full items-center justify-center bg-primary/10 border border-primary/20 rounded-2xl px-3 sm:px-6 py-2 sm:py-3 mb-8"
+                className="inline-block bg-primary/10 border border-primary/20 rounded-2xl px-6 py-3 mb-8"
               >
-                <div className="flex flex-col items-center max-w-full">
-                  <p className="text-xs sm:text-sm text-foreground/60 mb-0.5">Order Number</p>
-                  <div className="w-full max-w-full">
-                    <p className="whitespace-nowrap text-base sm:text-2xl font-bold text-primary">{orderNumber}</p>
-                  </div>
-                </div>
+                <p className="text-sm text-foreground/60 mb-1">Order Number</p>
+                <p className="text-2xl font-bold text-primary">{orderNumber}</p>
               </motion.div>
             )}
           </div>
 
-          {/* Removed message rendering for safety; order number shown above */}
+          {/* Message Content */}
+          {message && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="bg-white/80 backdrop-blur-md rounded-3xl p-8 md:p-12 shadow-xl border border-primary/10 mb-8"
+            >
+              <div
+                className="prose prose-lg max-w-none"
+                dangerouslySetInnerHTML={renderMessage(message)}
+                style={{
+                  fontFamily: "Arial, sans-serif",
+                  lineHeight: "1.6",
+                  color: "#333",
+                }}
+              />
+            </motion.div>
+          )}
 
           {/* Contact Information */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.7 }}
-            className="bg-white/70 backdrop-blur-md rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 border border-primary/10"
+            className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-3xl p-8 md:p-12 border border-primary/10"
           >
-            <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-6 text-center flex items-center justify-center gap-2">
+            <h3 className="text-2xl font-bold text-foreground mb-6 text-center flex items-center justify-center gap-2">
               <HiSparkles className="w-6 h-6 text-primary" />
               Need Help?
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* WhatsApp */}
               <motion.a
                 href="https://wa.me/919574758282"
@@ -177,20 +167,20 @@ export default function ThankYouPageContent() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.8 }}
-            className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mt-8 px-4"
+            className="flex flex-col sm:flex-row gap-4 justify-center mt-8"
           >
             <Button
               href="/"
-              className="bg-gradient-to-r from-primary to-secondary text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-semibold text-base sm:text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+              className="bg-gradient-to-r from-primary to-secondary text-white px-8 py-4 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
             >
               <HiHeart className="w-5 h-5" />
               Back to Home
             </Button>
 
             <Button
-              href="/services"
+              href="/book"
               variant="outline"
-              className="border-2 border-primary/20 text-primary hover:bg-primary/5 px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-semibold text-base sm:text-lg flex items-center justify-center gap-2"
+              className="border-2 border-primary/20 text-primary hover:bg-primary/5 px-8 py-4 rounded-2xl font-semibold text-lg flex items-center justify-center gap-2"
             >
               <HiSparkles className="w-5 h-5" />
               Book Another Service

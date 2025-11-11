@@ -1,6 +1,5 @@
 "use client";
 
-import { Suspense } from "react";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useServices } from "@/hooks/useApi";
@@ -30,11 +29,15 @@ function ServicesContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Set initial category from URL parameters
+  // Set initial category and subcategory from URL parameters
   useEffect(() => {
     const categoryParam = searchParams.get("category");
+    const subcategoryParam = searchParams.get("subcategory");
     if (categoryParam) {
       setActiveCategory(categoryParam);
+    }
+    if (subcategoryParam) {
+      setActiveSubCategory(subcategoryParam);
     }
   }, [searchParams]);
 
@@ -54,8 +57,14 @@ function ServicesContent() {
 
   const clearAllFilters = () => {
     setActiveCategory("9");
+    setActiveSubCategory(null);
     setSearchQuery("");
     setCurrentPage(1);
+    // Update URL to remove all filters
+    const url = new URL(window.location.href);
+    url.searchParams.delete("category");
+    url.searchParams.delete("subcategory");
+    window.history.pushState({}, "", url.toString());
   };
 
   const handlePageChange = (page: number) => {
@@ -64,25 +73,38 @@ function ServicesContent() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleCategoryChange = (
-    categoryId: string,
-    subcategories: string[] | any
-  ) => {
+  const handleCategoryChange = (categoryId: string, subcategories: string[] | any) => {
     setActiveCategory(categoryId);
-    if (subcategories && subcategories.length > 0) {
-      // Auto-select first subcategory
-      setActiveSubCategory(subcategories[0]);
+    // Reset subcategory when changing category
+    setActiveSubCategory(null);
+    // Update URL: set category to the new one (or remove when "All Services"), and drop subcategory
+    const url = new URL(window.location.href);
+    if (categoryId === "9") {
+      url.searchParams.delete("category");
     } else {
-      // Reset subcategory if none exist
-      setActiveSubCategory(null);
+      url.searchParams.set("category", categoryId);
     }
-
+    url.searchParams.delete("subcategory");
+    window.history.pushState({}, "", url.toString());
     setCurrentPage(1); // Reset to first page when changing category
   };
 
   const handleSubCategoryChange = (subCategoryId: string | null) => {
+    // Only update subcategory, don't touch category
     setActiveSubCategory(subCategoryId);
-    setCurrentPage(1); // Reset to first page when changing category
+    setCurrentPage(1); // Reset to first page when changing subcategory
+    // Update URL to include subcategory - preserve existing category
+    const url = new URL(window.location.href);
+    if (subCategoryId) {
+      url.searchParams.set("subcategory", subCategoryId);
+      // Ensure category is preserved in URL
+      if (activeCategory && activeCategory !== "9") {
+        url.searchParams.set("category", activeCategory);
+      }
+    } else {
+      url.searchParams.delete("subcategory");
+    }
+    window.history.pushState({}, "", url.toString());
   };
 
   const handleSearchChange = (search: string) => {
@@ -215,28 +237,7 @@ function ServicesContent() {
   );
 }
 
-// Loading fallback component
-function ServicesPageFallback() {
-  return (
-    <div className="min-h-screen bg-background">
-      <ServiceHero />
-
-      <section className="pb-12 md:pb-16">
-        <Container>
-          <ServiceFilterSkeleton />
-        </Container>
-      </section>
-
-      <ServiceGridSkeleton />
-    </div>
-  );
-}
-
-// Main component wrapped in Suspense
+// Export the main content component
 export default function ServicesPageContent() {
-  return (
-    <Suspense fallback={<ServicesPageFallback />}>
-      <ServicesContent />
-    </Suspense>
-  );
+  return <ServicesContent />;
 }
