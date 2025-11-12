@@ -69,7 +69,7 @@ const ServiceModal = ({
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {/* Service Image */}
-          <div className="relative w-full h-64 rounded-xl overflow-hidden">
+          <div className="relative w-full h-80 rounded-xl overflow-hidden">
             <Image
               src={imgError ? FALLBACK_IMAGE : (service.icon || defaultImageForCategory(service.category_name) || FALLBACK_IMAGE)}
               alt={service.name}
@@ -179,13 +179,13 @@ const ServiceCard = ({ service, index, animated = true, priorityImage = false }:
       className="group bg-white/80 backdrop-blur-md rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 border border-primary/10 hover:border-primary/20 h-full flex flex-col"
     >
       {/* Service Image */}
-      <div className="aspect-[4/3] overflow-hidden relative">
+      <div className="relative h-64 md:h-72 overflow-hidden">
         <Image
           src={cardImgError ? FALLBACK_IMAGE : (service.icon || defaultImageForCategory(service.category_name) || FALLBACK_IMAGE)}
           alt={service.name}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
-          className="object-cover group-hover:scale-110 transition-transform duration-700"
+          className="object-cover transition-transform duration-700"
           priority={priorityImage}
           onError={() => setCardImgError(true)}
         />
