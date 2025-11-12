@@ -116,7 +116,7 @@ const ServiceFilter = ({
 
         {/* Category Filter */}
         <div className="lg:col-span-2">
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide px-2 pb-1 sm:flex-wrap sm:overflow-visible sm:px-0">
+          <div className="flex flex-wrap gap-2 px-2 pb-1 sm:px-0">
             {categories.map((category, index) => {
               const categoryId = category.id.toString();
               const isActive = activeCategory === categoryId;
@@ -174,7 +174,7 @@ const ServiceFilter = ({
           <div className="flex items-center justify-between mb-3">
             <div className="text-sm font-semibold text-foreground/80">Subcategories</div>
           </div>
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide px-2 pb-1 sm:flex-wrap sm:overflow-visible sm:px-0">
+          <div className="flex flex-wrap gap-2 px-2 pb-1 sm:px-0">
             {selectedCategory && selectedCategory.subcategories.map((sub: any, index: any) => {
               const subId = sub.id.toString();
               const isActive = activeSubCategory == subId;
