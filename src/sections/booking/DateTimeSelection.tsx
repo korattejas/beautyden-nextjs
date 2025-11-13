@@ -351,12 +351,12 @@ const DateTimeSelection = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="flex items-center justify-between pt-6"
+        className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pt-6"
       >
         <Button
           onClick={onPrev}
           variant="outline"
-          className="border-2 border-primary/20 text-primary hover:bg-primary/5 px-8 py-4 rounded-2xl font-semibold flex items-center gap-3 text-lg"
+          className="border-2 border-primary/20 text-primary hover:bg-primary/5 px-8 py-4 rounded-2xl font-semibold flex items-center justify-center gap-3 text-lg w-full sm:w-auto"
         >
           <HiArrowLeft className="w-5 h-5" />
           Previous Step
@@ -365,7 +365,7 @@ const DateTimeSelection = ({
         <Button
           onClick={onNext}
           disabled={!canProceed}
-          className="bg-gradient-to-r from-primary to-secondary text-white px-8 py-4 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-3 text-lg"
+          className="bg-gradient-to-r from-primary to-secondary text-white px-8 py-4 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3 text-lg w-full sm:w-auto"
         >
           Continue to Details
           <HiArrowRight className="w-5 h-5" />

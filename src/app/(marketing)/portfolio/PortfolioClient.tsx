@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Container from "@/components/ui/Container";
@@ -22,25 +22,8 @@ const PortfolioClient = ({ portfolioItems }: PortfolioClientProps) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [visibleCount, setVisibleCount] = useState(12);
   const [missingImages, setMissingImages] = useState<string[]>([]);
-
-  const handleScroll = () => {
-    if (
-      typeof window !== "undefined" &&
-      window.innerHeight + window.scrollY >=
-        document.documentElement.scrollHeight - 1000
-    ) {
-      setVisibleCount((prev) => Math.min(prev + 12, portfolioItems.length));
-    }
-  };
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [portfolioItems.length]);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const loadingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const filteredItems = useMemo(() => {
     if (!missingImages.length) return portfolioItems;
@@ -52,6 +35,48 @@ const PortfolioClient = ({ portfolioItems }: PortfolioClientProps) => {
     () => filteredItems.slice(0, visibleCount),
     [filteredItems, visibleCount]
   );
+
+  const loadMoreItems = useCallback(() => {
+    if (isLoadingMore || visibleCount >= filteredItems.length) return;
+
+    setIsLoadingMore(true);
+    loadingTimeoutRef.current = setTimeout(() => {
+      setVisibleCount((prev) =>
+        Math.min(prev + 12, filteredItems.length)
+      );
+      setIsLoadingMore(false);
+    }, 500);
+  }, [filteredItems.length, isLoadingMore, visibleCount]);
+
+  const handleScroll = useCallback(() => {
+    if (typeof window === "undefined") return;
+
+    const threshold = Math.max(
+      document.documentElement.scrollHeight - window.innerHeight - 1000,
+      0
+    );
+
+    if (window.scrollY >= threshold) {
+      loadMoreItems();
+    }
+  }, [loadMoreItems]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [handleScroll]);
+
+  useEffect(() => {
+    return () => {
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (activeIndex === null) return;
@@ -134,6 +159,12 @@ const PortfolioClient = ({ portfolioItems }: PortfolioClientProps) => {
           </div>
         </Container>
       </section>
+
+      {isLoadingMore && visibleItems.length < filteredItems.length && (
+        <div className="flex justify-center py-10">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
+        </div>
+      )}
 
       {activeIndex !== null && (
         <Lightbox

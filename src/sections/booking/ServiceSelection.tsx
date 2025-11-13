@@ -427,9 +427,9 @@ console.log("selectedServices----",selectedServices)
       </motion.div>
 
       {/* Main Content - Left Right Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         {/* Left Section - Services Selection */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-6 order-2 lg:order-1">
           {/* Search and Category Filters */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -757,7 +757,7 @@ console.log("selectedServices----",selectedServices)
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
-                className="flex flex-col items-center space-y-4 mt-8"
+                className="flex flex-col items-center space-y-4 mt-8 w-full"
               >
                 {/* Results Info */}
                 <div className="text-sm text-foreground/60">
@@ -777,12 +777,12 @@ console.log("selectedServices----",selectedServices)
                 </div>
 
                 {/* Pagination Controls */}
-                <div className="flex items-center space-x-2">
+                <div className="flex flex-wrap items-center justify-center gap-3 w-full">
                   {/* Previous Button */}
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    className={`flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 w-full sm:w-auto ${
                       currentPage === 1
                         ? "bg-muted text-foreground/40 cursor-not-allowed"
                         : "bg-card text-foreground hover:bg-primary hover:text-white border border-border cursor-pointer"
@@ -793,7 +793,7 @@ console.log("selectedServices----",selectedServices)
                   </button>
 
                   {/* Page Numbers */}
-                  <div className="flex items-center space-x-1">
+                  <div className="flex flex-wrap items-center justify-center gap-2">
                     {Array.from(
                       { length: Math.min(5, paginationData.last_page) },
                       (_, i) => {
@@ -802,7 +802,7 @@ console.log("selectedServices----",selectedServices)
                           <button
                             key={page}
                             onClick={() => handlePageChange(page)}
-                            className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer ${
+                            className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer w-10 sm:w-auto text-center ${
                               currentPage === page
                                 ? "bg-primary text-white"
                                 : "bg-card text-foreground hover:bg-primary/10 border border-border"
@@ -823,7 +823,7 @@ console.log("selectedServices----",selectedServices)
                           onClick={() =>
                             handlePageChange(paginationData.last_page)
                           }
-                          className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer ${
+                          className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer w-10 sm:w-auto text-center ${
                             currentPage === paginationData.last_page
                               ? "bg-primary text-white"
                               : "bg-card text-foreground hover:bg-primary/10 border border-border"
@@ -839,7 +839,7 @@ console.log("selectedServices----",selectedServices)
                   <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === paginationData.last_page}
-                    className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    className={`flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 w-full sm:w-auto ${
                       currentPage === paginationData.last_page
                         ? "bg-muted text-foreground/40 cursor-not-allowed"
                         : "bg-card text-foreground hover:bg-primary hover:text-white border border-border cursor-pointer"
@@ -878,12 +878,12 @@ console.log("selectedServices----",selectedServices)
         </div>
 
         {/* Right Section - Selected Services & Summary */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 order-1 lg:order-2 w-full">
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
-            className="bg-accent/50 backdrop-blur-md rounded-3xl p-6 border border-border shadow-xl sticky top-8"
+            className="bg-accent/50 backdrop-blur-md rounded-3xl p-6 border border-border shadow-xl lg:sticky lg:top-8"
           >
             {/* Header */}
     
