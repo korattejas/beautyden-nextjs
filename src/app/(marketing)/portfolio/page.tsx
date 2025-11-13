@@ -17,20 +17,35 @@ const getPortfolioItems = async (): Promise<PortfolioItem[]> => {
       .map((entry) => entry.name)
       .filter((name) => /\.(jpe?g|png|webp|gif)$/i.test(name));
 
-    const sorted = files.sort((a, b) => {
-      const extractNumber = (filename: string) => {
-        const match = filename.match(/(\d+)/);
-        return match ? parseInt(match[1], 10) : Number.POSITIVE_INFINITY;
-      };
+    const extractNumber = (filename: string) => {
+      const match = filename.match(/(\d+)/);
+      return match ? parseInt(match[1], 10) : Number.POSITIVE_INFINITY;
+    };
 
+    const getPrefixRank = (filename: string) => {
+      const lower = filename.toLowerCase();
+      if (lower.startsWith("p-")) return 0;
+      if (lower.startsWith("pn-")) return 1;
+      if (lower.startsWith("p")) return 2;
+      return 3;
+    };
+
+    const sorted = files.sort((a, b) => {
       const aNum = extractNumber(a);
       const bNum = extractNumber(b);
 
-      if (aNum === bNum) {
-        return a.localeCompare(b);
+      if (aNum !== bNum) {
+        return aNum - bNum;
       }
 
-      return aNum - bNum;
+      const aRank = getPrefixRank(a);
+      const bRank = getPrefixRank(b);
+
+      if (aRank !== bRank) {
+        return aRank - bRank;
+      }
+
+      return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" });
     });
 
     return sorted.map((name) => ({

@@ -252,12 +252,12 @@ const CustomerInformation = ({
         </div>
 
         {/* Navigation Buttons */}
-        <div className="flex items-center justify-between pt-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pt-6">
           <Button
             type="button"
             onClick={onPrev}
             variant="outline"
-            className="border-2 border-primary/20 text-primary hover:bg-primary/5 px-8 py-3 rounded-full font-semibold flex items-center gap-2"
+            className="border-2 border-primary/20 text-primary hover:bg-primary/5 px-8 py-3 rounded-full font-semibold flex items-center justify-center gap-2 w-full sm:w-auto"
           >
             <HiArrowLeft className="w-4 h-4" />
             Previous
@@ -266,7 +266,7 @@ const CustomerInformation = ({
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="bg-gradient-to-r from-primary to-secondary text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="bg-gradient-to-r from-primary to-secondary text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full sm:w-auto"
           >
             Continue
             <HiArrowRight className="w-4 h-4" />
