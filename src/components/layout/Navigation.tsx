@@ -119,7 +119,10 @@ const Navigation = () => {
       if (cartRef.current && !cartRef.current.contains(event.target as Node)) {
         setShowCartDropdown(false);
       }
-      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(event.target as Node)
+      ) {
         setShowProfileDropdown(false);
       }
     };
@@ -436,15 +439,24 @@ const Navigation = () => {
                       className="absolute top-full right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-200 p-4 z-50"
                     >
                       <div className="mb-3 flex items-center justify-between">
-                        <div className="text-sm font-semibold text-gray-900">Your Cart</div>
-                        <div className="text-xs text-gray-500">{totalItems} item{totalItems !== 1 ? "s" : ""}</div>
+                        <div className="text-sm font-semibold text-gray-900">
+                          Your Cart
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {totalItems} item{totalItems !== 1 ? "s" : ""}
+                        </div>
                       </div>
                       {items.length === 0 ? (
-                        <div className="text-sm text-gray-500 py-6 text-center">Your cart is empty</div>
+                        <div className="text-sm text-gray-500 py-6 text-center">
+                          Your cart is empty
+                        </div>
                       ) : (
                         <div className="max-h-56 overflow-auto space-y-3">
                           {items.map((it) => (
-                            <div key={it.id} className="flex items-start justify-between gap-3 border-b border-gray-100 pb-3 last:border-b-0">
+                            <div
+                              key={it.id}
+                              className="flex items-start justify-between gap-3 border-b border-gray-100 pb-3 last:border-b-0"
+                            >
                               <div className="flex items-start gap-3 min-w-0 flex-1">
                                 <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 flex items-center justify-center">
                                   {it.icon ? (
@@ -461,14 +473,27 @@ const Navigation = () => {
                                   )}
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                  <div className="text-sm font-medium text-gray-900 truncate">{it.name}</div>
-                                  <div className="text-xs text-gray-500 truncate">{it.category_name}</div>
-                                  <div className="text-xs text-gray-500">{it.duration}</div>
+                                  <div className="text-sm font-medium text-gray-900 truncate">
+                                    {it.name}
+                                  </div>
+                                  <div className="text-xs text-gray-500 truncate">
+                                    {it.category_name}
+                                  </div>
+                                  <div className="text-xs text-gray-500">
+                                    {it.duration}
+                                  </div>
                                 </div>
                               </div>
                               <div className="text-right flex-shrink-0">
-                                <div className="text-sm font-semibold text-gray-900">₹{it.discount_price ?? it.price}</div>
-                                <button onClick={() => removeItem(it.id)} className="text-xs text-red-500 hover:underline mt-1">Remove</button>
+                                <div className="text-sm font-semibold text-gray-900">
+                                  ₹{it.discount_price ?? it.price}
+                                </div>
+                                <button
+                                  onClick={() => removeItem(it.id)}
+                                  className="text-xs text-red-500 hover:underline mt-1"
+                                >
+                                  Remove
+                                </button>
                               </div>
                             </div>
                           ))}
@@ -479,7 +504,13 @@ const Navigation = () => {
                         <div className="text-sm font-bold text-primary">₹{totalPrice.toLocaleString()}</div>
                       </div> */}
                       <div className="mt-3 grid grid-cols-1 gap-2">
-                        <Link href="/book" className="text-center text-sm px-3 py-2 rounded-lg bg-primary text-white hover:bg-primary/90" onClick={() => setShowCartDropdown(false)}>View</Link>
+                        <Link
+                          href="/book"
+                          className="text-center text-sm px-3 py-2 rounded-lg bg-primary text-white hover:bg-primary/90"
+                          onClick={() => setShowCartDropdown(false)}
+                        >
+                          View
+                        </Link>
                         {/* <Link href="/book" className="text-center text-sm px-3 py-2 rounded-lg bg-primary text-white hover:bg-primary/90" onClick={() => setShowCartDropdown(false)}>Continue</Link> */}
                       </div>
                     </motion.div>
@@ -504,7 +535,7 @@ const Navigation = () => {
                 </button>
 
                 {/* Profile Dropdown - Only show when not logged in */}
-                {/* <AnimatePresence>
+              {/* <AnimatePresence>
                   {showProfileDropdown && !isLoggedIn && (
                     <motion.div
                       initial={{ opacity: 0, y: 8 }}
@@ -556,15 +587,24 @@ const Navigation = () => {
                       className="absolute top-full right-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-gray-200 p-4 z-50"
                     >
                       <div className="mb-3 flex items-center justify-between">
-                        <div className="text-sm font-semibold text-gray-900">Your Cart</div>
-                        <div className="text-xs text-gray-500">{totalItems} item{totalItems !== 1 ? "s" : ""}</div>
+                        <div className="text-sm font-semibold text-gray-900">
+                          Your Cart
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {totalItems} item{totalItems !== 1 ? "s" : ""}
+                        </div>
                       </div>
                       {items.length === 0 ? (
-                        <div className="text-sm text-gray-500 py-6 text-center">Your cart is empty</div>
+                        <div className="text-sm text-gray-500 py-6 text-center">
+                          Your cart is empty
+                        </div>
                       ) : (
                         <div className="max-h-56 overflow-auto space-y-3">
                           {items.map((it) => (
-                            <div key={it.id} className="flex items-start justify-between gap-3 border-b border-gray-100 pb-3 last:border-b-0">
+                            <div
+                              key={it.id}
+                              className="flex items-start justify-between gap-3 border-b border-gray-100 pb-3 last:border-b-0"
+                            >
                               <div className="flex items-start gap-3 min-w-0 flex-1">
                                 <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 flex items-center justify-center">
                                   {it.icon ? (
@@ -581,26 +621,58 @@ const Navigation = () => {
                                   )}
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                  <div className="text-sm font-medium text-gray-900 truncate">{it.name}</div>
-                                  <div className="text-xs text-gray-500 truncate">{it.category_name}</div>
-                                  <div className="text-xs text-gray-500">{it.duration}</div>
+                                  <div className="text-sm font-medium text-gray-900 truncate">
+                                    {it.name}
+                                  </div>
+                                  <div className="text-xs text-gray-500 truncate">
+                                    {it.category_name}
+                                  </div>
+                                  <div className="text-xs text-gray-500">
+                                    {it.duration}
+                                  </div>
                                 </div>
                               </div>
                               <div className="text-right flex-shrink-0">
-                                <div className="text-sm font-semibold text-gray-900">₹{(it.discount_price ?? it.price).toLocaleString()}</div>
-                                <button onClick={() => removeItem(it.id)} className="text-xs text-red-500 hover:underline mt-1">Remove</button>
+                                <div className="text-sm font-semibold text-gray-900">
+                                  ₹
+                                  {(
+                                    it.discount_price ?? it.price
+                                  ).toLocaleString()}
+                                </div>
+                                <button
+                                  onClick={() => removeItem(it.id)}
+                                  className="text-xs text-red-500 hover:underline mt-1"
+                                >
+                                  Remove
+                                </button>
                               </div>
                             </div>
                           ))}
                         </div>
                       )}
                       <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                        <div className="text-sm font-semibold text-gray-900">Total</div>
-                        <div className="text-sm font-bold text-primary">₹{totalPrice.toLocaleString()}</div>
+                        <div className="text-sm font-semibold text-gray-900">
+                          Total
+                        </div>
+                        <div className="text-sm font-bold text-primary">
+                          ₹{totalPrice.toLocaleString()}
+                        </div>
                       </div>
                       <div className="mt-3 grid grid-cols-2 gap-2">
-                        <Link href="/book" className="text-center text-sm px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-50" onClick={() => setShowCartDropdown(false)}>View</Link>
-                        <Link href="/book" className="text-center text-sm px-3 py-2 rounded-lg bg-primary text-white hover:bg-primary/90" onClick={() => setShowCartDropdown(false)}>Continue</Link>
+                        <Link
+                          href="/book"
+                          className="text-center text-sm px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-50"
+                          onClick={() => setShowCartDropdown(false)}
+                        >
+                          View
+                        </Link>
+                        <Link
+                          href="/book"
+                          className="text-center text-sm px-3 py-2 rounded-lg bg-primary text-white hover:bg-primary/90"
+                          onClick={() => setShowCartDropdown(false)}
+                        >
+                          Continue
+                        </Link>
                       </div>
                     </motion.div>
                   )}
@@ -624,7 +696,7 @@ const Navigation = () => {
                 </button>
 
                 {/* Mobile Profile Dropdown */}
-                {/* <AnimatePresence>
+              {/* <AnimatePresence>
                   {showProfileDropdown && !isLoggedIn && (
                     <motion.div
                       initial={{ opacity: 0, y: 8 }}
@@ -663,13 +735,13 @@ const Navigation = () => {
       </header>
 
       {/* Fixed Book Now Button - responsive position */}
-      <Link
+      {/* <Link
         href="/book"
         className="fixed right-4 bottom-6 md:right-6 md:bottom-auto md:top-1/2 md:-translate-y-1/2 z-40 bg-primary hover:bg-primary/90 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center group"
         aria-label="Book Now"
       >
         <HiSparkles className="w-5 h-5 group-hover:rotate-12 transition-transform duration-200" />
-      </Link>
+      </Link> */}
 
       {/* Mobile Menu */}
       <AnimatePresence>
