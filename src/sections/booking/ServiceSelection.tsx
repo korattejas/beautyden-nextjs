@@ -706,7 +706,7 @@ console.log("selectedServices----",selectedServices)
                         )}
 
                         {/* Action Buttons */}
-                        <div className="flex gap-2">
+                        <div className="flex flex-col sm:flex-row gap-2">
                           {/* View Service Button */}
                           <Button
                             variant="outline"
@@ -714,7 +714,7 @@ console.log("selectedServices----",selectedServices)
                               setSelectedService(service);
                               setShowModal(true);
                             }}
-                            className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl font-medium text-sm transition-all duration-300 min-h-[40px]"
+                            className="w-full sm:w-1/2 flex items-center justify-center gap-2 h-10 rounded-xl font-medium text-sm transition-all duration-300 min-h-[40px]"
                           >
                             <HiSparkles className="w-3 h-3" />
                             View Service
@@ -729,7 +729,7 @@ console.log("selectedServices----",selectedServices)
                               }
                               toggleService(service);
                             }}
-                            className={`w-full flex items-center justify-center gap-2 h-10 rounded-xl font-medium text-sm transition-all duration-300 bg-gradient-to-r from-primary to-secondary hover:scale-105`}
+                            className={`w-full sm:w-1/2 flex items-center justify-center gap-2 h-10 rounded-xl font-medium text-sm transition-all duration-300 bg-gradient-to-r from-primary to-secondary hover:scale-105`}
                           >
                             {isSelected ? (
                               <>
