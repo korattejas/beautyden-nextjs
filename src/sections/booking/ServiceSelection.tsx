@@ -110,17 +110,37 @@ const ServiceModal = ({
           <div className="bg-gray-50 rounded-xl p-4">
             <div className="flex items-baseline gap-2 align-middle" style={{alignItems:"center"}}>
               <span className="text-sm font-medium text-foreground/70">{getSetting("service_price_start_text")}</span>
-              <span className="text-2xl font-bold text-primary">
-                ₹{displayPrice.toLocaleString()}
-              </span>
-            </div>
-            {hasDiscount && (
-              <div className="flex items-center gap-2 mt-2">
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">
-                  {hasDiscount}
+              {hasDiscount ? (
+                <>
+                  <span className="text-2xl font-bold text-primary">
+                    ₹{displayPrice.toLocaleString()}
+                  </span>
+                  <span className="text-sm text-foreground/50 line-through">
+                    ₹{hasDiscount.toLocaleString()}
+                  </span>
+                </>
+              ) : (
+                <span className="text-2xl font-bold text-primary">
+                  ₹{displayPrice.toLocaleString()}
                 </span>
-              </div>
-            )}
+              )}
+            </div>
+            {hasDiscount && (() => {
+              const originalPrice = parseFloat(hasDiscount);
+              const discountedPrice = parseFloat(displayPrice);
+              // Calculate discount percentage based on what % of original price you're paying
+              const discountPercent = originalPrice > 0 && originalPrice > discountedPrice
+                ? Math.floor((discountedPrice / originalPrice) * 100)
+                : 0;
+              return discountPercent > 0 ? (
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold flex items-center gap-1">
+                    <HiTag className="w-3 h-3" />
+                    {discountPercent}% OFF
+                  </span>
+                </div>
+              ) : null;
+            })()}
           </div>
 
           {/* Description with fixed height */}
@@ -681,18 +701,37 @@ console.log("selectedServices----",selectedServices)
                           <div className="mb-4">
                             <div className="flex items-baseline gap-2 mb-1" style={{alignItems:"center"}}>
                               <span className="text-xs font-medium text-foreground/70">{getSetting("service_price_start_text")}</span>
-                              <span className="text-lg font-bold text-primary">
-                                ₹{displayPrice}
-                              </span>
-                            </div>
-                            {hasDiscount && (
-                              <div className="flex items-center gap-2">
-                               
-                                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">
-                                  {hasDiscount}
+                              {hasDiscount ? (
+                                <>
+                                  <span className="text-lg font-bold text-primary">
+                                    ₹{displayPrice}
+                                  </span>
+                                  <span className="text-sm text-foreground/50 line-through">
+                                    ₹{hasDiscount}
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-lg font-bold text-primary">
+                                  ₹{displayPrice}
                                 </span>
-                              </div>
-                            )}
+                              )}
+                            </div>
+                            {hasDiscount && (() => {
+                              const originalPrice = parseFloat(hasDiscount);
+                              const discountedPrice = parseFloat(displayPrice);
+                              // Calculate discount percentage based on what % of original price you're paying
+                              const discountPercent = originalPrice > 0 && originalPrice > discountedPrice
+                                ? Math.floor((discountedPrice / originalPrice) * 100)
+                                : 0;
+                              return discountPercent > 0 ? (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold flex items-center gap-1">
+                                    <HiTag className="w-3 h-3" />
+                                    {discountPercent}% OFF
+                                  </span>
+                                </div>
+                              ) : null;
+                            })()}
                             <div className="flex items-center gap-1 mt-1 text-xs text-foreground/60">
                               <HiClock className="w-3 h-3" />
                               {service.duration || "60 min"}
@@ -1026,6 +1065,19 @@ console.log("selectedServices----",selectedServices)
                   return null;
                 })()} */}
                 
+                {/* Order Amount Discount Text */}
+                {getSetting("order_amount_discount_text") && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-4 p-3 rounded-xl bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20"
+                  >
+                    <p className="text-sm font-medium text-foreground text-center">
+                      {getSetting("order_amount_discount_text")}
+                    </p>
+                  </motion.div>
+                )}
+
                 <Button
                   onClick={() => {
                     // Get min and max service limits from settings
@@ -1047,11 +1099,11 @@ console.log("selectedServices----",selectedServices)
                     onServicesChange([...cartItems]);
                     onNext();
                   }}
-                  // disabled={(() => {
-                  //   const minService = parseInt(getSetting("min_service_book") || "1");
-                  //   const maxService = parseInt(getSetting("max_service_book") || "100");
-                  //   return cartItems.length < minService || cartItems.length > maxService;
-                  // })()}
+                  disabled={(() => {
+                    const minOrderAmount = parseFloat(getSetting("min_order_amount") || "0");
+                    const totalPrice = getTotalPrice();
+                    return totalPrice < minOrderAmount;
+                  })()}
                   className="w-full bg-primary text-white py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
                   Continue to Date & Time
