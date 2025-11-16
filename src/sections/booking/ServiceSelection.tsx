@@ -17,6 +17,7 @@ import {
   HiPhoto,
   HiSquares2X2,
   HiStar,
+  HiPhone,
 } from "react-icons/hi2";
 import { useServices, useServiceCategories, useSettings, useService } from "@/hooks/useApi";
 import { BookingService } from "@/types/booking";
@@ -927,7 +928,7 @@ console.log("selectedServices----",selectedServices)
             {/* Header */}
     
  
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-primary/10 rounded-2xl flex items-center justify-center">
                 <HiShoppingBag className="w-5 h-5 text-primary" />
               </div>
@@ -941,6 +942,31 @@ console.log("selectedServices----",selectedServices)
                 </p>
               </div>
             </div>
+
+            {/* Advance Booking Message */}
+            {getSetting("phone_number") && (
+              <motion.div
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-6 p-3 rounded-xl bg-blue-50 border border-blue-200"
+              >
+                <p className="text-xs text-foreground/70 leading-relaxed">
+                  <span className="font-semibold text-foreground">Please book in 2 days advance</span>
+                  {getSetting("phone_number") && (
+                    <>
+                      {" "}and if urgent then call{" "}
+                      <a 
+                        href={`tel:${getSetting("phone_number")}`}
+                        className="text-primary font-semibold hover:underline inline-flex items-center gap-1"
+                      >
+                        <HiPhone className="w-3 h-3" />
+                        {getSetting("phone_number")}
+                      </a>
+                    </>
+                  )}
+                </p>
+              </motion.div>
+            )}
 
            
             {/* Selected Services */}
@@ -1077,6 +1103,31 @@ console.log("selectedServices----",selectedServices)
                     </p>
                   </motion.div>
                 )}
+
+                {/* Minimum Order Amount Message - Show when button is disabled */}
+                {(() => {
+                  const minOrderAmount = parseFloat(getSetting("min_order_amount") || "0");
+                  const totalPrice = getTotalPrice();
+                  const isDisabled = totalPrice < minOrderAmount;
+                  
+                  return isDisabled && minOrderAmount > 0 ? (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200"
+                    >
+                      <p className="text-sm font-medium text-amber-800 flex items-start gap-2">
+                        <HiSparkles className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                        <span>
+                          Minimum ₹{minOrderAmount.toLocaleString()} order required. 
+                          <span className="block mt-1 text-amber-700 font-normal">
+                            Add ₹{(minOrderAmount - totalPrice).toLocaleString()} more to proceed.
+                          </span>
+                        </span>
+                      </p>
+                    </motion.div>
+                  ) : null;
+                })()}
 
                 <Button
                   onClick={() => {
