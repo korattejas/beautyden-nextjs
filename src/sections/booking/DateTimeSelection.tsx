@@ -33,6 +33,25 @@ const DateTimeSelection = ({
 }: DateTimeSelectionProps) => {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
 
+  // Fixed date parsing and formatting functions
+  const formatDateToString = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  // Set default date to tomorrow if no date is selected
+  useEffect(() => {
+    if (!selectedDate) {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowString = formatDateToString(tomorrow);
+      onDateChange(tomorrowString);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
+
   // Generate time slots when component mounts
   useEffect(() => {
     const generateTimeSlots = () => {
@@ -79,13 +98,6 @@ const DateTimeSelection = ({
     // Create date in local timezone to avoid timezone issues
     const [year, month, day] = dateString.split("-").map(Number);
     return new Date(year, month - 1, day); // month is 0-indexed
-  };
-
-  const formatDateToString = (date: Date): string => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
   };
 
   const formatDateDisplay = (dateString: string) => {
@@ -229,9 +241,11 @@ const DateTimeSelection = ({
               <DatePicker
                 selected={selectedDateObj}
                 onChange={handleDateChange}
-                // minDate={new Date()}
-                // maxDate={new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)}
-                minDate={new Date()} // ✅ still prevents past dates
+                minDate={(() => {
+                  const tomorrow = new Date();
+                  tomorrow.setDate(tomorrow.getDate() + 1);
+                  return tomorrow;
+                })()} // Disable today and past dates - only allow tomorrow onwards
                 inline
                 dateFormat="yyyy-MM-dd"
                 calendarClassName="custom-datepicker"
