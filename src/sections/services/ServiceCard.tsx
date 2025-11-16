@@ -2,7 +2,7 @@
 
 import Button from "@/components/ui/Button";
 import { motion } from "framer-motion";
-import { HiStar, HiClock, HiArrowRight, HiSparkles, HiXMark } from "react-icons/hi2";
+import { HiStar, HiClock, HiArrowRight, HiSparkles, HiXMark, HiTag } from "react-icons/hi2";
 import Image from "next/image";
 // import { formatPrice } from "@/data";
 import { Service } from "@/services/services.service";
@@ -96,18 +96,37 @@ const ServiceModal = ({
           <div className="bg-gray-50 rounded-xl p-4">
             <div className="flex items-baseline gap-2" style={{alignItems:"center"}}>
               <span className="text-sm font-medium text-foreground/70">{getSetting("service_price_start_text")}</span>
-              <span className="text-2xl font-bold text-primary">
-                ₹{displayPrice.toLocaleString()}
-              </span>
-            </div>
-            {hasDiscount && (
-              <div className="flex items-center gap-2 mt-2">
-               
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">
-                  {hasDiscount}
+              {hasDiscount ? (
+                <>
+                  <span className="text-2xl font-bold text-primary">
+                    ₹{displayPrice.toLocaleString()}
+                  </span>
+                  <span className="text-sm text-foreground/50 line-through">
+                    ₹{hasDiscount.toLocaleString()}
+                  </span>
+                </>
+              ) : (
+                <span className="text-2xl font-bold text-primary">
+                  ₹{displayPrice.toLocaleString()}
                 </span>
-              </div>
-            )}
+              )}
+            </div>
+            {hasDiscount && (() => {
+              const originalPrice = parseFloat(hasDiscount);
+              const discountedPrice = parseFloat(displayPrice);
+              // Calculate discount percentage based on what % of original price you're paying
+              const discountPercent = originalPrice > 0 && originalPrice > discountedPrice
+                ? Math.floor((discountedPrice / originalPrice) * 100)
+                : 0;
+              return discountPercent > 0 ? (
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold flex items-center gap-1">
+                    <HiTag className="w-3 h-3" />
+                    {discountPercent}% OFF
+                  </span>
+                </div>
+              ) : null;
+            })()}
           </div>
 
           {/* Description with fixed height */}
@@ -300,17 +319,37 @@ const ServiceCard = ({ service, index, animated = true, priorityImage = false }:
 <div className="mb-4">
   <div className="flex items-baseline gap-2 mb-1" style={{alignItems:"center"}}>
     <span className="text-sm font-medium text-foreground/70">{getSetting("service_price_start_text")}</span>
-    <span className="text-xl font-bold text-primary">
-      ₹{displayPrice.toLocaleString()}
-    </span>
-  </div>
-  {hasDiscount && (
-    <div className="flex items-center gap-2">
-      <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">
-        {hasDiscount}
+    {hasDiscount ? (
+      <>
+        <span className="text-xl font-bold text-primary">
+          ₹{displayPrice.toLocaleString()}
+        </span>
+        <span className="text-sm text-foreground/50 line-through">
+          ₹{hasDiscount.toLocaleString()}
+        </span>
+      </>
+    ) : (
+      <span className="text-xl font-bold text-primary">
+        ₹{displayPrice.toLocaleString()}
       </span>
-    </div>
-  )}
+    )}
+  </div>
+  {hasDiscount && (() => {
+    const originalPrice = parseFloat(hasDiscount);
+    const discountedPrice = parseFloat(displayPrice);
+    // Calculate discount percentage based on what % of original price you're paying
+    const discountPercent = originalPrice > 0 && originalPrice > discountedPrice
+      ? Math.floor((discountedPrice / originalPrice) * 100)
+      : 0;
+    return discountPercent > 0 ? (
+      <div className="flex items-center gap-2">
+        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold flex items-center gap-1">
+          <HiTag className="w-3 h-3" />
+          {discountPercent}% OFF
+        </span>
+      </div>
+    ) : null;
+  })()}
 </div>
 
           {/* Action Buttons */}

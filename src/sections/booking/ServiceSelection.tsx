@@ -17,6 +17,7 @@ import {
   HiPhoto,
   HiSquares2X2,
   HiStar,
+  HiPhone,
 } from "react-icons/hi2";
 import { useServices, useServiceCategories, useSettings, useService } from "@/hooks/useApi";
 import { BookingService } from "@/types/booking";
@@ -110,17 +111,37 @@ const ServiceModal = ({
           <div className="bg-gray-50 rounded-xl p-4">
             <div className="flex items-baseline gap-2 align-middle" style={{alignItems:"center"}}>
               <span className="text-sm font-medium text-foreground/70">{getSetting("service_price_start_text")}</span>
-              <span className="text-2xl font-bold text-primary">
-                ₹{displayPrice.toLocaleString()}
-              </span>
-            </div>
-            {hasDiscount && (
-              <div className="flex items-center gap-2 mt-2">
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">
-                  {hasDiscount}
+              {hasDiscount ? (
+                <>
+                  <span className="text-2xl font-bold text-primary">
+                    ₹{displayPrice.toLocaleString()}
+                  </span>
+                  <span className="text-sm text-foreground/50 line-through">
+                    ₹{hasDiscount.toLocaleString()}
+                  </span>
+                </>
+              ) : (
+                <span className="text-2xl font-bold text-primary">
+                  ₹{displayPrice.toLocaleString()}
                 </span>
-              </div>
-            )}
+              )}
+            </div>
+            {hasDiscount && (() => {
+              const originalPrice = parseFloat(hasDiscount);
+              const discountedPrice = parseFloat(displayPrice);
+              // Calculate discount percentage based on what % of original price you're paying
+              const discountPercent = originalPrice > 0 && originalPrice > discountedPrice
+                ? Math.floor((discountedPrice / originalPrice) * 100)
+                : 0;
+              return discountPercent > 0 ? (
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold flex items-center gap-1">
+                    <HiTag className="w-3 h-3" />
+                    {discountPercent}% OFF
+                  </span>
+                </div>
+              ) : null;
+            })()}
           </div>
 
           {/* Description with fixed height */}
@@ -681,18 +702,37 @@ console.log("selectedServices----",selectedServices)
                           <div className="mb-4">
                             <div className="flex items-baseline gap-2 mb-1" style={{alignItems:"center"}}>
                               <span className="text-xs font-medium text-foreground/70">{getSetting("service_price_start_text")}</span>
-                              <span className="text-lg font-bold text-primary">
-                                ₹{displayPrice}
-                              </span>
-                            </div>
-                            {hasDiscount && (
-                              <div className="flex items-center gap-2">
-                               
-                                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">
-                                  {hasDiscount}
+                              {hasDiscount ? (
+                                <>
+                                  <span className="text-lg font-bold text-primary">
+                                    ₹{displayPrice}
+                                  </span>
+                                  <span className="text-sm text-foreground/50 line-through">
+                                    ₹{hasDiscount}
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-lg font-bold text-primary">
+                                  ₹{displayPrice}
                                 </span>
-                              </div>
-                            )}
+                              )}
+                            </div>
+                            {hasDiscount && (() => {
+                              const originalPrice = parseFloat(hasDiscount);
+                              const discountedPrice = parseFloat(displayPrice);
+                              // Calculate discount percentage based on what % of original price you're paying
+                              const discountPercent = originalPrice > 0 && originalPrice > discountedPrice
+                                ? Math.floor((discountedPrice / originalPrice) * 100)
+                                : 0;
+                              return discountPercent > 0 ? (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold flex items-center gap-1">
+                                    <HiTag className="w-3 h-3" />
+                                    {discountPercent}% OFF
+                                  </span>
+                                </div>
+                              ) : null;
+                            })()}
                             <div className="flex items-center gap-1 mt-1 text-xs text-foreground/60">
                               <HiClock className="w-3 h-3" />
                               {service.duration || "60 min"}
@@ -706,7 +746,7 @@ console.log("selectedServices----",selectedServices)
                         )}
 
                         {/* Action Buttons */}
-                        <div className="flex gap-2">
+                        <div className="flex flex-col sm:flex-row gap-2">
                           {/* View Service Button */}
                           <Button
                             variant="outline"
@@ -714,7 +754,7 @@ console.log("selectedServices----",selectedServices)
                               setSelectedService(service);
                               setShowModal(true);
                             }}
-                            className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl font-medium text-sm transition-all duration-300 min-h-[40px]"
+                            className="w-full sm:w-1/2 flex items-center justify-center gap-2 h-10 rounded-xl font-medium text-sm transition-all duration-300 min-h-[40px]"
                           >
                             <HiSparkles className="w-3 h-3" />
                             View Service
@@ -729,7 +769,7 @@ console.log("selectedServices----",selectedServices)
                               }
                               toggleService(service);
                             }}
-                            className={`w-full flex items-center justify-center gap-2 h-10 rounded-xl font-medium text-sm transition-all duration-300 bg-gradient-to-r from-primary to-secondary hover:scale-105`}
+                            className={`w-full sm:w-1/2 flex items-center justify-center gap-2 h-10 rounded-xl font-medium text-sm transition-all duration-300 bg-gradient-to-r from-primary to-secondary hover:scale-105`}
                           >
                             {isSelected ? (
                               <>
@@ -888,7 +928,7 @@ console.log("selectedServices----",selectedServices)
             {/* Header */}
     
  
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-primary/10 rounded-2xl flex items-center justify-center">
                 <HiShoppingBag className="w-5 h-5 text-primary" />
               </div>
@@ -902,6 +942,31 @@ console.log("selectedServices----",selectedServices)
                 </p>
               </div>
             </div>
+
+            {/* Advance Booking Message */}
+            {getSetting("phone_number") && (
+              <motion.div
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-6 p-3 rounded-xl bg-blue-50 border border-blue-200"
+              >
+                <p className="text-xs text-foreground/70 leading-relaxed">
+                  <span className="font-semibold text-foreground">Please book in 2 days advance</span>
+                  {getSetting("phone_number") && (
+                    <>
+                      {" "}and if urgent then call{" "}
+                      <a 
+                        href={`tel:${getSetting("phone_number")}`}
+                        className="text-primary font-semibold hover:underline inline-flex items-center gap-1"
+                      >
+                        <HiPhone className="w-3 h-3" />
+                        {getSetting("phone_number")}
+                      </a>
+                    </>
+                  )}
+                </p>
+              </motion.div>
+            )}
 
            
             {/* Selected Services */}
@@ -1026,6 +1091,44 @@ console.log("selectedServices----",selectedServices)
                   return null;
                 })()} */}
                 
+                {/* Order Amount Discount Text */}
+                {getSetting("order_amount_discount_text") && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-4 p-3 rounded-xl bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20"
+                  >
+                    <p className="text-sm font-medium text-foreground text-center">
+                      {getSetting("order_amount_discount_text")}
+                    </p>
+                  </motion.div>
+                )}
+
+                {/* Minimum Order Amount Message - Show when button is disabled */}
+                {(() => {
+                  const minOrderAmount = parseFloat(getSetting("min_order_amount") || "0");
+                  const totalPrice = getTotalPrice();
+                  const isDisabled = totalPrice < minOrderAmount;
+                  
+                  return isDisabled && minOrderAmount > 0 ? (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200"
+                    >
+                      <p className="text-sm font-medium text-amber-800 flex items-start gap-2">
+                        <HiSparkles className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                        <span>
+                          Minimum ₹{minOrderAmount.toLocaleString()} order required. 
+                          <span className="block mt-1 text-amber-700 font-normal">
+                            Add ₹{(minOrderAmount - totalPrice).toLocaleString()} more to proceed.
+                          </span>
+                        </span>
+                      </p>
+                    </motion.div>
+                  ) : null;
+                })()}
+
                 <Button
                   onClick={() => {
                     // Get min and max service limits from settings
@@ -1047,11 +1150,11 @@ console.log("selectedServices----",selectedServices)
                     onServicesChange([...cartItems]);
                     onNext();
                   }}
-                  // disabled={(() => {
-                  //   const minService = parseInt(getSetting("min_service_book") || "1");
-                  //   const maxService = parseInt(getSetting("max_service_book") || "100");
-                  //   return cartItems.length < minService || cartItems.length > maxService;
-                  // })()}
+                  disabled={(() => {
+                    const minOrderAmount = parseFloat(getSetting("min_order_amount") || "0");
+                    const totalPrice = getTotalPrice();
+                    return totalPrice < minOrderAmount;
+                  })()}
                   className="w-full bg-primary text-white py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
                   Continue to Date & Time

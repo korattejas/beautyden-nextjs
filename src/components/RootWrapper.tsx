@@ -10,6 +10,7 @@ import CitySelectionPopup from "@/components/ui/CitySelectionPopup";
 import SplashScreen from "@/components/SplashScreen";
 import { City } from "@/types/city";
 import WhatsAppWidget from "./WhatsAppWidget";
+import FixedBookButton from "./ui/FixedBookButton";
 
 interface RootWrapperProps {
   children: ReactNode;
@@ -88,21 +89,22 @@ export default function RootWrapper({ children }: RootWrapperProps) {
       <QueryClientProvider client={queryClient}>
         <CityProvider>
           <CartProvider>
-          {/* Splash Screen */}
-          <AnimatePresence mode="wait">
-            {showSplash && (
-              <SplashScreen key="splash" onComplete={handleSplashComplete} />
-            )}
-          </AnimatePresence>
+            {/* Splash Screen */}
+            <AnimatePresence mode="wait">
+              {showSplash && (
+                <SplashScreen key="splash" onComplete={handleSplashComplete} />
+              )}
+            </AnimatePresence>
 
-          {/* Main Content */}
-          <AnimatePresence mode="wait">
-            {!showSplash && (
-              <div key="content">
-                <RootWrapperInner>{children}</RootWrapperInner>
-              </div>
-            )}
-          </AnimatePresence>
+            {/* Main Content */}
+            <AnimatePresence mode="wait">
+              {!showSplash && (
+                <div key="content">
+                  <FixedBookButton />
+                  <RootWrapperInner>{children}</RootWrapperInner>
+                </div>
+              )}
+            </AnimatePresence>
           </CartProvider>
         </CityProvider>
         <ReactQueryDevtools initialIsOpen={false} />

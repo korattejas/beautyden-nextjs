@@ -36,7 +36,11 @@ const BookingPageContent = () => {
   // Initialize bookingData.services from cart items on mount (only once)
   const [hasInitialized, setHasInitialized] = useState(false);
   useEffect(() => {
-    if (!hasInitialized && items.length > 0 && bookingData.services.length === 0) {
+    if (
+      !hasInitialized &&
+      items.length > 0 &&
+      bookingData.services.length === 0
+    ) {
       updateBookingData({ services: items });
       setHasInitialized(true);
     }
@@ -68,11 +72,14 @@ const BookingPageContent = () => {
       setCurrentStep(currentStep - 1);
     }
   };
-  console.log("bookingData----->>>",bookingData)
-  console.log("bookingData.services----->>>",bookingData.services)
-  console.log("bookingData.services.length----->>>",bookingData.services?.length)
-  console.log("cart items----->>>",items)
-  console.log("cart items.length----->>>",items?.length)
+  console.log("bookingData----->>>", bookingData);
+  console.log("bookingData.services----->>>", bookingData.services);
+  console.log(
+    "bookingData.services.length----->>>",
+    bookingData.services?.length
+  );
+  console.log("cart items----->>>", items);
+  console.log("cart items.length----->>>", items?.length);
 
   const renderStep = () => {
     switch (currentStep) {
@@ -144,28 +151,36 @@ const BookingPageContent = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 overflow-x-hidden">
       {/* Header */}
-      <section className="pt-24 pb-12 bg-gradient-to-br from-primary/10 to-secondary/10">
+      <section className="pt-28 pb-20 bg-white">
         <Container>
-          <div className="text-center max-w-3xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto">
             <motion.h1
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 25 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="font-heading text-4xl md:text-5xl font-bold mb-4"
+              transition={{ duration: 0.7 }}
+              className="font-heading text-4xl md:text-6xl font-semibold text-gray-900 tracking-tight"
             >
-              <span className="text-foreground">Book Your</span>
-              <br />
-              <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Book Your
+              <span className="block mt-2 bg-gradient-to-r from-black to-gray-600 bg-clip-text text-transparent">
                 Beauty Service
               </span>
             </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+
+            {/* Apple-style thin gradient line */}
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-xl text-foreground/70"
+              className="h-[2px] w-24 mx-auto mt-4 bg-gradient-to-r from-gray-900/80 to-gray-400/60 rounded-full"
+            />
+
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.3 }}
+              className="text-lg md:text-xl text-gray-600 mt-6"
             >
-              Professional beauty services delivered to your doorstep
+              Professional beauty services delivered to your doorstep.
             </motion.p>
           </div>
         </Container>
