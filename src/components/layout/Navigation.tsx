@@ -46,6 +46,19 @@ const Navigation = () => {
   const [showCartDropdown, setShowCartDropdown] = useState(false);
   const cartRef = useRef<HTMLDivElement>(null);
 
+  // Calculate approximate total price (parse prices correctly)
+  const calculateApproxTotal = () => {
+    return items.reduce((total, item) => {
+      const priceStr = item.discount_price || item.price || "0";
+      // Extract first number from price string (handles "300" or "300-500" format)
+      const priceMatch = priceStr.toString().match(/(\d+)/);
+      const price = priceMatch ? parseFloat(priceMatch[1]) : 0;
+      return total + price;
+    }, 0);
+  };
+
+  const approxTotal = calculateApproxTotal();
+
   // Fetch service categories
   const { data: categoriesData } = useServiceCategories();
   const categories = categoriesData?.data || [];
@@ -486,7 +499,12 @@ const Navigation = () => {
                               </div>
                               <div className="text-right flex-shrink-0">
                                 <div className="text-sm font-semibold text-gray-900">
-                                  ₹{it.discount_price ?? it.price}
+                                  ₹{(() => {
+                                    const priceStr = (it.discount_price || it.price || "0").toString();
+                                    const priceMatch = priceStr.match(/(\d+)/);
+                                    const price = priceMatch ? parseFloat(priceMatch[1]) : 0;
+                                    return price.toLocaleString();
+                                  })()}
                                 </div>
                                 <button
                                   onClick={() => removeItem(it.id)}
@@ -499,10 +517,10 @@ const Navigation = () => {
                           ))}
                         </div>
                       )}
-                      {/* <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                        <div className="text-sm font-semibold text-gray-900">Total</div>
-                        <div className="text-sm font-bold text-primary">₹{totalPrice.toLocaleString()}</div>
-                      </div> */}
+                      <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+                        <div className="text-sm font-semibold text-gray-900">Approx Total</div>
+                        <div className="text-sm font-bold text-primary">₹{approxTotal.toLocaleString()}</div>
+                      </div>
                       <div className="mt-3 grid grid-cols-1 gap-2">
                         <Link
                           href="/book"
@@ -634,10 +652,12 @@ const Navigation = () => {
                               </div>
                               <div className="text-right flex-shrink-0">
                                 <div className="text-sm font-semibold text-gray-900">
-                                  ₹
-                                  {(
-                                    it.discount_price ?? it.price
-                                  ).toLocaleString()}
+                                  ₹{(() => {
+                                    const priceStr = (it.discount_price || it.price || "0").toString();
+                                    const priceMatch = priceStr.match(/(\d+)/);
+                                    const price = priceMatch ? parseFloat(priceMatch[1]) : 0;
+                                    return price.toLocaleString();
+                                  })()}
                                 </div>
                                 <button
                                   onClick={() => removeItem(it.id)}
@@ -652,10 +672,10 @@ const Navigation = () => {
                       )}
                       <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
                         <div className="text-sm font-semibold text-gray-900">
-                          Total
+                          Approx Total
                         </div>
                         <div className="text-sm font-bold text-primary">
-                          ₹{totalPrice.toLocaleString()}
+                          ₹{approxTotal.toLocaleString()}
                         </div>
                       </div>
                       <div className="mt-3 grid grid-cols-2 gap-2">

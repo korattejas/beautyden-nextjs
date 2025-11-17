@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import {
@@ -232,6 +232,32 @@ const ServiceSelection = ({
     return () => window.removeEventListener("bd-auth-changed", onAuthChanged as EventListener);
   }, []);
 
+  // Sync selectedServices with cartItems when cart changes externally (e.g., from header)
+  // This ensures that when items are removed from header cart, selectedServices also updates
+  // Use a ref to track if we're currently updating from within this component
+  const isInternalUpdate = useRef(false);
+  
+  useEffect(() => {
+    // Skip sync if this is an internal update (from toggleService or removeService)
+    if (isInternalUpdate.current) {
+      isInternalUpdate.current = false;
+      return;
+    }
+    
+    // Only sync if cart and selectedServices are out of sync
+    const cartItemIds = new Set(cartItems.map(item => item.id));
+    const selectedServiceIds = new Set(selectedServices.map(item => item.id));
+    
+    const hasMissingInSelected = cartItems.some(item => !selectedServiceIds.has(item.id));
+    const hasExtraInSelected = selectedServices.some(item => !cartItemIds.has(item.id));
+    
+    // Only sync if cart was modified externally (items removed or added outside this component)
+    if (hasMissingInSelected || hasExtraInSelected) {
+      // Update selectedServices to match cartItems
+      onServicesChange([...cartItems]);
+    }
+  }, [cartItems, selectedServices, onServicesChange]);
+
   // Build filters for API call
   const filters = {
     page: currentPage,
@@ -274,6 +300,9 @@ console.log("selectedServices----",selectedServices)
 
     // Mark as processed to avoid re-adding on user removal
     setHasProcessedPreSelected(true);
+
+    // Mark as internal update to prevent sync effect from running
+    isInternalUpdate.current = true;
 
     // If already in cart, sync to selected and exit
     const alreadyInCart = cartItems.find((s) => s.id === preSelectedServiceId);
@@ -356,6 +385,9 @@ console.log("selectedServices----",selectedServices)
 
     const isSelected = cartItems.find((s) => s.id === bookingService.id);
 
+    // Mark as internal update to prevent sync effect from running
+    isInternalUpdate.current = true;
+
     if (isSelected) {
       // Remove from cart immediately
       removeItem(bookingService.id);
@@ -372,6 +404,8 @@ console.log("selectedServices----",selectedServices)
   };
 
   const removeService = (serviceId: string) => {
+    // Mark as internal update to prevent sync effect from running
+    isInternalUpdate.current = true;
     // Remove from cart first
     removeItem(serviceId);
     // Remove from selected services
@@ -1044,6 +1078,14 @@ console.log("selectedServices----",selectedServices)
                     </span>
                     <span className="font-medium text-foreground text-sm">
                       {getTotalDuration()} min
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm text-foreground/70">
+                      Approx Total:
+                    </span>
+                    <span className="font-medium text-foreground text-sm">
+                      ₹{getTotalPrice().toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between items-center mb-4">
