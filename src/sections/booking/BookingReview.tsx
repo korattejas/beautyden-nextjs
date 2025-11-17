@@ -373,6 +373,12 @@ const BookingReview = ({
                   {getTotalDuration()} min
                 </span>
               </div>
+              <div className="flex justify-between items-center">
+                <span className="text-foreground/70">Approx Total</span>
+                <span className="font-semibold text-foreground">
+                  ₹{getTotalPrice().toLocaleString()}
+                </span>
+              </div>
               {/* <div className="flex justify-between items-center border-t border-primary/20 pt-3">
                 <span className="text-foreground/70">Subtotal</span>
                 <span className="font-semibold text-foreground">
