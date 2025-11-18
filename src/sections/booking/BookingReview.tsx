@@ -16,6 +16,7 @@ import Button from "@/components/ui/Button";
 import { BookingFormData } from "@/types/booking";
 import { bookAppointment } from "@/services/booking.service";
 import { useCart } from "@/contexts/CartContext";
+import { useSettings } from "@/hooks/useApi";
 
 interface BookingReviewProps {
   bookingData: BookingFormData;
@@ -32,6 +33,41 @@ const BookingReview = ({
   const [paymentMethod] = useState("pay_after_service"); // For now, only pay after service
   const router = useRouter();
   const { clearCart, items: cartItems } = useCart();
+  const { data: settingsData } = useSettings();
+  const settings = settingsData?.data || [];
+
+  const getSetting = (key: string) => {
+    return settings.find((setting: any) => setting.key === key)?.value || "";
+  };
+
+  const parseNumberFromSetting = (
+    value: string | number | undefined,
+    fallback = 0
+  ) => {
+    if (value === undefined || value === null) return fallback;
+    const cleaned = value.toString().replace(/[^\d.]/g, "");
+    const parsed = parseFloat(cleaned);
+    return Number.isNaN(parsed) ? fallback : parsed;
+  };
+
+  const specialOfferPercentageSetting = getSetting("special_offer_percentage");
+  const specialOfferThresholdSetting = getSetting(
+    "special_offer_above_order_discount_amount"
+  );
+  const specialOfferPercentage = parseNumberFromSetting(
+    specialOfferPercentageSetting,
+    0
+  );
+  const specialOfferThreshold = parseNumberFromSetting(
+    specialOfferThresholdSetting,
+    0
+  );
+
+  const getSpecialOfferDiscount = (amount: number) => {
+    if (!specialOfferPercentage || !specialOfferThreshold) return 0;
+    if (amount < specialOfferThreshold) return 0;
+    return Math.round((amount * specialOfferPercentage) / 100);
+  };
 
   // Debug logging
   console.log("BookingReview - bookingData:", bookingData);
@@ -73,9 +109,9 @@ const BookingReview = ({
     return priceMatch ? parseInt(priceMatch[1]) : 0;
   };
 
-  // Helper function to get display price (use discount_price if available, otherwise original price)
+  // Helper function to get display price (use current price if available, otherwise fallback)
   const getDisplayPrice = (service: any): string => {
-    return service.discount_price || service.price;
+    return service.price || service.discount_price || "0";
   };
 
   const getTotalPrice = () => {
@@ -85,9 +121,32 @@ const BookingReview = ({
     }, 0);
   };
 
+  const baseTotalPrice = getTotalPrice();
+  const specialOfferDiscountAmount = getSpecialOfferDiscount(baseTotalPrice);
+  const payableAfterSpecialOffer = Math.max(
+    baseTotalPrice - specialOfferDiscountAmount,
+    0
+  );
+  const specialOfferLabel =
+    specialOfferPercentageSetting ||
+    (specialOfferPercentage ? `${specialOfferPercentage}%` : "");
+
   const getTotalDuration = () => {
-    // Simple duration calculation - sum all service durations
-    return servicesToUse.length * 60; // Assuming 60 minutes per service
+    return servicesToUse.reduce((total, service) => {
+      const durationMatch = service.duration
+        ?.toString()
+        .match(/(\d+)/);
+      const duration = durationMatch ? parseInt(durationMatch[1]) : 60;
+      return total + duration;
+    }, 0);
+  };
+
+  const formatDuration = (totalMinutes: number) => {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    if (hours && minutes) return `${hours} h ${minutes} min`;
+    if (hours) return `${hours} h`;
+    return `${minutes} min`;
   };
 
   const formatDate = (dateString: string) => {
@@ -120,14 +179,25 @@ const BookingReview = ({
       console.log("servicesToUse",servicesToUse)
 
       // Prepare payload
-      const serviceIds = servicesToUse.map(service => service.id).join(',');
-      const serviceCategoryId = servicesToUse[0]?.category_id || '1';
-      const totalPrice = getTotalPrice();
-      const totalDiscount = servicesToUse.reduce((total, service) => {
-        const originalPrice = parseFloat(service.price);
-        const discountPrice = service.discount_price ? parseFloat(service.discount_price) : originalPrice;
-        return total + (originalPrice - discountPrice);
+      const serviceIds = servicesToUse.map((service) => service.id).join(",");
+      const serviceCategoryId = servicesToUse[0]?.category_id || "1";
+      const calculatedBaseTotal = getTotalPrice();
+      const specialOfferDiscountValue =
+        getSpecialOfferDiscount(calculatedBaseTotal);
+      const totalPrice = Math.max(
+        calculatedBaseTotal - specialOfferDiscountValue,
+        0
+      );
+      const serviceLevelDiscount = servicesToUse.reduce((total, service) => {
+        const originalPriceStr = service.discount_price || service.price || "0";
+        const discountedPriceStr = service.price || service.discount_price || "0";
+        const originalPrice = parseFloat(originalPriceStr);
+        const discountedPrice = parseFloat(discountedPriceStr);
+        const diff = originalPrice > discountedPrice ? originalPrice - discountedPrice : 0;
+        return total + diff;
       }, 0);
+      const combinedDiscount =
+        serviceLevelDiscount + specialOfferDiscountValue;
 
       const payload = {
         first_name: bookingData.firstName,
@@ -141,7 +211,9 @@ const BookingReview = ({
         notes: bookingData.specialNotes || '',
         quantity: servicesToUse.length,
         price: totalPrice,
-        discount_price: totalDiscount > 0 ? totalDiscount : undefined,
+        discount_price: combinedDiscount > 0 ? combinedDiscount : undefined,
+        special_offer_discount:
+          specialOfferDiscountValue > 0 ? specialOfferDiscountValue : undefined,
         service_address: bookingData.address,
         service_sub_category_id: undefined,
       };
@@ -173,7 +245,11 @@ const BookingReview = ({
       // Use a simple success message instead of the complex HTML from API
       const message = "Booking successful! We'll contact you shortly to confirm your appointment.";
       
-      router.push(`/thank-you?orderNumber=${orderNumber}&message=${encodeURIComponent(message)}`);
+      router.push(
+        `/thank-you?orderNumber=${encodeURIComponent(
+          orderNumber
+        )}&message=${encodeURIComponent(message)}`
+      );
       
     } catch (error: any) {
       console.error("Booking error:", error);
@@ -238,21 +314,48 @@ const BookingReview = ({
                   </div>
                   {/* <p className="font-bold text-foreground">₹{service.price}</p> */}
                   <div className="text-right self-start">
-          {service?.discount_price ? (
-            <div className="flex flex-row gap-1 self-start items-end">
-              <span className="font-bold text-foreground">
-                Start ₹{service?.discount_price}
-              </span>
-              <span className="text-sm text-foreground/60 line-through">
-                ₹{service.price}
-              </span>
-            </div>
-          ) : (
-            <span className="font-bold text-foreground">
-              Start ₹{service.price}
-            </span>
-          )}
-        </div>
+                    {service?.discount_price ? (
+                      <div className="flex flex-row gap-1 self-start items-end">
+                        <span className="font-bold text-foreground">
+                          Start ₹
+                          {(() => {
+                            const priceMatch = service.price
+                              ?.toString()
+                              .match(/(\d+)/);
+                            const price = priceMatch
+                              ? parseFloat(priceMatch[1])
+                              : 0;
+                            return price.toLocaleString();
+                          })()}
+                        </span>
+                        <span className="text-sm text-foreground/60 line-through">
+                          ₹
+                          {(() => {
+                            const priceMatch = service.discount_price
+                              ?.toString()
+                              .match(/(\d+)/);
+                            const price = priceMatch
+                              ? parseFloat(priceMatch[1])
+                              : 0;
+                            return price.toLocaleString();
+                          })()}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="font-bold text-foreground">
+                        Start ₹
+                        {(() => {
+                          const priceMatch = service.price
+                            ?.toString()
+                            .match(/(\d+)/);
+                          const price = priceMatch
+                            ? parseFloat(priceMatch[1])
+                            : 0;
+                          return price.toLocaleString();
+                        })()}
+                      </span>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -370,13 +473,31 @@ const BookingReview = ({
               <div className="flex justify-between items-center">
                 <span className="text-foreground/70">Estimated Duration</span>
                 <span className="font-semibold text-foreground">
-                  {getTotalDuration()} min
+                  {formatDuration(getTotalDuration())}
                 </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-foreground/70">Approx Total</span>
                 <span className="font-semibold text-foreground">
-                  ₹{getTotalPrice().toLocaleString()}
+                  ₹{baseTotalPrice.toLocaleString()}
+                </span>
+              </div>
+              {specialOfferDiscountAmount > 0 && (
+                <div className="flex justify-between items-center text-green-700">
+                  <span className="text-sm font-medium">
+                    Special Offer ({specialOfferLabel || `${specialOfferPercentage}%`})
+                  </span>
+                  <span className="text-sm font-semibold">
+                    -₹{specialOfferDiscountAmount.toLocaleString()}
+                  </span>
+                </div>
+              )}
+              <div className="flex justify-between items-center border-t border-primary/20 pt-3">
+                <span className="text-foreground font-semibold">
+                  Payable Amount
+                </span>
+                <span className="text-xl font-bold text-primary">
+                  ₹{payableAfterSpecialOffer.toLocaleString()}
                 </span>
               </div>
               {/* <div className="flex justify-between items-center border-t border-primary/20 pt-3">
@@ -385,10 +506,10 @@ const BookingReview = ({
                   ₹{getTotalPrice()}
                 </span>
               </div> */}
-              <div className="flex justify-between items-center">
+              {/* <div className="flex justify-between items-center">
                 <span className="text-foreground/70">Service Charge</span>
                 <span className="font-semibold text-foreground">₹0</span>
-              </div>
+              </div> */}
             </div>
 
             {/* Total */}

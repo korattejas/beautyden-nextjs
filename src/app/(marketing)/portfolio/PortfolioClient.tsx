@@ -24,6 +24,7 @@ const PortfolioClient = ({ portfolioItems }: PortfolioClientProps) => {
   const [missingImages, setMissingImages] = useState<string[]>([]);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const loadingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const filteredItems = useMemo(() => {
     if (!missingImages.length) return portfolioItems;
@@ -48,27 +49,28 @@ const PortfolioClient = ({ portfolioItems }: PortfolioClientProps) => {
     }, 500);
   }, [filteredItems.length, isLoadingMore, visibleCount]);
 
-  const handleScroll = useCallback(() => {
-    if (typeof window === "undefined") return;
+  useEffect(() => {
+    if (!sentinelRef.current) return;
 
-    const threshold = Math.max(
-      document.documentElement.scrollHeight - window.innerHeight - 1000,
-      0
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting) {
+          loadMoreItems();
+        }
+      },
+      { rootMargin: "200px 0px 200px 0px" }
     );
 
-    if (window.scrollY >= threshold) {
-      loadMoreItems();
-    }
-  }, [loadMoreItems]);
+    const current = sentinelRef.current;
+    observer.observe(current);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    window.addEventListener("scroll", handleScroll);
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      if (current) {
+        observer.unobserve(current);
+      }
     };
-  }, [handleScroll]);
+  }, [loadMoreItems]);
 
   useEffect(() => {
     return () => {
@@ -157,14 +159,22 @@ const PortfolioClient = ({ portfolioItems }: PortfolioClientProps) => {
               );
             })}
           </div>
+
+          <div
+            ref={sentinelRef}
+            className="mt-10 flex min-h-[4rem] items-center justify-center"
+          >
+            {visibleItems.length < filteredItems.length && (
+              <div
+                className={`h-10 w-10 rounded-full border-4 border-primary/20 border-t-primary transition-opacity duration-300 ${
+                  isLoadingMore ? "opacity-100 animate-spin" : "opacity-0"
+                }`}
+                aria-label={isLoadingMore ? "Loading more looks" : undefined}
+              />
+            )}
+          </div>
         </Container>
       </section>
-
-      {isLoadingMore && visibleItems.length < filteredItems.length && (
-        <div className="flex justify-center py-10">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
-        </div>
-      )}
 
       {activeIndex !== null && (
         <Lightbox
