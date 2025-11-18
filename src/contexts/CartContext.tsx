@@ -63,7 +63,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const totalItems = items.length;
   const totalPrice = useMemo(() => {
     return items.reduce((sum: number, s) => {
-      const priceStr = s.discount_price || s.price || "0";
+      const priceStr = s.price || s.discount_price || "0";
       // Extract first number from price string (handles "300" or "300-500" format)
       const priceMatch = priceStr.toString().match(/(\d+)/);
       const price = priceMatch ? parseFloat(priceMatch[1]) : 0;

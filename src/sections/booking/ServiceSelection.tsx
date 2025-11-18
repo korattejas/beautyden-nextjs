@@ -274,13 +274,47 @@ console.log("selectedServices----",selectedServices)
   const { data: categoriesData, isLoading: categoriesLoading } =
     useServiceCategories();
 
-    const { data: settingsData, isLoading: settingsLoading } = useSettings();
-    const settings = settingsData?.data || [];
-  
-    // Helper function to get setting value by key
-    const getSetting = (key: string) => {
-      return settings.find((setting) => setting.key === key)?.value || "";
-    };
+  const { data: settingsData, isLoading: settingsLoading } = useSettings();
+  const settings = settingsData?.data || [];
+
+  // Helper function to get setting value by key
+  const getSetting = (key: string) => {
+    return settings.find((setting) => setting.key === key)?.value || "";
+  };
+
+  const parseNumberFromSetting = (value: string | number | undefined, fallback = 0) => {
+    if (value === undefined || value === null) return fallback;
+    const cleaned = value.toString().replace(/[^\d.]/g, "");
+    const parsed = parseFloat(cleaned);
+    return Number.isNaN(parsed) ? fallback : parsed;
+  };
+
+  const advanceBookingDays = (() => {
+    const parsed = parseInt(
+      (getSetting("advance_book_day") || "").toString().replace(/[^\d]/g, ""),
+      10
+    );
+    return Number.isNaN(parsed) ? 2 : parsed;
+  })();
+
+  const specialOfferPercentageSetting = getSetting("special_offer_percentage");
+  const specialOfferThresholdSetting = getSetting(
+    "special_offer_above_order_discount_amount"
+  );
+  const specialOfferPercentage = parseNumberFromSetting(
+    specialOfferPercentageSetting,
+    0
+  );
+  const specialOfferThreshold = parseNumberFromSetting(
+    specialOfferThresholdSetting,
+    0
+  );
+
+  const getSpecialOfferDiscount = (amount: number) => {
+    if (!specialOfferPercentage || !specialOfferThreshold) return 0;
+    if (amount < specialOfferThreshold) return 0;
+    return Math.round((amount * specialOfferPercentage) / 100);
+  };
   
 
   // Fix: Access nested data structure correctly
@@ -421,9 +455,9 @@ console.log("selectedServices----",selectedServices)
     return priceMatch ? parseInt(priceMatch[1]) : 0;
   };
 
-  // Helper function to get display price (use discount_price if available, otherwise original price)
+  // Helper function to get display price (use current price if available, otherwise fallback to discount/original price)
   const getDisplayPrice = (service: BookingService): string => {
-    return service.discount_price || service.price;
+    return service.price || service.discount_price || "0";
   };
 
   const getTotalPrice = () => {
@@ -435,10 +469,29 @@ console.log("selectedServices----",selectedServices)
 
   const getTotalDuration = () => {
     return cartItems.reduce((total, service) => {
-      const duration = parseInt(service.duration) || 60;
+      const durationMatch = service.duration?.toString().match(/(\d+)/);
+      const duration = durationMatch ? parseInt(durationMatch[1]) : 60;
       return total + duration;
     }, 0);
   };
+
+  const formatDuration = (totalMinutes: number) => {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    if (hours && minutes) return `${hours} h ${minutes} min`;
+    if (hours) return `${hours} h`;
+    return `${minutes} min`;
+  };
+
+  const cartTotal = getTotalPrice();
+  const specialOfferDiscountAmount = getSpecialOfferDiscount(cartTotal);
+  const payableAfterSpecialOffer = Math.max(
+    cartTotal - specialOfferDiscountAmount,
+    0
+  );
+  const specialOfferLabel =
+    specialOfferPercentageSetting ||
+    (specialOfferPercentage ? `${specialOfferPercentage}%` : "");
 
   if (servicesLoading || categoriesLoading) {
     return (
@@ -673,11 +726,11 @@ console.log("selectedServices----",selectedServices)
                 className="grid grid-cols-1 md:grid-cols-2 gap-4"
               >
                 {/* cart header */}
-                           <MobileCartHeader
+                           {/* <MobileCartHeader
   totalItems={totalItems}
   totalPrice={getTotalPrice()}
   onNext={onNext}
-/>
+/> */}
                 {services.map((service, index) => {
                   const isSelected = cartItems.find(
                     (s) => s.id === service.id.toString()
@@ -985,7 +1038,10 @@ console.log("selectedServices----",selectedServices)
                 className="mb-6 p-3 rounded-xl bg-blue-50 border border-blue-200"
               >
                 <p className="text-xs text-foreground/70 leading-relaxed">
-                  <span className="font-semibold text-foreground">Please book in 2 days advance</span>
+                  <span className="font-semibold text-foreground">
+                    Please book in {advanceBookingDays}{" "}
+                    {advanceBookingDays === 1 ? "day" : "days"} advance
+                  </span>
                   {getSetting("phone_number") && (
                     <>
                       {" "}and if urgent then call{" "}
@@ -1037,9 +1093,49 @@ console.log("selectedServices----",selectedServices)
                         <p className="text-xs text-foreground/60">
                           {service.duration}
                         </p>
-                        <p className="text-sm font-bold text-primary">
-                          ₹{getDisplayPrice(service)}
-                        </p>
+                        <div className="text-sm font-bold text-primary">
+                          {service.discount_price ? (
+                            <div className="flex items-end gap-1">
+                              <span>
+                                ₹
+                                {(() => {
+                                  const priceMatch = service.price
+                                    ?.toString()
+                                    .match(/(\d+)/);
+                                  const price = priceMatch
+                                    ? parseFloat(priceMatch[1])
+                                    : 0;
+                                  return price.toLocaleString();
+                                })()}
+                              </span>
+                              <span className="text-xs text-foreground/60 line-through">
+                                ₹
+                                {(() => {
+                                  const priceMatch = service.discount_price
+                                    ?.toString()
+                                    .match(/(\d+)/);
+                                  const price = priceMatch
+                                    ? parseFloat(priceMatch[1])
+                                    : 0;
+                                  return price.toLocaleString();
+                                })()}
+                              </span>
+                            </div>
+                          ) : (
+                            <span>
+                              ₹
+                              {(() => {
+                                const priceMatch = service.price
+                                  ?.toString()
+                                  .match(/(\d+)/);
+                                const price = priceMatch
+                                  ? parseFloat(priceMatch[1])
+                                  : 0;
+                                return price.toLocaleString();
+                              })()}
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <button
                         onClick={(e) => {
@@ -1077,7 +1173,7 @@ console.log("selectedServices----",selectedServices)
                       Duration:
                     </span>
                     <span className="font-medium text-foreground text-sm">
-                      {getTotalDuration()} min
+                      {formatDuration(getTotalDuration())}
                     </span>
                   </div>
                   <div className="flex justify-between items-center mb-2">
@@ -1085,9 +1181,19 @@ console.log("selectedServices----",selectedServices)
                       Approx Total:
                     </span>
                     <span className="font-medium text-foreground text-sm">
-                      ₹{getTotalPrice().toLocaleString()}
+                    ₹{cartTotal.toLocaleString()}
                     </span>
                   </div>
+                {specialOfferDiscountAmount > 0 && (
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-sm font-medium text-green-700">
+                      Special Offer ({specialOfferLabel || `${specialOfferPercentage}%`})
+                    </span>
+                    <span className="text-sm font-semibold text-green-700">
+                      -₹{specialOfferDiscountAmount.toLocaleString()}
+                    </span>
+                  </div>
+                )}
                   <div className="flex justify-between items-center mb-4">
                     <span className="text-sm text-foreground/70">
                       Services:
@@ -1096,14 +1202,14 @@ console.log("selectedServices----",selectedServices)
                       {totalItems}
                     </span>
                   </div>
-                  {/* <div className="flex justify-between items-center">
-                    <span className="font-semibold text-foreground">
-                      Total:
-                    </span>
-                    <span className="text-xl font-bold text-primary">
-                      ₹{getTotalPrice().toLocaleString()}
-                    </span>
-                  </div> */}
+                <div className="flex justify-between items-center pt-2 border-t border-border">
+                  <span className="font-semibold text-foreground">
+                    Estimated Payable:
+                  </span>
+                  <span className="text-xl font-bold text-primary">
+                    ₹{payableAfterSpecialOffer.toLocaleString()}
+                  </span>
+                </div>
                 </div>
 
                 {/* Validation Message */}
@@ -1149,7 +1255,7 @@ console.log("selectedServices----",selectedServices)
                 {/* Minimum Order Amount Message - Show when button is disabled */}
                 {(() => {
                   const minOrderAmount = parseFloat(getSetting("min_order_amount") || "0");
-                  const totalPrice = getTotalPrice();
+                  const totalPrice = cartTotal;
                   const isDisabled = totalPrice < minOrderAmount;
                   
                   return isDisabled && minOrderAmount > 0 ? (
@@ -1194,7 +1300,7 @@ console.log("selectedServices----",selectedServices)
                   }}
                   disabled={(() => {
                     const minOrderAmount = parseFloat(getSetting("min_order_amount") || "0");
-                    const totalPrice = getTotalPrice();
+                    const totalPrice = cartTotal;
                     return totalPrice < minOrderAmount;
                   })()}
                   className="w-full bg-primary text-white py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"

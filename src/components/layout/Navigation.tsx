@@ -21,7 +21,7 @@ import {
 import Image from "next/image";
 import { useCityContext } from "@/contexts/CityContext";
 import { useCart } from "@/contexts/CartContext";
-import { useServiceCategories } from "@/hooks/useApi";
+import { useServiceCategories, useSettings } from "@/hooks/useApi";
 import AuthModal from "@/components/ui/AuthModal";
 
 const Navigation = () => {
@@ -45,12 +45,27 @@ const Navigation = () => {
   const { totalItems, items, totalPrice, removeItem } = useCart();
   const [showCartDropdown, setShowCartDropdown] = useState(false);
   const cartRef = useRef<HTMLDivElement>(null);
+  const { data: settingsData } = useSettings();
+  const settings = settingsData?.data || [];
 
-  // Calculate approximate total price (parse prices correctly)
+  const getSetting = (key: string) => {
+    return settings.find((setting: any) => setting.key === key)?.value || "";
+  };
+
+  const parseNumberFromSetting = (
+    value: string | number | undefined,
+    fallback = 0
+  ) => {
+    if (value === undefined || value === null) return fallback;
+    const cleaned = value.toString().replace(/[^\d.]/g, "");
+    const parsed = parseFloat(cleaned);
+    return Number.isNaN(parsed) ? fallback : parsed;
+  };
+
+  // Calculate approximate total price (parse prices correctly, base on current price)
   const calculateApproxTotal = () => {
     return items.reduce((total, item) => {
-      const priceStr = item.discount_price || item.price || "0";
-      // Extract first number from price string (handles "300" or "300-500" format)
+      const priceStr = item.price || item.discount_price || "0";
       const priceMatch = priceStr.toString().match(/(\d+)/);
       const price = priceMatch ? parseFloat(priceMatch[1]) : 0;
       return total + price;
@@ -58,6 +73,31 @@ const Navigation = () => {
   };
 
   const approxTotal = calculateApproxTotal();
+  const specialOfferPercentageSetting = getSetting("special_offer_percentage");
+  const specialOfferThresholdSetting = getSetting(
+    "special_offer_above_order_discount_amount"
+  );
+  const specialOfferPercentage = parseNumberFromSetting(
+    specialOfferPercentageSetting,
+    0
+  );
+  const specialOfferThreshold = parseNumberFromSetting(
+    specialOfferThresholdSetting,
+    0
+  );
+  const getSpecialOfferDiscount = (amount: number) => {
+    if (!specialOfferPercentage || !specialOfferThreshold) return 0;
+    if (amount < specialOfferThreshold) return 0;
+    return Math.round((amount * specialOfferPercentage) / 100);
+  };
+  const specialOfferDiscountAmount = getSpecialOfferDiscount(approxTotal);
+  const payableAfterSpecialOffer = Math.max(
+    approxTotal - specialOfferDiscountAmount,
+    0
+  );
+  const specialOfferLabel =
+    specialOfferPercentageSetting ||
+    (specialOfferPercentage ? `${specialOfferPercentage}%` : "");
 
   // Fetch service categories
   const { data: categoriesData } = useServiceCategories();
@@ -499,12 +539,50 @@ const Navigation = () => {
                               </div>
                               <div className="text-right flex-shrink-0">
                                 <div className="text-sm font-semibold text-gray-900">
-                                  ₹{(() => {
-                                    const priceStr = (it.discount_price || it.price || "0").toString();
-                                    const priceMatch = priceStr.match(/(\d+)/);
-                                    const price = priceMatch ? parseFloat(priceMatch[1]) : 0;
-                                    return price.toLocaleString();
-                                  })()}
+                                  {it.discount_price ? (
+                                    <div className="flex flex-col items-end gap-0.5">
+                                      <span className="text-sm font-semibold text-primary">
+                                        ₹
+                                        {(() => {
+                                          const priceStr =
+                                            (it.price || "0").toString();
+                                          const priceMatch =
+                                            priceStr.match(/(\d+)/);
+                                          const price = priceMatch
+                                            ? parseFloat(priceMatch[1])
+                                            : 0;
+                                          return price.toLocaleString();
+                                        })()}
+                                      </span>
+                                      <span className="text-xs text-gray-500 line-through">
+                                        ₹
+                                        {(() => {
+                                          const priceStr =
+                                            (it.discount_price || "0").toString();
+                                          const priceMatch =
+                                            priceStr.match(/(\d+)/);
+                                          const price = priceMatch
+                                            ? parseFloat(priceMatch[1])
+                                            : 0;
+                                          return price.toLocaleString();
+                                        })()}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    <span>
+                                      ₹
+                                      {(() => {
+                                        const priceStr =
+                                          (it.price || "0").toString();
+                                        const priceMatch =
+                                          priceStr.match(/(\d+)/);
+                                        const price = priceMatch
+                                          ? parseFloat(priceMatch[1])
+                                          : 0;
+                                        return price.toLocaleString();
+                                      })()}
+                                    </span>
+                                  )}
                                 </div>
                                 <button
                                   onClick={() => removeItem(it.id)}
@@ -517,9 +595,35 @@ const Navigation = () => {
                           ))}
                         </div>
                       )}
-                      <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                        <div className="text-sm font-semibold text-gray-900">Approx Total</div>
-                        <div className="text-sm font-bold text-primary">₹{approxTotal.toLocaleString()}</div>
+                      <div className="mt-4 pt-4 border-t border-gray-100 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <div className="text-sm font-semibold text-gray-900">
+                            Approx Total
+                          </div>
+                          <div className="text-sm font-bold text-primary">
+                            ₹{approxTotal.toLocaleString()}
+                          </div>
+                        </div>
+                        {specialOfferDiscountAmount > 0 && (
+                          <>
+                            <div className="flex items-center justify-between text-green-700 text-xs font-semibold">
+                              <span>
+                                Special Offer ({specialOfferLabel || `${specialOfferPercentage}%`})
+                              </span>
+                              <span>
+                                -₹{specialOfferDiscountAmount.toLocaleString()}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <div className="text-sm font-semibold text-gray-900">
+                                Payable
+                              </div>
+                              <div className="text-sm font-bold text-primary">
+                                ₹{payableAfterSpecialOffer.toLocaleString()}
+                              </div>
+                            </div>
+                          </>
+                        )}
                       </div>
                       <div className="mt-3 grid grid-cols-1 gap-2">
                         <Link
@@ -652,12 +756,50 @@ const Navigation = () => {
                               </div>
                               <div className="text-right flex-shrink-0">
                                 <div className="text-sm font-semibold text-gray-900">
-                                  ₹{(() => {
-                                    const priceStr = (it.discount_price || it.price || "0").toString();
-                                    const priceMatch = priceStr.match(/(\d+)/);
-                                    const price = priceMatch ? parseFloat(priceMatch[1]) : 0;
-                                    return price.toLocaleString();
-                                  })()}
+                                  {it.discount_price ? (
+                                    <div className="flex flex-col items-end gap-0.5">
+                                      <span className="text-sm font-semibold text-primary">
+                                        ₹
+                                        {(() => {
+                                          const priceStr =
+                                            (it.price || "0").toString();
+                                          const priceMatch =
+                                            priceStr.match(/(\d+)/);
+                                          const price = priceMatch
+                                            ? parseFloat(priceMatch[1])
+                                            : 0;
+                                          return price.toLocaleString();
+                                        })()}
+                                      </span>
+                                      <span className="text-xs text-gray-500 line-through">
+                                        ₹
+                                        {(() => {
+                                          const priceStr =
+                                            (it.discount_price || "0").toString();
+                                          const priceMatch =
+                                            priceStr.match(/(\d+)/);
+                                          const price = priceMatch
+                                            ? parseFloat(priceMatch[1])
+                                            : 0;
+                                          return price.toLocaleString();
+                                        })()}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    <span>
+                                      ₹
+                                      {(() => {
+                                        const priceStr =
+                                          (it.price || "0").toString();
+                                        const priceMatch =
+                                          priceStr.match(/(\d+)/);
+                                        const price = priceMatch
+                                          ? parseFloat(priceMatch[1])
+                                          : 0;
+                                        return price.toLocaleString();
+                                      })()}
+                                    </span>
+                                  )}
                                 </div>
                                 <button
                                   onClick={() => removeItem(it.id)}
@@ -670,13 +812,35 @@ const Navigation = () => {
                           ))}
                         </div>
                       )}
-                      <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                        <div className="text-sm font-semibold text-gray-900">
-                          Approx Total
+                      <div className="mt-4 pt-4 border-t border-gray-100 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <div className="text-sm font-semibold text-gray-900">
+                            Approx Total
+                          </div>
+                          <div className="text-sm font-bold text-primary">
+                            ₹{approxTotal.toLocaleString()}
+                          </div>
                         </div>
-                        <div className="text-sm font-bold text-primary">
-                          ₹{approxTotal.toLocaleString()}
-                        </div>
+                        {specialOfferDiscountAmount > 0 && (
+                          <>
+                            <div className="flex items-center justify-between text-green-700 text-xs font-semibold">
+                              <span>
+                                Special Offer ({specialOfferLabel || `${specialOfferPercentage}%`})
+                              </span>
+                              <span>
+                                -₹{specialOfferDiscountAmount.toLocaleString()}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <div className="text-sm font-semibold text-gray-900">
+                                Payable
+                              </div>
+                              <div className="text-sm font-bold text-primary">
+                                ₹{payableAfterSpecialOffer.toLocaleString()}
+                              </div>
+                            </div>
+                          </>
+                        )}
                       </div>
                       <div className="mt-3 grid grid-cols-2 gap-2">
                         <Link
