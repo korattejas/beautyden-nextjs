@@ -23,7 +23,7 @@ export default function ThankYouContent() {
     const order = searchParams.get("orderNumber");
     const msg = searchParams.get("message");
 
-    if (order) setOrderNumber(order);
+    if (order) setOrderNumber(decodeURIComponent(order));
     if (msg) setMessage(decodeURIComponent(msg));
   }, [searchParams]);
 
@@ -78,7 +78,9 @@ export default function ThankYouContent() {
                 className="inline-block bg-primary/10 border border-primary/20 rounded-2xl px-6 py-3 mb-8"
               >
                 <p className="text-sm text-foreground/60 mb-1">Order Number</p>
-                <p className="text-2xl font-bold text-primary">{orderNumber}</p>
+                <p className="text-xl md:text-2xl font-bold text-primary">
+                  {orderNumber}
+                </p>
               </motion.div>
             )}
           </div>
