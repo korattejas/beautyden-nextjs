@@ -37,28 +37,41 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, []);
 
-  useEffect(() => {
+  const persistCart = (nextItems: CartItem[]) => {
     if (typeof window === "undefined") return;
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(nextItems));
     } catch (e) {
       console.error("Failed to persist cart to storage", e);
     }
-  }, [items]);
+  };
+
+  const updateItems = React.useCallback(
+    (updater: (prev: CartItem[]) => CartItem[]) => {
+      setItems((prev) => {
+        const next = updater(prev);
+        persistCart(next);
+        return next;
+      });
+    },
+    []
+  );
 
   const addItem = React.useCallback((service: BookingService) => {
-    setItems((prev) => {
+    updateItems((prev) => {
       const exists = prev.find((i) => i.id === service.id);
       if (exists) return prev; // avoid duplicates for services; they are unique selections
       return [...prev, { ...service, quantity: 1 }];
     });
-  }, []);
+  }, [updateItems]);
 
   const removeItem = React.useCallback((serviceId: string) => {
-    setItems((prev) => prev.filter((i) => i.id !== serviceId));
-  }, []);
+    updateItems((prev) => prev.filter((i) => i.id !== serviceId));
+  }, [updateItems]);
 
-  const clearCart = () => setItems([]);
+  const clearCart = React.useCallback(() => {
+    updateItems(() => []);
+  }, [updateItems]);
 
   const totalItems = items.length;
   const totalPrice = useMemo(() => {
