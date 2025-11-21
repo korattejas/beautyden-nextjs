@@ -77,8 +77,9 @@ const BookingReview = ({
   console.log("BookingReview - cartItems length:", cartItems?.length);
 
   // Use cart items as fallback if bookingData.services is empty
-  const servicesToUse = bookingData.services?.length > 0 ? bookingData.services : cartItems;
-  
+  const servicesToUse =
+    bookingData.services?.length > 0 ? bookingData.services : cartItems;
+
   // Final safety check - if still no services, show error
   if (!servicesToUse || servicesToUse.length === 0) {
     console.error("No services found in booking data or cart");
@@ -133,9 +134,7 @@ const BookingReview = ({
 
   const getTotalDuration = () => {
     return servicesToUse.reduce((total, service) => {
-      const durationMatch = service.duration
-        ?.toString()
-        .match(/(\d+)/);
+      const durationMatch = service.duration?.toString().match(/(\d+)/);
       const duration = durationMatch ? parseInt(durationMatch[1]) : 60;
       return total + duration;
     }, 0);
@@ -176,7 +175,7 @@ const BookingReview = ({
         alert("Please select at least one service before booking.");
         return;
       }
-      console.log("servicesToUse",servicesToUse)
+      console.log("servicesToUse", servicesToUse);
 
       // Prepare payload
       const serviceIds = servicesToUse.map((service) => service.id).join(",");
@@ -190,14 +189,15 @@ const BookingReview = ({
       );
       const serviceLevelDiscount = servicesToUse.reduce((total, service) => {
         const originalPriceStr = service.discount_price || service.price || "0";
-        const discountedPriceStr = service.price || service.discount_price || "0";
+        const discountedPriceStr =
+          service.price || service.discount_price || "0";
         const originalPrice = parseFloat(originalPriceStr);
         const discountedPrice = parseFloat(discountedPriceStr);
-        const diff = originalPrice > discountedPrice ? originalPrice - discountedPrice : 0;
+        const diff =
+          originalPrice > discountedPrice ? originalPrice - discountedPrice : 0;
         return total + diff;
       }, 0);
-      const combinedDiscount =
-        serviceLevelDiscount + specialOfferDiscountValue;
+      const combinedDiscount = serviceLevelDiscount + specialOfferDiscountValue;
 
       const payload = {
         first_name: bookingData.firstName,
@@ -208,7 +208,7 @@ const BookingReview = ({
         service_id: serviceIds,
         appointment_date: bookingData.selectedDate,
         appointment_time: bookingData.selectedTime,
-        notes: bookingData.specialNotes || '',
+        notes: bookingData.specialNotes || "",
         quantity: servicesToUse.length,
         price: totalPrice,
         discount_price: combinedDiscount > 0 ? combinedDiscount : undefined,
@@ -228,41 +228,42 @@ const BookingReview = ({
       // Call API
       const response = await bookAppointment(payload);
       console.log("Booking response:", response);
-      
+
       // Clear cart
       clearCart();
-      
+
       // Redirect to thank you page with response data
       // Fix: Access response data correctly with safety checks
       let orderNumber = "Unknown";
-      
+
+      console.log("response?.data: ", response?.data);
       if (response?.data?.order_number) {
         orderNumber = response.data.order_number;
       } else if (response?.data?.appointment?.order_number) {
         orderNumber = response.data.appointment.order_number;
       }
-      
+
       // Use a simple success message instead of the complex HTML from API
-      const message = "Booking successful! We'll contact you shortly to confirm your appointment.";
-      
+      const message =
+        "Booking successful! We'll contact you shortly to confirm your appointment.";
+
       router.push(
         `/thank-you?orderNumber=${encodeURIComponent(
           orderNumber
         )}&message=${encodeURIComponent(message)}`
       );
-      
     } catch (error: any) {
       console.error("Booking error:", error);
-      
+
       // Show more detailed error message
       let errorMessage = "Failed to book appointment. Please try again.";
-      
+
       if (error?.response?.data?.message) {
         errorMessage = error.response.data.message;
       } else if (error?.message) {
         errorMessage = error.message;
       }
-      
+
       alert(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -485,7 +486,8 @@ const BookingReview = ({
               {specialOfferDiscountAmount > 0 && (
                 <div className="flex justify-between items-center text-green-700">
                   <span className="text-sm font-medium">
-                    Special Offer ({specialOfferLabel || `${specialOfferPercentage}%`})
+                    Special Offer (
+                    {specialOfferLabel || `${specialOfferPercentage}%`})
                   </span>
                   <span className="text-sm font-semibold">
                     -₹{specialOfferDiscountAmount.toLocaleString()}
