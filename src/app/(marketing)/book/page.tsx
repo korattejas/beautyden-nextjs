@@ -3,15 +3,12 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Container from "@/components/ui/Container";
-
-import { BookingFormData, BookingService } from "@/types/booking";
+import { BookingFormData } from "@/types/booking";
 import { motion } from "framer-motion";
-import ServiceSelection from "@/sections/booking/ServiceSelection";
-import DateTimeSelection from "@/sections/booking/DateTimeSelection";
-import CustomerInformation from "@/sections/booking/CustomerInformation";
-import BookingReview from "@/sections/booking/BookingReview";
-import BookingStepper from "@/sections/booking/BookingStepper";
+
 import { useCart } from "@/contexts/CartContext";
+import ServiceSelectionWithCart from "@/sections/booking/new/ServiceSelectionWithCart";
+import BookingDetailsWithCart from "@/sections/booking/new/BookingDetailsWithCart";
 
 const BookingPageContent = () => {
   const { items, addItem, removeItem } = useCart();
@@ -33,7 +30,7 @@ const BookingPageContent = () => {
   const categoryId = searchParams.get("category");
   const subcategoryId = searchParams.get("subcategory");
 
-  // Initialize bookingData.services from cart items on mount (only once)
+  // Initialize bookingData.services from cart items
   const [hasInitialized, setHasInitialized] = useState(false);
   useEffect(() => {
     if (
@@ -46,23 +43,12 @@ const BookingPageContent = () => {
     }
   }, [items, hasInitialized, bookingData.services.length]);
 
-  const steps = [
-    {
-      id: 1,
-      title: "Select Services",
-      description: "Choose your beauty services",
-    },
-    { id: 2, title: "Date & Time", description: "Pick your preferred slot" },
-    { id: 3, title: "Your Information", description: "Enter your details" },
-    { id: 4, title: "Review & Book", description: "Confirm your booking" },
-  ];
-
   const updateBookingData = (data: Partial<BookingFormData>) => {
     setBookingData((prev) => ({ ...prev, ...data }));
   };
 
   const nextStep = () => {
-    if (currentStep < steps.length) {
+    if (currentStep < 2) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -72,34 +58,22 @@ const BookingPageContent = () => {
       setCurrentStep(currentStep - 1);
     }
   };
-  console.log("bookingData----->>>", bookingData);
-  console.log("bookingData.services----->>>", bookingData.services);
-  console.log(
-    "bookingData.services.length----->>>",
-    bookingData.services?.length
-  );
-  console.log("cart items----->>>", items);
-  console.log("cart items.length----->>>", items?.length);
 
   const renderStep = () => {
     switch (currentStep) {
       case 1:
         return (
-          <ServiceSelection
+          <ServiceSelectionWithCart
             selectedServices={bookingData.services}
             onServicesChange={(services) => {
-              // sync to local booking state immediately
               updateBookingData({ services });
-              // sync to global cart immediately
               const newIds = new Set(services.map((s) => s.id));
               const oldIds = new Set(items.map((i) => i.id));
-              // add new services immediately
               services.forEach((s) => {
                 if (!oldIds.has(s.id)) {
                   addItem(s);
                 }
               });
-              // remove deselected services immediately
               items.forEach((i) => {
                 if (!newIds.has(i.id)) {
                   removeItem(i.id);
@@ -110,37 +84,15 @@ const BookingPageContent = () => {
             preSelectedServiceId={serviceId}
             preSelectedCategoryId={categoryId}
             preSelectedSubCategoryId={subcategoryId}
+            bookingData={bookingData}
           />
         );
       case 2:
         return (
-          <DateTimeSelection
-            selectedDate={bookingData.selectedDate}
-            selectedTime={bookingData.selectedTime}
-            onDateChange={(selectedDate) => updateBookingData({ selectedDate })}
-            onTimeChange={(selectedTime) => updateBookingData({ selectedTime })}
-            onNext={nextStep}
-            onPrev={prevStep}
-          />
-        );
-      case 3:
-        return (
-          <CustomerInformation
-            formData={bookingData}
-            onDataChange={updateBookingData}
-            onNext={nextStep}
-            onPrev={prevStep}
-          />
-        );
-      case 4:
-        return (
-          <BookingReview
+          <BookingDetailsWithCart
             bookingData={bookingData}
+            updateBookingData={updateBookingData}
             onPrev={prevStep}
-            onConfirm={() => {
-              // Handle booking confirmation
-              console.log("Booking confirmed:", bookingData);
-            }}
           />
         );
       default:
@@ -149,61 +101,47 @@ const BookingPageContent = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 overflow-x-hidden">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <section className="pt-28 pb-20 bg-white">
+      <section className="pt-24 pb-8 bg-white border-b">
         <Container>
           <div className="text-center max-w-2xl mx-auto">
             <motion.h1
-              initial={{ opacity: 0, y: 25 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7 }}
-              className="font-heading text-4xl md:text-6xl font-semibold text-gray-900 tracking-tight"
+              transition={{ duration: 0.5 }}
+              className="text-3xl md:text-4xl font-bold text-gray-900"
             >
-              Book Your
-              <span className="block mt-2 bg-gradient-to-r from-black to-gray-600 bg-clip-text text-transparent">
-                Beauty Service
-              </span>
+              Book Your Beauty Service
             </motion.h1>
-
-            {/* Apple-style thin gradient line */}
-            <motion.div
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="h-[2px] w-24 mx-auto mt-4 bg-gradient-to-r from-gray-900/80 to-gray-400/60 rounded-full"
-            />
-
             <motion.p
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.3 }}
-              className="text-lg md:text-xl text-gray-600 mt-6"
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="text-base text-gray-600 mt-3"
             >
-              Professional beauty services delivered to your doorstep.
+              Step {currentStep} of 2:{" "}
+              {currentStep === 1 ? "Select Services" : "Booking Details"}
             </motion.p>
           </div>
         </Container>
       </section>
 
-      {/* Stepper */}
-      <section className="py-4 sm:py-6 md:py-8">
-        <Container>
-          <BookingStepper steps={steps} currentStep={currentStep} />
-        </Container>
-      </section>
-
       {/* Step Content */}
-      <section className="pb-20">
-        <Container>{renderStep()}</Container>
-      </section>
+      <section className="py-6">{renderStep()}</section>
     </div>
   );
 };
 
 export default function BookingPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="w-8 h-8 border-3 border-gray-200 border-t-black rounded-full animate-spin" />
+        </div>
+      }
+    >
       <BookingPageContent />
     </Suspense>
   );

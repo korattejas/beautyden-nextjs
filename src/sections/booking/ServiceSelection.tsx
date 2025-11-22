@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import {
@@ -211,6 +211,21 @@ const ServiceSelection = ({
   const [selectedService, setSelectedService] = useState<any>(null);
   const [hasProcessedPreSelected, setHasProcessedPreSelected] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
+  const clearPreselectedParams = useCallback(() => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    let changed = false;
+    ["service", "category", "subcategory"].forEach((key) => {
+      if (url.searchParams.has(key)) {
+        url.searchParams.delete(key);
+        changed = true;
+      }
+    });
+    if (changed) {
+      const nextUrl = `${url.pathname}${url.search}${url.hash}`;
+      window.history.replaceState({}, document.title, nextUrl);
+    }
+  }, []);
   
   // Use cart context for localStorage management
   const { items: cartItems, addItem, removeItem, totalItems, totalPrice } = useCart();
@@ -334,6 +349,7 @@ console.log("selectedServices----",selectedServices)
 
     // Mark as processed to avoid re-adding on user removal
     setHasProcessedPreSelected(true);
+    clearPreselectedParams();
 
     // Mark as internal update to prevent sync effect from running
     isInternalUpdate.current = true;
@@ -376,7 +392,7 @@ console.log("selectedServices----",selectedServices)
         onServicesChange([...selectedServices, bookingService]);
       }
     }
-  }, [preSelectedServiceId, preSelectedServiceData, isServiceLoading, hasProcessedPreSelected, cartItems, selectedServices, onServicesChange, addItem, services]);
+  }, [preSelectedServiceId, preSelectedServiceData, isServiceLoading, hasProcessedPreSelected, cartItems, selectedServices, onServicesChange, addItem, services, clearPreselectedParams]);
 
   const toggleCategory = (categoryId: string,subcategories?: any) => {
     setSelectedCategories([categoryId]); // Single category selection for API

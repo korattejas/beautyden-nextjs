@@ -307,7 +307,7 @@ const Footer = () => {
             {/* Developer Credit */}
             <div className="flex items-center gap-2">
               <HiCode className="w-4 h-4 text-white" />
-              <span>Designed & Developed by</span>
+              <span>Developed by</span>
               <a
                 href="https://www.vrushikvisavadiya.com/"
                 target="_blank"
