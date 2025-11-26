@@ -511,7 +511,7 @@ const ServiceSelectionWithCart = ({
     <>
       <div className="max-w-7xl mx-auto px-4">
         {/* Mobile Header - Sticky Search & Categories */}
-        <div className="lg:hidden sticky top-20 bg-white z-30 pb-4 -mx-4 px-4 border-b">
+        <div className="lg:hidden sticky top-16 bg-white z-30 pb-4 -mx-4 px-4 border-b">
           {/* Search */}
           <div className="relative mb-3">
             <HiMagnifyingGlass className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
