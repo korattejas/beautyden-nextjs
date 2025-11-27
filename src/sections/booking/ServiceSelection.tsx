@@ -14,6 +14,7 @@ import {
   HiXMark,
   HiChevronLeft,
   HiChevronRight,
+  HiChevronDown,
   HiPhoto,
   HiSquares2X2,
   HiStar,
@@ -54,6 +55,8 @@ const ServiceModal = ({
   const getSetting = (key: string) => {
     return settings.find((setting) => setting.key === key)?.value || "";
   };
+
+  const modalPriceLabelText = getSetting("service_price_start_text") || "From";
 
   const hasDiscount = service.discount_price;
   const displayPrice = service.price;
@@ -110,7 +113,9 @@ const ServiceModal = ({
           {/* Pricing Section */}
           <div className="bg-gray-50 rounded-xl p-4">
             <div className="flex items-baseline gap-2 align-middle" style={{alignItems:"center"}}>
-              <span className="text-sm font-medium text-foreground/70">{getSetting("service_price_start_text")}</span>
+              <span className="text-sm font-medium text-foreground/70">
+                {modalPriceLabelText}
+              </span>
               {hasDiscount ? (
                 <>
                   <span className="text-2xl font-bold text-primary">
@@ -273,13 +278,15 @@ const ServiceSelection = ({
     }
   }, [cartItems, selectedServices, onServicesChange]);
 
+  const activeCategoryId = selectedCategories[0];
+
   // Build filters for API call
   const filters = {
     page: currentPage,
-    ...(selectedCategories.length > 0 &&
-      selectedCategories[0] !== "all" && {
-        category_id: selectedCategories[0], // API might expect single category
-        subcategory_id:selectedSubCategories
+    ...(activeCategoryId &&
+      activeCategoryId !== "all" && {
+        category_id: activeCategoryId, // API might expect single category
+        subcategory_id: selectedSubCategories,
       }),
     ...(searchQuery && { search: searchQuery }),
   };
@@ -296,6 +303,8 @@ console.log("selectedServices----",selectedServices)
   const getSetting = (key: string) => {
     return settings.find((setting) => setting.key === key)?.value || "";
   };
+
+  const servicePriceLabelText = getSetting("service_price_start_text") || "From";
 
   const parseNumberFromSetting = (value: string | number | undefined, fallback = 0) => {
     if (value === undefined || value === null) return fallback;
@@ -338,8 +347,9 @@ console.log("selectedServices----",selectedServices)
   const categories = categoriesData?.data ?? [];
 
   const selectedCategory = categories.find(
-    (c) => c.id.toString() === selectedCategories[0]
-  ) ;
+    (c) => c.id.toString() === activeCategoryId
+  );
+  const subCategories = selectedCategory?.subcategories || [];
 
   // Pre-select service if coming from service page - fetch directly if not on current page
   const { data: preSelectedServiceData, isLoading: isServiceLoading } = useService(preSelectedServiceId || "");
@@ -471,6 +481,20 @@ console.log("selectedServices----",selectedServices)
     return priceMatch ? parseInt(priceMatch[1]) : 0;
   };
 
+  const getNumericPrice = (value?: string | number): number => {
+    if (!value) return 0;
+    const cleaned = value.toString().replace(/,/g, "");
+    const match = cleaned.match(/(\d+(\.\d+)?)/);
+    return match ? parseFloat(match[1]) : 0;
+  };
+
+  const getDiscountPercent = (service: any) => {
+    const original = getNumericPrice(service.discount_price);
+    const current = getNumericPrice(service.price);
+    if (!original || !current || original <= current) return 0;
+    return Math.round(((original - current) / original) * 100);
+  };
+
   // Helper function to get display price (use current price if available, otherwise fallback to discount/original price)
   const getDisplayPrice = (service: BookingService): string => {
     return service.price || service.discount_price || "0";
@@ -597,8 +621,7 @@ console.log("selectedServices----",selectedServices)
               <button
                 onClick={() => toggleCategory("all")}
                 className={`flex items-center gap-3 px-6 py-4 rounded-full font-medium transition-all duration-300 text-base ${
-                  selectedCategories.length === 0 ||
-                  selectedCategories[0] === "all"
+                  !activeCategoryId || activeCategoryId === "all"
                     ? "bg-primary text-white shadow-lg"
                     : "bg-background text-foreground/70 hover:text-primary hover:bg-primary/5 border border-border"
                 }`}
@@ -621,7 +644,7 @@ console.log("selectedServices----",selectedServices)
                     toggleCategory(category.id.toString(),subIds)
                   }}
                   className={`flex items-center gap-3 px-6 py-4 rounded-full font-medium transition-all duration-300 text-base ${
-                    selectedCategories.includes(category.id.toString())
+                    activeCategoryId === category.id.toString()
                       ? "bg-primary text-white shadow-lg"
                       : "bg-background text-foreground/70 hover:text-primary hover:bg-primary/5 border border-border"
                   }`}
@@ -641,57 +664,71 @@ console.log("selectedServices----",selectedServices)
                     )}
                   </div>
                   {category.name}
+                  {category.subcategories?.length > 0 && (
+                    <HiChevronDown
+                      className={`hidden lg:inline-flex w-3 h-3 transition-transform duration-200 ${
+                        activeCategoryId === category.id.toString()
+                          ? "rotate-180"
+                          : ""
+                      }`}
+                    />
+                  )}
                 </motion.button>
               ))}
             </div>
-            {selectedCategory?.subcategories?.length > 0 && (
-        <div className="mt-6 pt-4 border-t border-border">
-          <div className="flex flex-wrap gap-2">
-            {selectedCategory  && selectedCategory?.subcategories.map((sub: any, index: any) => {
-              const subId = sub.id.toString();
-              const isActive = selectedSubCategories == subId;
-              return (
-                <motion.button
-                  key={sub.id}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3, delay: index * 0.05 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => toggleSubCategory(subId)}
-                  className={`flex items-center gap-3 px-6 py-4 rounded-full text-base font-medium transition-all duration-200 ${
-                    isActive
-                      ? "bg-primary text-white shadow-md shadow-primary/25"
-                      : "bg-background hover:bg-primary/10 text-foreground/70 hover:text-primary border border-border"
-                  }`}
-                >
-                  <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center">
-                    {sub.icon ? (
-                      <Image
-                        src={sub.icon}
-                        alt={`${sub.name} icon`}
-                        width={24}
-                        height={24}
-                        className="w-full h-full object-cover"
-                        unoptimized
-                      />
-                    ) : (
-                      <HiSparkles
-                        className={`w-5 h-5 ${
-                          isActive ? "text-white" : "text-primary"
+            {subCategories.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35 }}
+                className="mt-6 border border-border rounded-3xl bg-white/90 shadow-sm p-4"
+              >
+                <div className="flex flex-wrap gap-2">
+                  {subCategories.map((sub: any, index: any) => {
+                    const subId = sub.id.toString();
+                    const isActive = selectedSubCategories == subId;
+                    return (
+                      <motion.button
+                        key={sub.id}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.3, delay: index * 0.05 }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => toggleSubCategory(subId)}
+                        className={`flex items-center gap-3 px-6 py-4 rounded-full text-base font-medium transition-all duration-200 ${
+                          isActive
+                            ? "bg-primary text-white shadow-md shadow-primary/25"
+                            : "bg-background hover:bg-primary/10 text-foreground/70 hover:text-primary border border-border"
                         }`}
-                      />
-                    )}
-                  </div>
-                  <span className="whitespace-nowrap"> {sub.name}</span>
-                </motion.button>
-              );
-            })}
-          </div>
-        </div>
-      )}
+                      >
+                        <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center">
+                          {sub.icon ? (
+                            <Image
+                              src={sub.icon}
+                              alt={`${sub.name} icon`}
+                              width={24}
+                              height={24}
+                              className="w-full h-full object-cover"
+                              unoptimized
+                            />
+                          ) : (
+                            <HiSparkles
+                              className={`w-5 h-5 ${
+                                isActive ? "text-white" : "text-primary"
+                              }`}
+                            />
+                          )}
+                        </div>
+                        <span className="whitespace-nowrap"> {sub.name}</span>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
             {/* Active Filters */}
-            {(searchQuery || selectedCategories.length > 0) && (
+            {(searchQuery || (activeCategoryId && activeCategoryId !== "all")) && (
               <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-border">
                 <span className="text-sm text-foreground/60 font-medium">
                   Active filters:
@@ -706,12 +743,11 @@ console.log("selectedServices----",selectedServices)
                   </span>
                 )}
 
-                {selectedCategories.length > 0 &&
-                  selectedCategories[0] !== "all" && (
+                {activeCategoryId && activeCategoryId !== "all" && (
                     <span className="inline-flex items-center gap-2 bg-secondary/10 text-secondary px-3 py-1.5 rounded-full text-sm font-medium">
-                      {
+                    {
                         categories.find(
-                          (c) => c.id.toString() === selectedCategories[0]
+                          (c) => c.id.toString() === activeCategoryId
                         )?.name
                       }
                       <button onClick={() => setSelectedCategories([])}>
@@ -751,6 +787,7 @@ console.log("selectedServices----",selectedServices)
                   const isSelected = cartItems.find(
                     (s) => s.id === service.id.toString()
                   );
+                  const discountPercent = getDiscountPercent(service);
                   const hasDiscount = service.discount_price
               
                   const displayPrice = service.price
@@ -804,7 +841,9 @@ console.log("selectedServices----",selectedServices)
                           {/* Pricing Section - Improved Layout */}
                           <div className="mb-4">
                             <div className="flex items-baseline gap-2 mb-1" style={{alignItems:"center"}}>
-                              <span className="text-xs font-medium text-foreground/70">{getSetting("service_price_start_text")}</span>
+                              <span className="text-xs font-medium text-foreground/70">
+                                {servicePriceLabelText}
+                              </span>
                               {hasDiscount ? (
                                 <>
                                   <span className="text-lg font-bold text-primary">
@@ -820,6 +859,14 @@ console.log("selectedServices----",selectedServices)
                                 </span>
                               )}
                             </div>
+                            {discountPercent > 0 && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-semibold flex items-center gap-1">
+                                  <HiTag className="w-3 h-3" />
+                                  {discountPercent}% OFF
+                                </span>
+                              </div>
+                            )}
                             {hasDiscount && (() => {
                               const originalPrice = parseFloat(hasDiscount);
                               const discountedPrice = parseFloat(displayPrice);
