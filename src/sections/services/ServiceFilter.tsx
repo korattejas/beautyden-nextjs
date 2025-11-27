@@ -79,15 +79,151 @@ const ServiceFilter = ({
     onSearchChange("");
     onCategoryChange("9");
   };
+
+  const renderActiveFilters = () => {
+    if (!hasActiveFilters) return null;
+    return (
+      <motion.div
+        initial={{ opacity: 0, height: 0 }}
+        animate={{ opacity: 1, height: "auto" }}
+        exit={{ opacity: 0, height: 0 }}
+        className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-border"
+      >
+        <div className="text-sm text-foreground/60 font-medium">
+          Active filters:
+        </div>
+
+        {searchQuery && (
+          <span className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full text-sm font-medium">
+            <HiMagnifyingGlass className="w-3 h-3" />
+            &quot;{searchQuery}&quot;
+            <button onClick={() => onSearchChange("")}>
+              <HiXMark className="w-3 h-3" />
+            </button>
+          </span>
+        )}
+
+        {activeCategory !== "9" && (
+          <span className="inline-flex items-center gap-2 bg-secondary/10 text-secondary px-3 py-1.5 rounded-full text-sm font-medium">
+            {
+              categories.find((c) => c.id.toString() === activeCategory)?.name
+            }
+            <button
+              onClick={() => onCategoryChange("9")}
+              className="hover:bg-secondary/20 rounded-full p-0.5 transition-colors"
+            >
+              <HiXMark className="w-3 h-3" />
+            </button>
+          </span>
+        )}
+
+        <button
+          onClick={clearAllFilters}
+          className="text-sm text-foreground/60 hover:text-primary transition-colors font-medium underline decoration-dotted underline-offset-2"
+        >
+          Clear All Filters
+        </button>
+      </motion.div>
+    );
+  };
   const selectedCategory = categories.find(
     (c) => c.id.toString() === activeCategory
-  ) ;
+  );
+  const subCategories = selectedCategory?.subcategories || [];
   return (
+    <>
+      <div className="lg:hidden bg-card backdrop-blur-md rounded-3xl p-4 border border-border mb-8 shadow-lg space-y-4 overflow-x-hidden">
+        <div className="relative">
+          <HiMagnifyingGlass className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40 z-10" />
+          <input
+            type="text"
+            placeholder="Search services, treatments, or keywords..."
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="w-full pl-12 pr-4 py-3 bg-background border border-border rounded-full focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 placeholder:text-foreground/40"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => onSearchChange("")}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40 hover:text-primary transition-colors"
+            >
+              <HiXMark className="w-full h-full" />
+            </button>
+          )}
+        </div>
+        <div className="overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
+          <div className="flex gap-2 min-w-max">
+            <button
+              onClick={() => onCategoryChange("9")}
+              className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+                activeCategory === "9"
+                  ? "bg-black text-white"
+                  : "bg-gray-100 text-gray-700"
+              }`}
+            >
+              All
+            </button>
+            {categories.map((category) => {
+              const subIds =
+                category.subcategories?.map((i: any) => i?.id) || [];
+              return (
+                <button
+                  key={`mobile-cat-${category.id}`}
+                  onClick={() =>
+                    onCategoryChange(category.id.toString(), subIds)
+                  }
+                  className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+                    activeCategory === category.id.toString()
+                      ? "bg-black text-white"
+                      : "bg-gray-100 text-gray-700"
+                  }`}
+                >
+                  {category.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        {subCategories.length > 0 && (
+          <div className="overflow-x-auto -mx-4 px-4 scrollbar-hide">
+            <div className="flex gap-2 min-w-max">
+              <button
+                onClick={() => onSubCategoryChange("")}
+                className={`px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap border transition-colors ${
+                  !activeSubCategory
+                    ? "bg-gray-900 text-white border-gray-900"
+                    : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
+                }`}
+              >
+                All
+              </button>
+              {subCategories.map((sub: any) => {
+                const subId = sub.id.toString();
+                const isActive = activeSubCategory === subId;
+                return (
+                  <button
+                    key={`mobile-sub-${sub.id}`}
+                    onClick={() => onSubCategoryChange(subId)}
+                    className={`px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap border transition-colors ${
+                      isActive
+                        ? "bg-gray-900 text-white border-gray-900"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
+                    }`}
+                  >
+                    {sub.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+        {renderActiveFilters()}
+      </div>
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="bg-card backdrop-blur-md rounded-3xl p-6 shadow-lg border border-border mb-8 overflow-x-hidden"
+      className="hidden lg:block bg-card backdrop-blur-md rounded-3xl p-6 shadow-lg border border-border mb-8 overflow-x-hidden"
     >
       {/* <div className="grid grid-cols-1 lg:grid-cols-4 gap-6"> */}
       <div className="flex flex-col gap-6">
@@ -220,82 +356,18 @@ const ServiceFilter = ({
           </div>
         </div>
       )}
-      {/* Active Filters Display */}
-      {hasActiveFilters && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          exit={{ opacity: 0, height: 0 }}
-          className="flex flex-wrap gap-2 mt-6 pt-4 border-t border-border"
-        >
-          <div className="flex items-center gap-2 text-sm text-foreground/60 font-medium">
-            Active filters:
-          </div>
-
-          {searchQuery && (
-            <motion.span
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full text-sm font-medium"
-            >
-              <HiMagnifyingGlass className="w-3 h-3" />
-              &quot;{searchQuery}&quot;
-              <button
-                onClick={() => onSearchChange("")}
-                className="hover:bg-primary/20 rounded-full p-0.5 transition-colors"
-              >
-                <HiXMark className="w-3 h-3" />
-              </button>
-            </motion.span>
-          )}
-
-          {activeCategory !== "9" && (
-            <motion.span
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="inline-flex items-center gap-2 bg-secondary/10 text-secondary px-3 py-1.5 rounded-full text-sm font-medium"
-            >
-              <div className="w-4 h-4 rounded-full overflow-hidden flex items-center justify-center">
-                {categories.find((c) => c.id.toString() === activeCategory)
-                  ?.icon ? (
-                  <Image
-                    src={
-                      categories.find((c) => c.id.toString() === activeCategory)
-                        ?.icon || ""
-                    }
-                    alt="Category"
-                    width={16}
-                    height={16}
-                    className="w-full h-full object-cover"
-                    unoptimized
-                  />
-                ) : (
-                  <HiSparkles className="w-3 h-3 text-secondary" />
-                )}
-              </div>
-              {categories.find((c) => c.id.toString() === activeCategory)?.name}
-              <button
-                onClick={() => onCategoryChange("9")}
-                className="hover:bg-secondary/20 rounded-full p-0.5 transition-colors"
-              >
-                <HiXMark className="w-3 h-3" />
-              </button>
-            </motion.span>
-          )}
-
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={clearAllFilters}
-            className="text-sm text-foreground/60 hover:text-primary transition-colors font-medium underline decoration-dotted underline-offset-2"
-          >
-            Clear All Filters
-          </motion.button>
-        </motion.div>
-      )}
-    </motion.div>
+      {renderActiveFilters()}
+      </motion.div>
+      <style jsx global>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
+    </>
   );
 };
 
