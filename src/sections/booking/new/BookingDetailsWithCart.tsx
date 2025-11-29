@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -20,6 +21,7 @@ import {
   HiShoppingBag,
   HiXMark,
   HiCheckCircle,
+  HiSparkles,
 } from "react-icons/hi2";
 import Button from "@/components/ui/Button";
 import { BookingFormData, TimeSlot } from "@/types/booking";
@@ -86,6 +88,16 @@ const BookingDetailsWithCart = ({
   const getSetting = (key: string) => {
     return settings.find((setting: any) => setting.key === key)?.value || "";
   };
+
+  const advanceBookingDays = (() => {
+    const raw = (getSetting("advance_book_day") || "")
+      .toString()
+      .replace(/[^\d]/g, "");
+    const parsed = parseInt(raw, 10);
+    return Number.isNaN(parsed) ? 2 : parsed;
+  })();
+
+  const phoneNumber = getSetting("phone_number");
 
   const parseNumberFromSetting = (
     value: string | number | undefined,
@@ -219,6 +231,11 @@ const BookingDetailsWithCart = ({
     baseTotalPrice - specialOfferDiscountAmount,
     0
   );
+
+  const minOrderAmount = parseFloat(getSetting("min_order_amount") || "0");
+  // Use final payable amount (after special offer) for minimum order check
+  const effectiveTotalForMin = payableAfterSpecialOffer;
+  const isBelowMinOrder = effectiveTotalForMin < minOrderAmount;
 
   const canProceed =
     bookingData.selectedDate &&
@@ -544,23 +561,71 @@ const BookingDetailsWithCart = ({
           </div>
 
           {/* Services */}
-          <div className="space-y-2 mb-4 max-h-[200px] overflow-y-auto">
-            {cartItems.map((service) => (
-              <div
-                key={service.id}
-                className="flex justify-between items-start text-sm p-2 bg-gray-50 rounded-lg"
-              >
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-900 truncate">
-                    {service.name}
-                  </p>
-                  <p className="text-xs text-gray-500">{service.duration}</p>
+          <div className="space-y-2 mb-4 max-h-[220px] overflow-y-auto">
+            {cartItems.map((service) => {
+              const formatPrice = (value?: string | number) => {
+                if (!value) return "0";
+                const match = value
+                  .toString()
+                  .replace(/,/g, "")
+                  .match(/(\d+(\.\d+)?)/);
+                const num = match ? parseFloat(match[1]) : 0;
+                return num.toLocaleString();
+              };
+
+              const hasDiscount =
+                service.discount_price && service.discount_price !== service.price;
+
+              return (
+                <div
+                  key={service.id}
+                  className="flex items-start gap-2 p-2 bg-gray-50 rounded-lg"
+                >
+                  <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 flex items-center justify-center flex-shrink-0">
+                    {service.icon ? (
+                      <Image
+                        src={service.icon}
+                        alt={service.name}
+                        width={48}
+                        height={48}
+                        className="object-cover w-full h-full"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="w-6 h-6 rounded-full bg-gray-200" />
+                    )}
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm text-gray-900 truncate">
+                      {service.name}
+                    </p>
+                    <p className="text-xs text-gray-500">{service.duration}</p>
+                    <div className="mt-1 text-sm font-semibold text-gray-900 flex items-end gap-1">
+                      {service.discount_price ? (
+                        <>
+                          <span>
+                            ₹{formatPrice(service.price || service.discount_price)}
+                          </span>
+                          {hasDiscount && (
+                            <span className="text-xs text-gray-400 line-through">
+                              ₹{formatPrice(service.discount_price)}
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <span>
+                          ₹
+                          {formatPrice(
+                            service.price || service.discount_price || "0"
+                          )}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <p className="font-semibold text-gray-900 ml-2">
-                  ₹{getMinPrice(service.price || service.discount_price || "0")}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Selected Date & Time */}
@@ -579,6 +644,32 @@ const BookingDetailsWithCart = ({
                 </span>
               </div>
             </div>
+          )}
+
+          {/* Advance Booking Message (same as Services Your Cart) */}
+          {phoneNumber && (
+            <motion.div
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-4 p-3 rounded-xl bg-blue-50 border border-blue-200"
+            >
+              <p className="text-xs text-gray-700 leading-relaxed">
+                <span className="font-semibold text-gray-900">
+                  Please book in {advanceBookingDays}{" "}
+                  {advanceBookingDays === 1 ? "day" : "days"} advance
+                </span>
+                <>
+                  {" "}and if urgent then call{" "}
+                  <a
+                    href={`tel:${phoneNumber}`}
+                    className="text-blue-600 font-semibold hover:underline inline-flex items-center gap-1"
+                  >
+                    <HiClock className="w-3 h-3" />
+                    {phoneNumber}
+                  </a>
+                </>
+              </p>
+            </motion.div>
           )}
 
           {/* Price Summary */}
@@ -601,10 +692,44 @@ const BookingDetailsWithCart = ({
             </div>
           </div>
 
+          {/* Order Amount Discount Text */}
+          {getSetting("order_amount_discount_text") && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-4 mt-1 p-3 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200"
+            >
+              <p className="text-sm font-medium text-gray-900 text-center">
+                {getSetting("order_amount_discount_text")}
+              </p>
+            </motion.div>
+          )}
+
+          {/* Minimum Order Amount Message */}
+          {isBelowMinOrder && minOrderAmount > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200"
+            >
+              <p className="text-sm font-medium text-amber-800 flex items-start gap-2">
+                <HiSparkles className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                <span>
+                  Minimum ₹{minOrderAmount.toLocaleString()} order required.
+                  <span className="block mt-1 text-amber-700 font-normal">
+                    Add ₹
+                    {(minOrderAmount - effectiveTotalForMin).toLocaleString()} more
+                    to proceed.
+                  </span>
+                </span>
+              </p>
+            </motion.div>
+          )}
+
           {/* Book Now Button */}
           <Button
             onClick={handleSubmit(onSubmit)}
-            disabled={!canProceed || isSubmitting}
+            disabled={!canProceed || isSubmitting || isBelowMinOrder}
             className="w-full bg-black hover:bg-gray-800 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
