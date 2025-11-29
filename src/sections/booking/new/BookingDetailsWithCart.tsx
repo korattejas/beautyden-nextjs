@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
@@ -63,6 +63,7 @@ const BookingDetailsWithCart = ({
 }: BookingDetailsWithCartProps) => {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isMobileModalOpen, setIsMobileModalOpen] = useState(false);
   const router = useRouter();
   const { items: cartItems, clearCart } = useCart();
   const { data: settingsData } = useSettings();
@@ -151,6 +152,18 @@ const BookingDetailsWithCart = ({
       updateBookingData({ selectedDate: tomorrowString });
     }
   }, []);
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isMobileModalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isMobileModalOpen]);
 
   // Generate time slots
   useEffect(() => {
@@ -248,6 +261,32 @@ const BookingDetailsWithCart = ({
     return slot?.time || timeString;
   };
 
+  const formatDateForDisplay = (dateString: string) => {
+    if (!dateString) return "";
+    const date = parseSelectedDate(dateString);
+    if (!date) return "";
+    return date.toLocaleDateString("en-US", {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  const getDateDisplayText = () => {
+    if (bookingData.selectedDate) {
+      return formatDateForDisplay(bookingData.selectedDate);
+    }
+    return "Select Date";
+  };
+
+  const getTimeDisplayText = () => {
+    if (bookingData.selectedTime) {
+      return formatTime(bookingData.selectedTime);
+    }
+    return "Select Time";
+  };
+
   const onSubmit = async (data: any) => {
     if (!canProceed) {
       alert("Please select date and time");
@@ -329,7 +368,58 @@ const BookingDetailsWithCart = ({
             Select Date & Time
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Mobile: Date & Time Input Fields */}
+          <div className="md:hidden mb-4">
+            <label className="block text-sm font-semibold text-gray-900 mb-3">
+              Select Date & Time
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              {/* Date Box */}
+              <button
+                type="button"
+                onClick={() => setIsMobileModalOpen(true)}
+                className="px-4 py-3 border border-gray-300 rounded-lg text-left bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black transition-all flex flex-col"
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <HiCalendar className="w-4 h-4 text-gray-400" />
+                  <span className="text-xs text-gray-500 font-medium">Date</span>
+                </div>
+                <span
+                  className={`text-sm font-medium ${
+                    bookingData.selectedDate
+                      ? "text-gray-900"
+                      : "text-gray-400"
+                  }`}
+                >
+                  {getDateDisplayText()}
+                </span>
+              </button>
+
+              {/* Time Box */}
+              <button
+                type="button"
+                onClick={() => setIsMobileModalOpen(true)}
+                className="px-4 py-3 border border-gray-300 rounded-lg text-left bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black transition-all flex flex-col"
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <HiClock className="w-4 h-4 text-gray-400" />
+                  <span className="text-xs text-gray-500 font-medium">Time</span>
+                </div>
+                <span
+                  className={`text-sm font-medium ${
+                    bookingData.selectedTime
+                      ? "text-gray-900"
+                      : "text-gray-400"
+                  }`}
+                >
+                  {getTimeDisplayText()}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Desktop: Inline Date Picker & Time Slots */}
+          <div className="hidden md:grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Date Picker */}
             <div>
               <label className="block text-sm font-semibold text-gray-900 mb-3">
@@ -386,6 +476,144 @@ const BookingDetailsWithCart = ({
             </div>
           </div>
         </motion.div>
+
+        {/* Mobile Date & Time Modal */}
+        <AnimatePresence>
+          {isMobileModalOpen && (
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm md:hidden"
+                onClick={() => setIsMobileModalOpen(false)}
+              />
+
+              {/* Modal */}
+              <motion.div
+                initial={{ opacity: 0, y: 100 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 100 }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl shadow-2xl max-h-[90vh] overflow-hidden md:hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Modal Header */}
+                <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
+                  <h3 className="text-lg font-bold text-gray-900">
+                    Select Date & Time
+                  </h3>
+                  <button
+                    onClick={() => setIsMobileModalOpen(false)}
+                    className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                    aria-label="Close"
+                  >
+                    <HiXMark className="w-6 h-6 text-gray-600" />
+                  </button>
+                </div>
+
+                {/* Modal Content */}
+                <div className="overflow-y-auto max-h-[calc(90vh-80px)] px-6 py-4 space-y-6">
+                  {/* Date Picker Section */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-900 mb-3">
+                      <HiCalendar className="inline w-4 h-4 mr-2" />
+                      Select Date
+                    </label>
+                    <DatePicker
+                      selected={selectedDateObj}
+                      onChange={handleDateChange}
+                      minDate={(() => {
+                        const tomorrow = new Date();
+                        tomorrow.setDate(tomorrow.getDate() + 1);
+                        return tomorrow;
+                      })()}
+                      inline
+                      dateFormat="yyyy-MM-dd"
+                      className="w-full"
+                    />
+                  </div>
+
+                  {/* Time Slots Section */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-900 mb-3">
+                      <HiClock className="inline w-4 h-4 mr-2" />
+                      Select Time
+                    </label>
+                    {bookingData.selectedDate ? (
+                      <div className="grid grid-cols-3 gap-2 max-h-[250px] overflow-y-auto">
+                        {timeSlots.map((slot) => (
+                          <button
+                            key={slot.id}
+                            onClick={() => {
+                              if (slot.available) {
+                                updateBookingData({ selectedTime: slot.id });
+                                // Auto-close modal after selection
+                                setTimeout(() => {
+                                  setIsMobileModalOpen(false);
+                                }, 300);
+                              }
+                            }}
+                            disabled={!slot.available}
+                            className={`p-3 rounded-lg text-sm font-medium transition-all ${
+                              bookingData.selectedTime === slot.id
+                                ? "bg-black text-white"
+                                : slot.available
+                                ? "bg-gray-100 text-gray-900 hover:bg-gray-200 active:bg-gray-300"
+                                : "bg-gray-50 text-gray-400 cursor-not-allowed"
+                            }`}
+                          >
+                            {slot.time}
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-4 bg-gray-50 rounded-lg">
+                        <p className="text-sm text-gray-500 text-center">
+                          Please select a date first
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Selected Info Display */}
+                  {bookingData.selectedDate && bookingData.selectedTime && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="bg-blue-50 rounded-lg p-4 border border-blue-200"
+                    >
+                      <p className="text-xs font-semibold text-blue-900 mb-2">
+                        Selected Appointment
+                      </p>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
+                          <HiCalendar className="w-4 h-4 text-blue-600" />
+                          <span>{formatDateForDisplay(bookingData.selectedDate)}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
+                          <HiClock className="w-4 h-4 text-blue-600" />
+                          <span>{formatTime(bookingData.selectedTime)}</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Done Button */}
+                  <div className="sticky bottom-0 bg-white pt-4 pb-2 border-t border-gray-200 -mx-6 px-6">
+                    <Button
+                      onClick={() => setIsMobileModalOpen(false)}
+                      className="w-full bg-black hover:bg-gray-800 text-white py-3 rounded-lg font-medium"
+                    >
+                      Done
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
 
         {/* Customer Information Form */}
         <motion.form
