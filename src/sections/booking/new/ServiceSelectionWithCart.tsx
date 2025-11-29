@@ -83,6 +83,11 @@ const MobileCartDrawer = ({
   onNext,
   selectedServices,
   onServicesChange,
+  orderAmountDiscountText,
+  minOrderAmount,
+  cartTotal,
+  advanceBookingDays,
+  phoneNumber,
 }: any) => {
   const getMinPrice = (priceString: string): number => {
     if (!priceString) return 0;
@@ -252,12 +257,82 @@ const MobileCartDrawer = ({
                     </div>
                   </div>
 
+                  {/* Advance Booking Message (same as desktop cart) */}
+                  {phoneNumber && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mb-4 p-3 rounded-xl bg-blue-50 border border-blue-200"
+                    >
+                      <p className="text-xs text-gray-700 leading-relaxed">
+                        <span className="font-semibold text-gray-900">
+                          Please book in {advanceBookingDays}{" "}
+                          {advanceBookingDays === 1 ? "day" : "days"} advance
+                        </span>
+                        <>
+                          {" "}and if urgent then call{" "}
+                          <a
+                            href={`tel:${phoneNumber}`}
+                            className="text-blue-600 font-semibold hover:underline inline-flex items-center gap-1"
+                          >
+                            <HiClock className="w-3 h-3" />
+                            {phoneNumber}
+                          </a>
+                        </>
+                      </p>
+                    </motion.div>
+                  )}
+
+                  {/* Order Amount Discount Text */}
+                  {orderAmountDiscountText && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mb-4 p-3 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200"
+                    >
+                      <p className="text-sm font-medium text-gray-900 text-center">
+                        {orderAmountDiscountText}
+                      </p>
+                    </motion.div>
+                  )}
+
+                  {/* Minimum Order Amount Message */}
+                  {(() => {
+                    const minOrder = parseFloat(minOrderAmount || "0");
+                    const totalPrice = cartTotal;
+                    const isDisabled = totalPrice < minOrder;
+
+                    return isDisabled && minOrder > 0 ? (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200"
+                      >
+                        <p className="text-sm font-medium text-amber-800 flex items-start gap-2">
+                          <HiSparkles className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                          <span>
+                            Minimum ₹{minOrder.toLocaleString()} order required.
+                            <span className="block mt-1 text-amber-700 font-normal">
+                              Add ₹
+                              {(minOrder - totalPrice).toLocaleString()} more to
+                              proceed.
+                            </span>
+                          </span>
+                        </p>
+                      </motion.div>
+                    ) : null;
+                  })()}
+
                   <Button
                     onClick={() => {
                       onNext();
                       onClose();
                     }}
-                    className="w-full bg-black hover:bg-gray-800 text-white py-3.5 rounded-xl font-semibold text-base flex items-center justify-center gap-2"
+                    disabled={(() => {
+                      const minOrder = parseFloat(minOrderAmount || "0");
+                      return cartTotal < minOrder;
+                    })()}
+                    className="w-full bg-black hover:bg-gray-800 text-white py-3.5 rounded-xl font-semibold text-base flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Continue to Booking
                     <HiArrowRight className="w-5 h-5" />
@@ -691,6 +766,8 @@ const ServiceSelectionWithCart = ({
   const specialOfferLabel =
     specialOfferPercentageSetting ||
     (specialOfferPercentage ? `${specialOfferPercentage}%` : "");
+  const minOrderAmount = parseFloat(getSetting("min_order_amount") || "0");
+  const phoneNumber = getSetting("phone_number");
 
   if (servicesLoading || categoriesLoading) {
     return (
@@ -961,7 +1038,7 @@ const ServiceSelectionWithCart = ({
                               src={service.icon}
                               alt={service.name}
                               fill
-                              // className="object-contain"
+                              className="object-cover"
                               unoptimized
                             />
                           ) : (
@@ -1398,6 +1475,11 @@ const ServiceSelectionWithCart = ({
         onNext={onNext}
         selectedServices={selectedServices}
         onServicesChange={onServicesChange}
+        orderAmountDiscountText={getSetting("order_amount_discount_text")}
+        minOrderAmount={minOrderAmount}
+        cartTotal={cartTotal}
+        advanceBookingDays={advanceBookingDays}
+        phoneNumber={phoneNumber}
       />
 
       {/* Hide scrollbar on mobile category scroll */}
