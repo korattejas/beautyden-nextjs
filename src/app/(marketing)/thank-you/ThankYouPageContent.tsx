@@ -75,7 +75,7 @@ export default function ThankYouContent() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.5 }}
-                className="inline-block bg-primary/10 border border-primary/20 rounded-2xl px-6 py-3 mb-8"
+                className="inline-block bg-primary/10 border border-primary/20 rounded-2xl px-4 py-3 mb-8"
               >
                 <p className="text-sm text-foreground/60 mb-1">Order Number</p>
                 <p className="text-xl md:text-2xl font-bold text-primary">
@@ -91,7 +91,7 @@ export default function ThankYouContent() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="bg-white/80 backdrop-blur-md rounded-3xl p-8 md:p-12 shadow-xl border border-primary/10 mb-8"
+              className="bg-white/80 backdrop-blur-md rounded-3xl p-4 md:p-12 shadow-xl border border-primary/10 mb-8"
             >
               <div
                 className="prose prose-lg max-w-none"
@@ -110,7 +110,7 @@ export default function ThankYouContent() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.7 }}
-            className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-3xl p-8 md:p-12 border border-primary/10"
+            className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-3xl p-4 md:p-12 border border-primary/10"
           >
             <h3 className="text-2xl font-bold text-foreground mb-6 text-center flex items-center justify-center gap-2">
               <HiSparkles className="w-6 h-6 text-primary" />

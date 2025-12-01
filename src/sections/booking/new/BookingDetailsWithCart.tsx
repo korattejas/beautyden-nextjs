@@ -362,7 +362,7 @@ const BookingDetailsWithCart = ({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl p-6 border border-gray-200"
+          className="bg-white rounded-2xl p-4 border border-gray-200"
         >
           <h2 className="text-xl font-bold text-gray-900 mb-6">
             Select Date & Time
@@ -621,7 +621,7 @@ const BookingDetailsWithCart = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           onSubmit={handleSubmit(onSubmit)}
-          className="bg-white rounded-2xl p-6 border border-gray-200 space-y-4"
+          className="bg-white rounded-2xl p-4 border border-gray-200 space-y-4"
         >
           <h2 className="text-xl font-bold text-gray-900 mb-4">
             Your Information
