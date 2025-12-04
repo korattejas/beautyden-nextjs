@@ -779,7 +779,7 @@ const ServiceSelectionWithCart = ({
 
   return (
     <>
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Mobile Header - Sticky Search & Categories */}
         <div className="lg:hidden sticky top-16 bg-white z-30 pb-4 -mx-4 px-4 border-b">
           {/* Search */}
