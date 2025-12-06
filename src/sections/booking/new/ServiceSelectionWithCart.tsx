@@ -17,7 +17,6 @@ import {
   HiPhone,
   HiStar,
   HiTag,
-  HiChevronDown,
 } from "react-icons/hi2";
 import { useServices, useServiceCategories, useSettings } from "@/hooks/useApi";
 import { BookingService, BookingFormData } from "@/types/booking";
@@ -537,11 +536,10 @@ const ServiceModal = ({
           <div className="flex gap-3 pt-4">
             <Button
               onClick={onToggle}
-              className={`flex-1 py-3 rounded-xl font-semibold text-base flex items-center justify-center gap-2 ${
-                isInCart
+              className={`flex-1 py-3 rounded-xl font-semibold text-base flex items-center justify-center gap-2 ${isInCart
                   ? "bg-red-50 text-red-600 hover:bg-red-100"
                   : "bg-black text-white hover:bg-gray-800"
-              }`}
+                }`}
             >
               {isInCart ? (
                 <>
@@ -807,11 +805,10 @@ const ServiceSelectionWithCart = ({
             <div className="flex gap-2 min-w-max">
               <button
                 onClick={() => handleCategorySelection()}
-                className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-                  selectedCategory === "all"
+                className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${selectedCategory === "all"
                     ? "bg-black text-white"
                     : "bg-gray-100 text-gray-700"
-                }`}
+                  }`}
               >
                 All
               </button>
@@ -819,11 +816,10 @@ const ServiceSelectionWithCart = ({
                 <button
                   key={category.id}
                   onClick={() => handleCategorySelection(category)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-                    selectedCategory === category.id.toString()
+                  className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${selectedCategory === category.id.toString()
                       ? "bg-black text-white"
                       : "bg-gray-100 text-gray-700"
-                  }`}
+                    }`}
                 >
                   {category.name}
                 </button>
@@ -837,11 +833,10 @@ const ServiceSelectionWithCart = ({
               <div className="flex gap-2 min-w-max">
                 <button
                   onClick={() => setSelectedSubCategory(null)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap border transition-colors ${
-                    !selectedSubCategory
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap border transition-colors ${!selectedSubCategory
                       ? "bg-gray-900 text-white border-gray-900"
                       : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
-                  }`}
+                    }`}
                 >
                   All
                 </button>
@@ -849,11 +844,10 @@ const ServiceSelectionWithCart = ({
                   <button
                     key={subCat.id}
                     onClick={() => setSelectedSubCategory(subCat.id.toString())}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap border transition-colors ${
-                      selectedSubCategory === subCat.id.toString()
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap border transition-colors ${selectedSubCategory === subCat.id.toString()
                         ? "bg-gray-900 text-white border-gray-900"
                         : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
-                    }`}
+                      }`}
                   >
                     {subCat.name}
                   </button>
@@ -867,120 +861,123 @@ const ServiceSelectionWithCart = ({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-4 lg:pt-0">
           {/* Desktop Left Sidebar */}
           <aside className="hidden lg:block lg:col-span-3 lg:sticky lg:top-24 lg:h-[calc(100vh-7rem)] lg:overflow-y-auto">
-            <div className="bg-white rounded-2xl p-4 border border-gray-200 space-y-4">
-              {/* Search */}
-              <div className="relative">
-                <HiMagnifyingGlass className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search services..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-sm"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                  >
-                    <HiXMark className="w-4 h-4 text-gray-400 hover:text-gray-600" />
-                  </button>
-                )}
-              </div>
+            <div className="bg-white rounded-2xl p-5 border border-gray-200 space-y-6">
+            
 
-              {/* Categories */}
+              {/* Category Grid */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-900 mb-3">
-                  Categories
-                </h3>
-                <div className="space-y-1">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-gray-900">
+                    Select a service
+                  </h3>
+                  {/* <span className="text-xs text-gray-400">Desktop view</span> */}
+                </div>
+                <div className="grid grid-cols-2 xl:grid-cols-3 gap-3">
                   <button
                     onClick={() => handleCategorySelection()}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                    className={`rounded-2xl p-3 flex flex-col items-center gap-2 transition-all ${
                       selectedCategory === "all"
-                        ? "bg-black text-white"
-                        : "hover:bg-gray-100 text-gray-700"
+                        ? " "
+                        : " "
                     }`}
                   >
-                    All Services
+                    <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center text-sm font-semibold">
+                      All
+                    </div>
+                    {/* <span className="text-sm font-medium text-center">
+                      All Services
+                    </span> */}
                   </button>
                   {categories.map((category: any) => {
                     const catId = category.id.toString();
-                    const hasSubcategories = category.subcategories?.length > 0;
                     const isActiveCategory = selectedCategory === catId;
                     return (
-                      <div key={catId} className="relative">
-                        <button
-                          onClick={() => handleCategorySelection(category)}
-                          className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                            isActiveCategory
-                              ? "bg-black text-white"
-                              : "hover:bg-gray-100 text-gray-700"
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <span>{category.name}</span>
-                            {hasSubcategories && (
-                              <HiChevronDown
-                                className={`w-3 h-3 transition-transform duration-200 ${
-                                  isActiveCategory && isCategoryDropdownOpen
-                                    ? "rotate-180"
-                                    : ""
-                                }`}
-                              />
-                            )}
-                          </div>
-                        </button>
-
-                        <AnimatePresence>
-                          {isActiveCategory &&
-                            hasSubcategories &&
-                            isCategoryDropdownOpen && (
-                              <motion.div
-                                initial={{ opacity: 0, y: -5 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -5 }}
-                                transition={{ duration: 0.2 }}
-                                className="absolute left-0 top-full mt-2 w-full rounded-2xl border border-gray-200 bg-white shadow-lg z-10"
-                              >
-                                <div className="space-y-1 px-3 py-3">
-                                  <button
-                                    onClick={() => setSelectedSubCategory(null)}
-                                    className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
-                                      !selectedSubCategory
-                                        ? "bg-gray-900 text-white"
-                                        : "hover:bg-gray-100 text-gray-700"
-                                    }`}
-                                  >
-                                    All
-                                  </button>
-                                  {category.subcategories?.map((subCat: any) => (
-                                    <button
-                                      key={subCat.id}
-                                      onClick={() =>
-                                        setSelectedSubCategory(
-                                          subCat.id.toString()
-                                        )
-                                      }
-                                      className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
-                                        selectedSubCategory ===
-                                        subCat.id.toString()
-                                          ? "bg-gray-900 text-white"
-                                          : "hover:bg-gray-100 text-gray-700"
-                                      }`}
-                                    >
-                                      {subCat.name}
-                                    </button>
-                                  ))}
-                                </div>
-                              </motion.div>
-                            )}
-                        </AnimatePresence>
-                      </div>
+                      <button
+                        key={catId}
+                        onClick={() => handleCategorySelection(category)}
+                        className={`rounded-2xl p-2 flex flex-col items-center gap-2 transition-all text-center ${
+                          isActiveCategory
+                            ? ""
+                            : ""
+                        }`}
+                      >
+                        <div className="w-16 h-16 rounded-2xl bg-gray-50 overflow-hidden flex items-center justify-center">
+                          {category.icon ? (
+                            <Image
+                              src={category.icon}
+                              alt={category.name}
+                              width={64}
+                              height={64}
+                              className="object-cover w-full h-full"
+                              unoptimized
+                            />
+                          ) : (
+                            <HiSparkles className="w-8 h-8 text-gray-300" />
+                          )}
+                        </div>
+                        <span className="text-sm font-medium">
+                          {category.name}
+                        </span>
+                        {/* {category.description && (
+                          <span className="text-[11px] text-gray-500 line-clamp-2">
+                            {category.description}
+                          </span>
+                        )} */}
+                      </button>
                     );
                   })}
                 </div>
               </div>
+
+              {/* Subcategory Grid */}
+              {subCategories.length > 0 && selectedCategory !== "all" && (
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-sm font-semibold text-gray-900">
+                      Subcategories
+                    </h4>
+                    <button
+                      onClick={() => setSelectedSubCategory(null)}
+                      className="text-xs font-semibold text-gray-500 hover:text-gray-800"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 gap-3">
+                    {subCategories.map((subCat: any) => (
+                      <button
+                        key={subCat.id}
+                        onClick={() => setSelectedSubCategory(subCat.id.toString())}
+                        className={`rounded-xl border-2 p-3 flex flex-col gap-2 transition-all text-left ${
+                          selectedSubCategory === subCat.id.toString()
+                            ? "border-black shadow-sm"
+                            : "border-gray-200 hover:border-black/30"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-xl bg-gray-50 overflow-hidden flex items-center justify-center">
+                            {subCat.icon ? (
+                              <Image
+                                src={subCat.icon}
+                                alt={subCat.name}
+                                width={48}
+                                height={48}
+                                className="object-cover w-full h-full"
+                                unoptimized
+                              />
+                            ) : (
+                              <HiSparkles className="w-6 h-6 text-gray-300" />
+                            )}
+                          </div>
+                          <span className="text-sm font-medium text-gray-900">
+                            {subCat.name}
+                          </span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </aside>
 
@@ -1006,14 +1003,15 @@ const ServiceSelectionWithCart = ({
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {services.map((service: any) => {
+                <div className="space-y-4">
+                  {services.map((service: any) => {
                     const isSelected = cartItems.find(
                       (s) => s.id === service.id.toString()
                     );
                     const discountInfo = getDiscountInfo(service);
                     const hasDiscount = discountInfo.percent > 0;
-                    const displayPrice = service.price || service.discount_price || "0";
+                    const displayPrice =
+                      service.price || service.discount_price || "0";
                     const showOriginal =
                       service.discount_price &&
                       service.discount_price !== service.price;
@@ -1022,112 +1020,128 @@ const ServiceSelectionWithCart = ({
                         key={service.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className={`bg-white rounded-xl border-2 overflow-hidden transition-all hover:shadow-lg ${
-                          isSelected
-                            ? "border-black shadow-md ring-2 ring-black ring-opacity-20"
+                        className={`bg-white rounded-2xl border-2 overflow-hidden transition-all hover:shadow-lg flex flex-col sm:flex-row gap-4 p-4 ${isSelected
+                            ? "border-black shadow-md"
                             : "border-gray-200"
-                        }`}
+                          }`}
                       >
-                        {/* Image */}
-                        <div
-                          className="relative h-40 lg:h-32 bg-gray-100 cursor-pointer overflow-hidden flex items-center justify-center"
-                          onClick={() => setSelectedService(service)}
-                        >
-                          {service.icon ? (
-                            <Image
-                              src={service.icon}
-                              alt={service.name}
-                              fill
-                              className="object-cover"
-                              unoptimized
-                            />
-                          ) : (
-                            <div className="flex items-center justify-center h-full">
-                              <HiSparkles className="w-10 h-10 text-gray-300" />
+                        {/* Left content */}
+                        <div className="flex-1 flex flex-col gap-3">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-xs uppercase tracking-wide font-medium">
+                                {service.category_name}
+                              </p>
+                              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 leading-snug">
+                                {service.name}
+                              </h3>
                             </div>
-                          )}
-                          <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md rounded-full px-3 py-1 text-[10px] font-semibold text-gray-900">
-                            {service.category_name}
-                          </div>
-                          <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-md rounded-full px-2 py-1 text-[10px] font-semibold text-gray-900 flex items-center gap-1">
-                            <HiStar className="w-3 h-3 text-yellow-500" />
-                            {service.rating || "N/A"}
-                          </div>
-                          {service?.is_popular === 1 && (
-                            <div className="absolute bottom-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded-full text-[9px] font-semibold flex items-center gap-1">
-                              <HiSparkles className="w-3 h-3" />
-                              Popular
-                            </div>
-                          )}
-                          {isSelected && (
-                            <div className="absolute top-3 right-3 bg-black text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg">
-                              ✓ Added
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Content */}
-                        <div className="p-4">
-                          <h3 className="font-semibold text-base text-gray-900 mb-2 line-clamp-1">
-                            {service.name}
-                          </h3>
-                          <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
-                            <HiClock className="w-4 h-4" />
-                            <span>{service.duration || "60 min"}</span>
-                          </div>
-                          <div className="flex items-baseline gap-2 mb-2">
-                            <span className="text-xs text-gray-500">
-                              {priceStartText}
-                            </span>
-                            <span className="text-xl font-bold text-gray-900">
-                              ₹{displayPrice}
-                            </span>
-                            {showOriginal && (
-                              <span className="text-sm text-gray-400 line-through">
-                                ₹{service.discount_price}
+                            {isSelected && (
+                              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-black text-white">
+                                ✓&nbsp;Added
                               </span>
                             )}
                           </div>
-                          {hasDiscount && (
-                            <div className="flex flex-wrap items-center gap-2 text-xs text-green-700 mb-2">
-                              <HiTag className="w-3 h-3" />
-                              <span>{discountInfo.percent}% OFF</span>
-                              <span className="font-semibold">
-                                Save ₹{discountInfo.amount.toLocaleString()}
+
+                          <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
+                            <span className="inline-flex items-center gap-1">
+                              <HiStar className="w-4 h-4 text-yellow-400" />
+                              <span className="font-semibold text-gray-900">
+                                {service.rating || "N/A"}
                               </span>
+                              {service.reviews && (
+                                <span className="text-gray-500">
+                                  ({service.reviews} reviews)
+                                </span>
+                              )}
+                            </span>
+                            <span className="text-gray-300">•</span>
+                            <span className="inline-flex items-center gap-1">
+                              <HiClock className="w-4 h-4" />
+                              {service.duration || "60 min"}
+                            </span>
+                            {service.subcategory_name && (
+                              <>
+                                <span className="text-gray-300">•</span>
+                                <span>{service.subcategory_name}</span>
+                              </>
+                            )}
+                          </div>
+
+                          <div>
+                            <p className="text-xs uppercase tracking-wide text-gray-500">
+                              {priceStartText}
+                            </p>
+                            <div className="flex flex-wrap items-baseline gap-2">
+                              <span className="text-2xl font-bold text-gray-900">
+                                ₹{displayPrice}
+                              </span>
+                              {showOriginal && (
+                                <span className="text-base text-gray-400 line-through">
+                                  ₹{service.discount_price}
+                                </span>
+                              )}
                             </div>
+                            {hasDiscount && (
+                              <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-green-700 bg-green-50">
+                                <HiTag className="w-3.5 h-3.5" />
+                                {discountInfo.percent}% OFF • Save ₹
+                                {discountInfo.amount.toLocaleString()}
+                              </div>
+                            )}
+                          </div>
+
+                          {service.description && (
+                            <p className="text-sm text-gray-600 line-clamp-2">
+                              {service.description}
+                            </p>
                           )}
 
-                          {/* Buttons - Fixed Size */}
-                          <div className="flex gap-2">
+                          <div className="flex flex-wrap gap-3 pt-2">
                             <button
                               onClick={() => setSelectedService(service)}
-                              className="flex-1 py-2 px-3 rounded-lg text-sm font-medium bg-gray-100 text-gray-900 hover:bg-gray-200 transition-colors flex items-center justify-center gap-1.5"
+                              className="inline-flex items-center gap-1 text-sm font-semibold  "
                             >
+                              <span>View details</span>
                               <HiInformationCircle className="w-4 h-4" />
-                              <span>View</span>
-                            </button>
-                            <button
-                              onClick={() => toggleService(service)}
-                              className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-1.5 ${
-                                isSelected
-                                  ? "bg-black text-white hover:bg-gray-800"
-                                  : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                              }`}
-                            >
-                              {isSelected ? (
-                                <>
-                                  <HiMinus className="w-4 h-4" />
-                                  <span>Remove</span>
-                                </>
-                              ) : (
-                                <>
-                                  <HiPlus className="w-4 h-4" />
-                                  <span>Add</span>
-                                </>
-                              )}
                             </button>
                           </div>
+                        </div>
+
+                        {/* Right column */}
+                        <div className="sm:w-60 flex flex-col gap-3">
+                          <div
+                            className="relative w-full h-40 sm:h-full min-h-[180px] rounded-2xl overflow-hidden bg-gray-100 cursor-pointer"
+                            onClick={() => setSelectedService(service)}
+                          >
+                            {service.icon ? (
+                              <Image
+                                src={service.icon}
+                                alt={service.name}
+                                fill
+                                className="object-cover"
+                                unoptimized
+                              />
+                            ) : (
+                              <div className="flex items-center justify-center h-full">
+                                <HiSparkles className="w-10 h-10 text-gray-300" />
+                              </div>
+                            )}
+                          </div>
+
+                          <button
+                            onClick={() => toggleService(service)}
+                            className={`w-full py-2.5 rounded-xl text-sm font-semibold border transition-all ${isSelected
+                                ? " border-black hover:bg-gray-800 hover:text-white"
+                                : "border-black-200 text-black-700 hover:bg-black-50"
+                              }`}
+                          >
+                            {isSelected ? "Remove from Cart" : "Add"}
+                          </button>
+
+                          {/* <p className="text-xs text-center text-gray-500">
+                            {service.category_name}
+                          </p> */}
                         </div>
                       </motion.div>
                     );
