@@ -17,6 +17,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
       <HeroSection />
+      <ProductBrand/>
       <CategoryServices />
       {/* <WhyChooseUsSection /> */}
       {/* <PopularServicesSection /> */}
@@ -24,7 +25,6 @@ export default function HomePage() {
       <TestimonialsSection />
       <ServiceAreaSection />
       <ComingSoonCities />
-      <ProductBrand/>
       <CTASection
         variant="gradient"
         title="Join Our Beauty Community"

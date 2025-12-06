@@ -781,7 +781,7 @@ const BookingDetailsWithCart = ({
       </main>
 
       {/* Right Sidebar - Sticky Cart with Book Now */}
-      <aside className="lg:col-span-4 lg:sticky lg:top-24 lg:h-[calc(100vh-7rem)]">
+      <aside className="lg:col-span-4 lg:sticky lg:top-24 lg:h-[calc(100vh-7rem)] overflow-y-scroll">
         <div className="bg-white rounded-2xl p-4 border border-gray-200">
           <div className="flex items-center gap-2 mb-4">
             <HiShoppingBag className="w-5 h-5" />
