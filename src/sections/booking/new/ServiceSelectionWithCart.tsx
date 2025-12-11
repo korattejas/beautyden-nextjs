@@ -578,6 +578,9 @@ const ServiceSelectionWithCart = ({
   const [selectedService, setSelectedService] = useState<any>(null);
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
+  const [hasAppliedCategoryPreset, setHasAppliedCategoryPreset] =
+    useState(false);
+  const [hasAppliedServicePreset, setHasAppliedServicePreset] = useState(false);
 
   const { items: cartItems, addItem, removeItem } = useCart();
   const { data: settingsData } = useSettings();
@@ -652,6 +655,58 @@ const ServiceSelectionWithCart = ({
     );
     setIsCategoryDropdownOpen(Boolean(selectedCat?.subcategories?.length));
   }, [selectedCategory, categories]);
+
+  // Apply pre-selected category/subcategory from URL/search params once data is ready
+  useEffect(() => {
+    if (hasAppliedCategoryPreset) return;
+    const catId = preSelectedCategoryId?.toString();
+    if (!catId) return;
+
+    const matchedCategory = categories.find(
+      (cat: any) => cat.id.toString() === catId
+    );
+    if (!matchedCategory) return;
+
+    setSelectedCategory(catId);
+    setIsCategoryDropdownOpen(Boolean(matchedCategory?.subcategories?.length));
+
+    const subId = preSelectedSubCategoryId?.toString();
+    if (subId) {
+      const hasSub = matchedCategory?.subcategories?.some(
+        (sub: any) => sub.id?.toString() === subId
+      );
+      if (hasSub) {
+        setSelectedSubCategory(subId);
+      }
+    }
+    setHasAppliedCategoryPreset(true);
+  }, [
+    categories,
+    preSelectedCategoryId,
+    preSelectedSubCategoryId,
+    hasAppliedCategoryPreset,
+  ]);
+
+  // Apply pre-selected service from URL/search params (only add if not already in cart)
+  useEffect(() => {
+    if (hasAppliedServicePreset || !preSelectedServiceId) return;
+    const match = services.find(
+      (svc: any) => svc.id?.toString() === preSelectedServiceId.toString()
+    );
+    if (!match) return;
+    const alreadyInCart = cartItems.some(
+      (item) => item.id === preSelectedServiceId.toString()
+    );
+    if (!alreadyInCart) {
+      toggleService(match);
+    }
+    setHasAppliedServicePreset(true);
+  }, [
+    cartItems,
+    services,
+    preSelectedServiceId,
+    hasAppliedServicePreset,
+  ]);
   const paginationData = servicesData?.data;
 
   // Get subcategories for selected category
@@ -829,13 +884,19 @@ const ServiceSelectionWithCart = ({
 
           {/* Subcategories - Show BELOW selected category */}
           {subCategories.length > 0 && selectedCategory !== "all" && (
-            <div className="mt-3 overflow-x-auto -mx-4 px-4 scrollbar-hide">
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25 }}
+              className="mt-3 overflow-x-auto -mx-4 px-4 pb-1 scrollbar-hide"
+            >
               <div className="flex gap-2 min-w-max">
                 <button
                   onClick={() => setSelectedSubCategory(null)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap border transition-colors ${!selectedSubCategory
-                      ? "bg-gray-900 text-white border-gray-900"
-                      : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
+                  className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap border-2 transition-all duration-200 ${!selectedSubCategory
+                      ? "bg-gradient-to-r from-gray-900 to-gray-700 text-white border-gray-900 shadow-md scale-105"
+                      : "bg-white text-gray-700 border-gray-300 hover:border-gray-500 hover:shadow-sm"
                     }`}
                 >
                   All
@@ -844,23 +905,35 @@ const ServiceSelectionWithCart = ({
                   <button
                     key={subCat.id}
                     onClick={() => setSelectedSubCategory(subCat.id.toString())}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap border transition-colors ${selectedSubCategory === subCat.id.toString()
-                        ? "bg-gray-900 text-white border-gray-900"
-                        : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
+                    className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap border-2 transition-all duration-200 flex items-center gap-2 ${selectedSubCategory === subCat.id.toString()
+                        ? "bg-gradient-to-r from-gray-900 to-gray-700 text-white border-gray-900 shadow-md scale-105"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-gray-500 hover:shadow-sm"
                       }`}
                   >
+                    {subCat.icon && (
+                      <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center">
+                        <Image
+                          src={subCat.icon}
+                          alt={subCat.name}
+                          width={20}
+                          height={20}
+                          className="object-cover"
+                          unoptimized
+                        />
+                      </div>
+                    )}
                     {subCat.name}
                   </button>
                 ))}
               </div>
-            </div>
+            </motion.div>
           )}
         </div>
 
         {/* Desktop + Mobile Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-4 lg:pt-0">
           {/* Desktop Left Sidebar */}
-          <aside className="hidden lg:block lg:col-span-3 lg:sticky lg:top-24 lg:h-[calc(100vh-7rem)] lg:overflow-y-auto">
+          <aside className="hidden lg:block lg:col-span-3 lg:sticky lg:top-24 lg:h-[calc(100vh-7rem)] lg:overflow-y-auto lg-overflow-x-hidden">
             <div className="bg-white rounded-2xl p-5 border border-gray-200 space-y-6">
             
 
@@ -892,92 +965,163 @@ const ServiceSelectionWithCart = ({
                     const catId = category.id.toString();
                     const isActiveCategory = selectedCategory === catId;
                     return (
-                      <button
-                        key={catId}
-                        onClick={() => handleCategorySelection(category)}
-                        className={`rounded-2xl p-2 flex flex-col items-center gap-2 transition-all text-center ${
-                          isActiveCategory
-                            ? ""
-                            : ""
-                        }`}
-                      >
-                        <div className="w-16 h-16 rounded-2xl bg-gray-50 overflow-hidden flex items-center justify-center">
-                          {category.icon ? (
-                            <Image
-                              src={category.icon}
-                              alt={category.name}
-                              width={64}
-                              height={64}
-                              className="object-cover w-full h-full"
-                              unoptimized
-                            />
-                          ) : (
-                            <HiSparkles className="w-8 h-8 text-gray-300" />
-                          )}
-                        </div>
-                        <span className="text-sm font-medium">
-                          {category.name}
-                        </span>
-                        {/* {category.description && (
-                          <span className="text-[11px] text-gray-500 line-clamp-2">
-                            {category.description}
-                          </span>
-                        )} */}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Subcategory Grid */}
-              {subCategories.length > 0 && selectedCategory !== "all" && (
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="text-sm font-semibold text-gray-900">
-                      Subcategories
-                    </h4>
-                    <button
-                      onClick={() => setSelectedSubCategory(null)}
-                      className="text-xs font-semibold text-gray-500 hover:text-gray-800"
-                    >
-                      Clear
-                    </button>
-                  </div>
-                  <div className="grid grid-cols-1 gap-3">
-                    {subCategories.map((subCat: any) => (
-                      <button
-                        key={subCat.id}
-                        onClick={() => setSelectedSubCategory(subCat.id.toString())}
-                        className={`rounded-xl border-2 p-3 flex flex-col gap-2 transition-all text-left ${
-                          selectedSubCategory === subCat.id.toString()
-                            ? "border-black shadow-sm"
-                            : "border-gray-200 hover:border-black/30"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-xl bg-gray-50 overflow-hidden flex items-center justify-center">
-                            {subCat.icon ? (
+                      <div key={catId} className="col-span-1 relative">
+                        <button
+                          onClick={() => handleCategorySelection(category)}
+                          className={`rounded-2xl p-2 flex flex-col items-center gap-2 transition-all text-center w-full`}
+                        >
+                          <div className={`w-16 h-16 rounded-2xl bg-gray-50 overflow-hidden flex items-center justify-center border-2 transition-all ${
+                            isActiveCategory
+                              ? "border-black shadow-md"
+                              : "border-transparent"
+                          }`}>
+                            {category.icon ? (
                               <Image
-                                src={subCat.icon}
-                                alt={subCat.name}
-                                width={48}
-                                height={48}
+                                src={category.icon}
+                                alt={category.name}
+                                width={64}
+                                height={64}
                                 className="object-cover w-full h-full"
                                 unoptimized
                               />
                             ) : (
-                              <HiSparkles className="w-6 h-6 text-gray-300" />
+                              <HiSparkles className="w-8 h-8 text-gray-300" />
                             )}
                           </div>
-                          <span className="text-sm font-medium text-gray-900">
-                            {subCat.name}
+                          <span className="text-sm font-medium">
+                            {category.name}
                           </span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                        </button>
+                        
+                        {/* Subcategories directly below selected category - Absolute positioning */}
+                        {isActiveCategory && category.subcategories?.length > 0 && (
+  <motion.div
+    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+    animate={{ opacity: 1, y: 0, scale: 1 }}
+    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+    transition={{ duration: 0.3, ease: "easeOut" }}
+    className="
+      absolute top-full mt-2 z-50
+      bg-gradient-to-br from-white to-gray-50/80 rounded-2xl shadow-2xl border-2 border-gray-200 backdrop-blur
+      p-3 max-h-[420px] overflow-y-auto overflow-x-hidden
+      w-[calc(100vw-2.5rem)] max-w-[22rem] sm:w-[min(24rem,calc(100vw-4rem))]
+      scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100
+    "
+  >
+    {/* Header with icon */}
+    <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-200">
+      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center">
+        <HiSparkles className="w-4 h-4 text-white" />
+      </div>
+      <div>
+        <p className="text-sm font-bold text-gray-900">
+          {category.name} Types
+        </p>
+        <p className="text-xs text-gray-500">
+          {category.subcategories.length} options available
+        </p>
+      </div>
+    </div>
+
+    {/* Grid Container */}
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      
+      {/* All Option */}
+      <button
+        onClick={() => setSelectedSubCategory(null)}
+        className={`group rounded-xl p-4 flex flex-col items-center gap-2.5 text-center transition-all duration-200 ${
+          !selectedSubCategory
+            ? "bg-gradient-to-br from-gray-900 to-gray-700 text-white shadow-lg ring-2 ring-gray-900 ring-offset-2"
+            : "bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-gray-400 hover:shadow-md"
+        }`}
+      >
+        <div
+          className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
+            !selectedSubCategory 
+              ? "bg-white/20 shadow-inner" 
+              : "bg-gradient-to-br from-gray-100 to-gray-200 group-hover:scale-110"
+          }`}
+        >
+          <HiSparkles
+            className={`w-6 h-6 transition-all ${
+              !selectedSubCategory ? "text-white" : "text-gray-700"
+            }`}
+          />
+        </div>
+        <span className={`text-sm font-bold leading-tight ${
+          !selectedSubCategory ? "text-white" : "text-gray-900"
+        }`}>
+          All {category.name}
+        </span>
+      </button>
+
+      {/* Subcategories */}
+      {category.subcategories.map((subCat: any) => {
+        const active = selectedSubCategory === subCat.id.toString();
+
+        return (
+          <button
+            key={subCat.id}
+            onClick={() => setSelectedSubCategory(subCat.id.toString())}
+            className={`group rounded-xl p-4 flex flex-col items-center gap-2.5 text-center transition-all duration-200 ${
+              active
+                ? "bg-gradient-to-br from-gray-900 to-gray-700 text-white shadow-lg ring-2 ring-gray-900 ring-offset-2"
+                : "bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-gray-400 hover:shadow-md"
+            }`}
+          >
+            <div
+              className={`w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center transition-all ${
+                active 
+                  ? "bg-white/20 shadow-inner ring-2 ring-white/30" 
+                  : "bg-gradient-to-br from-gray-100 to-gray-200 group-hover:scale-110"
+              }`}
+            >
+              {subCat.icon ? (
+                <Image
+                  src={subCat.icon}
+                  alt={subCat.name}
+                  width={48}
+                  height={48}
+                  className="object-cover w-full h-full"
+                  unoptimized
+                />
+              ) : (
+                <HiSparkles
+                  className={`w-6 h-6 transition-all ${
+                    active ? "text-white" : "text-gray-700"
+                  }`}
+                />
               )}
+            </div>
+
+            <span className={`text-sm font-bold leading-tight line-clamp-2 ${
+              active ? "text-white" : "text-gray-900"
+            }`}>
+              {subCat.name}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  </motion.div>
+)}
+
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Spacer to prevent dropdown overlap on selection */}
+                {isCategoryDropdownOpen && (
+                  <div
+                    aria-hidden
+                    className="transition-[height] duration-200"
+                    style={{ height: 260 }}
+                  />
+                )}
+              </div>
+
+              {/* Subcategory section removed - now shown inline below each category */}
             </div>
           </aside>
 
@@ -1092,7 +1236,7 @@ const ServiceSelectionWithCart = ({
                           </div>
 
                           {service.description && (
-                            <p className="text-sm text-gray-600 line-clamp-2">
+                            <p className="text-sm text-gray-600 line-clamp-1">
                               {service.description}
                             </p>
                           )}
@@ -1100,16 +1244,16 @@ const ServiceSelectionWithCart = ({
                           <div className="flex flex-wrap gap-3 pt-2">
                             <button
                               onClick={() => setSelectedService(service)}
-                              className="inline-flex items-center gap-1 text-sm font-semibold  "
+                              className="inline-flex items-center gap-1 text-sm font-semibold transition-colors pb-1"
                             >
-                              <span>View details</span>
+                            <span className="border-b-2 border-gray-300 hover:border-black">View details</span>
                               <HiInformationCircle className="w-4 h-4" />
                             </button>
                           </div>
                         </div>
 
                         {/* Right column */}
-                        <div className="sm:w-60 flex flex-col gap-3">
+                        <div className="sm:w-50 flex flex-col gap-3">
                           <div
                             className="relative w-full h-40 sm:h-full min-h-[180px] rounded-2xl overflow-hidden bg-gray-100 cursor-pointer"
                             onClick={() => setSelectedService(service)}
@@ -1496,7 +1640,7 @@ const ServiceSelectionWithCart = ({
         phoneNumber={phoneNumber}
       />
 
-      {/* Hide scrollbar on mobile category scroll */}
+      {/* Custom styles for subcategory UI */}
       <style jsx global>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
@@ -1504,6 +1648,27 @@ const ServiceSelectionWithCart = ({
         .scrollbar-hide {
           -ms-overflow-style: none;
           scrollbar-width: none;
+        }
+        
+        /* Custom scrollbar for subcategory dropdown */
+        .scrollbar-thin::-webkit-scrollbar {
+          width: 6px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-track {
+          background: #f3f4f6;
+          border-radius: 10px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+          background: #d1d5db;
+          border-radius: 10px;
+          transition: background 0.2s;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+          background: #9ca3af;
+        }
+        .scrollbar-thin {
+          scrollbar-width: thin;
+          scrollbar-color: #d1d5db #f3f4f6;
         }
       `}</style>
     </>

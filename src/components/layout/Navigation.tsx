@@ -316,7 +316,7 @@ const Navigation = () => {
                                 {popularCategories.map((category) => (
                                   <Link
                                     key={category.id}
-                                    href={`/services?category=${category.id}`}
+                                    href={`/book?category=${category.id}`}
                                     className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors duration-200"
                                   >
                                     {category.icon ? (
@@ -344,7 +344,7 @@ const Navigation = () => {
 
                               <div className="mt-4 pt-4 border-t border-gray-100">
                                 <Link
-                                  href="/services"
+                                  href="/book"
                                   className="flex items-center justify-center gap-2 text-primary hover:bg-primary/5 px-4 py-2 rounded-lg font-medium text-sm transition-colors duration-200"
                                 >
                                   <HiSparkles className="w-4 h-4" />
