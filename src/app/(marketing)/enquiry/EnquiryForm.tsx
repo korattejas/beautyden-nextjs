@@ -19,6 +19,7 @@ const EnquiryForm = () => {
     name: "",
     email: "",
     phone: "",
+    experience:"",
     address: "",
     description: ""
   });
@@ -48,6 +49,7 @@ const EnquiryForm = () => {
           name: "",
           email: "",
           phone: "",
+          experience:"",
           address: "",
           description: ""
         });
@@ -167,6 +169,25 @@ const EnquiryForm = () => {
                             placeholder="9876543210"
                           />
                         </div>
+                      </div>
+                    </div>
+
+                     {/* Experience Field */}
+                    <div>
+                      <label className="block text-sm font-semibold text-foreground mb-3">
+                        Experience *
+                      </label>
+                      <div className="relative">
+                        <HiMapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40" />
+                        <input
+                          type="text"
+                          name="experience"
+                          value={formData.experience}
+                          onChange={handleChange}
+                          required
+                          className="w-full pl-12 pr-4 py-4 bg-background border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 border-border focus:border-primary"
+                          placeholder="Your experience"
+                        />
                       </div>
                     </div>
 
