@@ -48,6 +48,8 @@ export const endpoints = {
 
   CONTACT_FORM: "/V1/contactFormSubmit",
 
+  BEAUTICIAN_INQUIRY_FORM: "/V1/beauticianInquiryFormSubmit",
+
   BLOG_CATEGORIES: "/V1/blogCategory",
   BLOGS: "/V1/blogs",
   BLOG_VIEW: "/V1/blogView",

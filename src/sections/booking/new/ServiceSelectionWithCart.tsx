@@ -992,133 +992,68 @@ const ServiceSelectionWithCart = ({
                             {category.name}
                           </span>
                         </button>
-                        
-                        {/* Subcategories directly below selected category - Absolute positioning */}
-                        {isActiveCategory && category.subcategories?.length > 0 && (
+{isActiveCategory && category.subcategories?.length > 0 && (
   <motion.div
-    initial={{ opacity: 0, y: -10, scale: 0.95 }}
-    animate={{ opacity: 1, y: 0, scale: 1 }}
-    exit={{ opacity: 0, y: -10, scale: 0.95 }}
-    transition={{ duration: 0.3, ease: "easeOut" }}
-    className="
-      absolute top-full mt-2 z-50
-      bg-gradient-to-br from-white to-gray-50/80 rounded-2xl shadow-2xl border-2 border-gray-200 backdrop-blur
-      p-3 max-h-[420px] overflow-y-auto overflow-x-hidden
-      w-[calc(100vw-2.5rem)] max-w-[22rem] sm:w-[min(24rem,calc(100vw-4rem))]
-      scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100
-    "
+    initial={{ opacity: 0, height: 0 }}
+    animate={{ opacity: 1, height: "auto" }}
+    exit={{ opacity: 0, height: 0 }}
+    transition={{ duration: 0.25 }}
+    className="w-100 mt-3"
   >
-    {/* Header with icon */}
-    <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-200">
-      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center">
-        <HiSparkles className="w-4 h-4 text-white" />
-      </div>
-      <div>
-        <p className="text-sm font-bold text-gray-900">
-          {category.name} Types
-        </p>
-        <p className="text-xs text-gray-500">
-          {category.subcategories.length} options available
-        </p>
-      </div>
-    </div>
-
-    {/* Grid Container */}
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-      
-      {/* All Option */}
-      <button
-        onClick={() => setSelectedSubCategory(null)}
-        className={`group rounded-xl p-4 flex flex-col items-center gap-2.5 text-center transition-all duration-200 ${
-          !selectedSubCategory
-            ? "bg-gradient-to-br from-gray-900 to-gray-700 text-white shadow-lg ring-2 ring-gray-900 ring-offset-2"
-            : "bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-gray-400 hover:shadow-md"
-        }`}
-      >
-        <div
-          className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
-            !selectedSubCategory 
-              ? "bg-white/20 shadow-inner" 
-              : "bg-gradient-to-br from-gray-100 to-gray-200 group-hover:scale-110"
+    <div className="bg-gray-50 rounded-2xl border border-gray-200 p-4">
+      <div className="grid grid-cols-2 gap-3">
+        
+        {/* All option */}
+        <button
+          onClick={() => setSelectedSubCategory(null)}
+          className={`rounded-xl p-3 text-sm font-semibold transition ${
+            !selectedSubCategory
+              ? "bg-black text-white"
+              : "bg-white border border-gray-300 hover:border-black"
           }`}
         >
-          <HiSparkles
-            className={`w-6 h-6 transition-all ${
-              !selectedSubCategory ? "text-white" : "text-gray-700"
-            }`}
-          />
-        </div>
-        <span className={`text-sm font-bold leading-tight ${
-          !selectedSubCategory ? "text-white" : "text-gray-900"
-        }`}>
           All {category.name}
-        </span>
-      </button>
+        </button>
 
-      {/* Subcategories */}
-      {category.subcategories.map((subCat: any) => {
-        const active = selectedSubCategory === subCat.id.toString();
+        {category.subcategories.map((subCat: any) => {
+          const active = selectedSubCategory === subCat.id.toString();
 
-        return (
-          <button
-            key={subCat.id}
-            onClick={() => setSelectedSubCategory(subCat.id.toString())}
-            className={`group rounded-xl p-4 flex flex-col items-center gap-2.5 text-center transition-all duration-200 ${
-              active
-                ? "bg-gradient-to-br from-gray-900 to-gray-700 text-white shadow-lg ring-2 ring-gray-900 ring-offset-2"
-                : "bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-gray-400 hover:shadow-md"
-            }`}
-          >
-            <div
-              className={`w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center transition-all ${
-                active 
-                  ? "bg-white/20 shadow-inner ring-2 ring-white/30" 
-                  : "bg-gradient-to-br from-gray-100 to-gray-200 group-hover:scale-110"
+          return (
+            <button
+              key={subCat.id}
+              onClick={() => setSelectedSubCategory(subCat.id.toString())}
+              className={`rounded-xl p-3 text-sm font-semibold transition flex items-center gap-2 ${
+                active
+                  ? "bg-black text-white"
+                  : "bg-white border border-gray-300 hover:border-black"
               }`}
             >
-              {subCat.icon ? (
+              {subCat.icon && (
                 <Image
                   src={subCat.icon}
                   alt={subCat.name}
-                  width={48}
-                  height={48}
-                  className="object-cover w-full h-full"
+                  width={20}
+                  height={20}
+                  className="rounded"
                   unoptimized
                 />
-              ) : (
-                <HiSparkles
-                  className={`w-6 h-6 transition-all ${
-                    active ? "text-white" : "text-gray-700"
-                  }`}
-                />
               )}
-            </div>
-
-            <span className={`text-sm font-bold leading-tight line-clamp-2 ${
-              active ? "text-white" : "text-gray-900"
-            }`}>
               {subCat.name}
-            </span>
-          </button>
-        );
-      })}
+            </button>
+          );
+        })}
+      </div>
     </div>
   </motion.div>
 )}
+
 
                       </div>
                     );
                   })}
                 </div>
 
-                {/* Spacer to prevent dropdown overlap on selection */}
-                {isCategoryDropdownOpen && (
-                  <div
-                    aria-hidden
-                    className="transition-[height] duration-200"
-                    style={{ height: 260 }}
-                  />
-                )}
+       
               </div>
 
               {/* Subcategory section removed - now shown inline below each category */}
