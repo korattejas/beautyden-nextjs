@@ -13,15 +13,16 @@ import {
 } from "react-icons/hi2";
 import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
+import { submitBeauticianInquiryForm } from "@/services/beauticianInquiry.service";
+import { BeauticianInquiryFormData } from "@/services/beauticianInquiry.service";
 
 const EnquiryForm = () => {
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
     phone: "",
-    experience:"",
+    experience_years: "",
     address: "",
-    description: ""
+    bio: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -34,12 +35,20 @@ const EnquiryForm = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
-    setTimeout(() => {
+    try {
+      const payload: BeauticianInquiryFormData = {
+        name: formData.name,
+        phone: formData.phone,
+        experience_years: formData.experience_years,
+        address: formData.address,
+        bio: formData.bio
+      };
+      
+      await submitBeauticianInquiryForm(payload);
       setIsSubmitting(false);
       setIsSuccess(true);
       
@@ -47,15 +56,18 @@ const EnquiryForm = () => {
       setTimeout(() => {
         setFormData({
           name: "",
-          email: "",
           phone: "",
-          experience:"",
+          experience_years: "",
           address: "",
-          description: ""
+          bio: ""
         });
         setIsSuccess(false);
       }, 5000);
-    }, 1500);
+    } catch (error) {
+      console.error("Form submission error:", error);
+      setIsSubmitting(false);
+      alert("Failed to submit form. Please try again later.");
+    }
   };
 
   return (
@@ -66,13 +78,13 @@ const EnquiryForm = () => {
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/60 px-4 py-2 text-sm font-medium text-primary shadow-sm">
               <HiSparkles className="h-4 w-4" />
-              Beauty Enquiry
+              Join Our Team
             </div>
             <h1 className="mt-6 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl md:text-5xl">
-              Get a Personalized Quote
+              Become a Beautician
             </h1>
             <p className="mt-4 text-base text-gray-600 sm:text-lg">
-              Tell us about your beauty needs and we'll provide you with a customized service package and pricing.
+              Join our team of professional beauticians. Fill out the form below and our team will contact you soon.
             </p>
           </div>
         </Container>
@@ -89,10 +101,10 @@ const EnquiryForm = () => {
             >
               <HiCheckCircle className="w-20 h-20 text-green-600 mx-auto mb-6" />
               <h3 className="text-3xl font-bold text-green-600 mb-4">
-                Enquiry Submitted Successfully!
+                Application Submitted Successfully!
               </h3>
               <p className="text-green-700 text-lg">
-                Thank you for your enquiry. We'll review your request and get back to you within 24 hours with a personalized quote.
+                Thank you for your application. Our team will review your request and get back to you soon.
               </p>
             </motion.div>
           ) : (
@@ -106,10 +118,10 @@ const EnquiryForm = () => {
                 <div className="p-6 sm:p-8 md:p-10">
                   <div className="text-center mb-8">
                     <h2 className="font-heading text-2xl font-bold text-foreground mb-2">
-                      Beauty Service Enquiry
+                      Beautician Application
                     </h2>
                     <p className="text-foreground/60">
-                      Fill out the form below and we'll provide you with a customized service package
+                      Fill out the form below and our team will contact you soon
                     </p>
                   </div>
 
@@ -135,23 +147,6 @@ const EnquiryForm = () => {
 
                     {/* Email & Phone */}
                     <div className="grid md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm font-semibold text-foreground mb-3">
-                          Email Address *
-                        </label>
-                        <div className="relative">
-                          <HiEnvelope className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40" />
-                          <input
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                            className="w-full pl-12 pr-4 py-4 bg-background border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 border-border focus:border-primary"
-                            placeholder="your@email.com"
-                          />
-                        </div>
-                      </div>
 
                       <div>
                         <label className="block text-sm font-semibold text-foreground mb-3">
@@ -170,24 +165,24 @@ const EnquiryForm = () => {
                           />
                         </div>
                       </div>
-                    </div>
-
-                     {/* Experience Field */}
-                    <div>
-                      <label className="block text-sm font-semibold text-foreground mb-3">
-                        Experience *
-                      </label>
-                      <div className="relative">
-                        <HiMapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40" />
-                        <input
-                          type="text"
-                          name="experience"
-                          value={formData.experience}
-                          onChange={handleChange}
-                          required
-                          className="w-full pl-12 pr-4 py-4 bg-background border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 border-border focus:border-primary"
-                          placeholder="Your experience"
-                        />
+                      
+                      <div>
+                        <label className="block text-sm font-semibold text-foreground mb-3">
+                          Years of Experience *
+                        </label>
+                        <div className="relative">
+                          <HiEnvelope className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40" />
+                          <input
+                            type="number"
+                            name="experience_years"
+                            value={formData.experience_years || ""}
+                            onChange={handleChange}
+                            required
+                            min="0"
+                            className="w-full pl-12 pr-4 py-4 bg-background border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 border-border focus:border-primary"
+                            placeholder="Years of experience"
+                          />
+                        </div>
                       </div>
                     </div>
 
@@ -210,21 +205,21 @@ const EnquiryForm = () => {
                       </div>
                     </div>
 
-                    {/* Description Field */}
+                    {/* Bio Field */}
                     <div>
                       <label className="block text-sm font-semibold text-foreground mb-3">
-                        Service Description *
+                        Bio *
                       </label>
                       <div className="relative">
                         <HiChatBubbleBottomCenterText className="absolute left-4 top-6 w-5 h-5 text-foreground/40" />
                         <textarea
-                          name="description"
-                          value={formData.description}
+                          name="bio"
+                          value={formData.bio}
                           onChange={handleChange}
                           required
                           rows={5}
                           className="w-full pl-12 pr-4 py-4 bg-background border-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 resize-none border-border focus:border-primary"
-                          placeholder="Describe the beauty services you're interested in, any specific requirements, preferred date/time, etc."
+                          placeholder="Tell us about your skills, expertise, and why you'd be a great addition to our team"
                         />
                       </div>
                     </div>
@@ -240,10 +235,10 @@ const EnquiryForm = () => {
                         {isSubmitting ? (
                           <div className="flex items-center gap-3">
                             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            Processing Enquiry...
+                            Submitting Application...
                           </div>
                         ) : (
-                          "Submit Enquiry"
+                          "Submit Application"
                         )}
                       </Button>
                     </div>
@@ -252,7 +247,7 @@ const EnquiryForm = () => {
               </div>
 
               <div className="mt-10 text-center text-sm text-foreground/60">
-                <p>We respect your privacy. Your information will only be used to process your enquiry.</p>
+                <p>We respect your privacy. Your information will only be used to process your application.</p>
               </div>
             </motion.div>
           )}
