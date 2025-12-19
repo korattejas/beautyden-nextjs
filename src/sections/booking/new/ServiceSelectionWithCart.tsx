@@ -22,6 +22,7 @@ import { useServices, useServiceCategories, useSettings } from "@/hooks/useApi";
 import { BookingService, BookingFormData } from "@/types/booking";
 import Button from "@/components/ui/Button";
 import { useCart } from "@/contexts/CartContext";
+import SeasonWiseBanner from "@/components/banner/SeasonWiseBanner";
 
 const FALLBACK_IMAGE = "/images/services/beauty-default.jpg";
 
@@ -832,6 +833,9 @@ const ServiceSelectionWithCart = ({
 
   return (
     <>
+      {/* Season Wise Banner */}
+      <SeasonWiseBanner />
+
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Mobile Header - Sticky Search & Categories */}
         <div className="lg:hidden sticky top-16 bg-white z-30 pb-4 -mx-4 px-4 border-b">
