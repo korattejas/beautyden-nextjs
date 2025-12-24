@@ -914,7 +914,7 @@ const ServiceSelectionWithCart = ({
                         : "bg-white text-gray-700 border-gray-300 hover:border-gray-500 hover:shadow-sm"
                       }`}
                   >
-                    {subCat.icon && (
+                    {/* {subCat.icon && (
                       <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center">
                         <Image
                           src={subCat.icon}
@@ -925,7 +925,7 @@ const ServiceSelectionWithCart = ({
                           unoptimized
                         />
                       </div>
-                    )}
+                    )} */}
                     {subCat.name}
                   </button>
                 ))}
@@ -942,7 +942,7 @@ const ServiceSelectionWithCart = ({
             
 
               {/* Category Grid */}
-              <div>
+              <div className="relative">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-semibold text-gray-900">
                     Select a service
@@ -969,7 +969,7 @@ const ServiceSelectionWithCart = ({
                     const catId = category.id.toString();
                     const isActiveCategory = selectedCategory === catId;
                     return (
-                      <div key={catId} className="col-span-1 relative">
+                      <div key={catId} className="col-span-1">
                         <button
                           onClick={() => handleCategorySelection(category)}
                           className={`rounded-2xl p-2 flex flex-col items-center gap-2 transition-all text-center w-full`}
@@ -996,16 +996,16 @@ const ServiceSelectionWithCart = ({
                             {category.name}
                           </span>
                         </button>
-{isActiveCategory && category.subcategories?.length > 0 && (
+                        {isActiveCategory && category.subcategories?.length > 0 && (
   <motion.div
     initial={{ opacity: 0, height: 0 }}
     animate={{ opacity: 1, height: "auto" }}
     exit={{ opacity: 0, height: 0 }}
     transition={{ duration: 0.25 }}
-    className="w-100 mt-3"
+    className="mt-3 col-span-full absolute left-0 right-0 "
   >
-    <div className="bg-gray-50 rounded-2xl border border-gray-200 p-4">
-      <div className="grid grid-cols-2 gap-3">
+    <div className="bg-gray-50 rounded-2xl border border-gray-200 p-2 shadow-lg">
+      <div className="grid grid-cols-2 gap-2">
         
         {/* All option */}
         <button
@@ -1026,13 +1026,13 @@ const ServiceSelectionWithCart = ({
             <button
               key={subCat.id}
               onClick={() => setSelectedSubCategory(subCat.id.toString())}
-              className={`rounded-xl p-3 text-sm font-semibold transition flex items-center gap-2 ${
+              className={`rounded-xl p-3 text-sm font-semibold transition items-center gap-1 ${
                 active
                   ? "bg-black text-white"
                   : "bg-white border border-gray-300 hover:border-black"
               }`}
             >
-              {subCat.icon && (
+              {/* {subCat.icon && (
                 <Image
                   src={subCat.icon}
                   alt={subCat.name}
@@ -1041,7 +1041,7 @@ const ServiceSelectionWithCart = ({
                   className="rounded"
                   unoptimized
                 />
-              )}
+              )} */}
               {subCat.name}
             </button>
           );
@@ -1050,6 +1050,7 @@ const ServiceSelectionWithCart = ({
     </div>
   </motion.div>
 )}
+
 
 
                       </div>
