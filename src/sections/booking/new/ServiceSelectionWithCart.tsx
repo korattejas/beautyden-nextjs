@@ -914,7 +914,7 @@ const ServiceSelectionWithCart = ({
                         : "bg-white text-gray-700 border-gray-300 hover:border-gray-500 hover:shadow-sm"
                       }`}
                   >
-                    {subCat.icon && (
+                    {/* {subCat.icon && (
                       <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center">
                         <Image
                           src={subCat.icon}
@@ -925,7 +925,7 @@ const ServiceSelectionWithCart = ({
                           unoptimized
                         />
                       </div>
-                    )}
+                    )} */}
                     {subCat.name}
                   </button>
                 ))}
