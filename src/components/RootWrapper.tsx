@@ -11,6 +11,7 @@ import SplashScreen from "@/components/SplashScreen";
 import { City } from "@/types/city";
 import WhatsAppWidget from "./WhatsAppWidget";
 import FixedBookButton from "./ui/FixedBookButton";
+import SeasonWiseBanner from "./banner/SeasonWiseBanner";
 
 interface RootWrapperProps {
   children: ReactNode;
@@ -109,6 +110,7 @@ export default function RootWrapper({ children }: RootWrapperProps) {
         </CityProvider>
         <ReactQueryDevtools initialIsOpen={false} />
         <WhatsAppWidget />
+        <SeasonWiseBanner />
       </QueryClientProvider>
     </div>
   );
