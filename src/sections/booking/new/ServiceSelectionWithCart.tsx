@@ -51,9 +51,7 @@ const getDiscountInfo = (service: any) => {
   // Show the same percentage style as Services page:
   // what % of original price the customer is paying
   const percent =
-    original > 0 && current > 0
-      ? Math.floor((current / original) * 100)
-      : 0;
+    original > 0 && current > 0 ? Math.floor((current / original) * 100) : 0;
 
   return { original, current, amount, percent };
 };
@@ -232,7 +230,9 @@ const MobileCartDrawer = ({
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600 text-sm">Approx Total</span>
+                      <span className="text-gray-600 text-sm">
+                        Approx Total
+                      </span>
                       <span className="font-medium text-base">
                         ₹{getTotalPrice().toLocaleString()}
                       </span>
@@ -270,7 +270,8 @@ const MobileCartDrawer = ({
                           {advanceBookingDays === 1 ? "day" : "days"} advance
                         </span>
                         <>
-                          {" "}and if urgent then call{" "}
+                          {" "}
+                          and if urgent then call{" "}
                           <a
                             href={`tel:${phoneNumber}`}
                             className="text-blue-600 font-semibold hover:underline inline-flex items-center gap-1"
@@ -313,9 +314,8 @@ const MobileCartDrawer = ({
                           <span>
                             Minimum ₹{minOrder.toLocaleString()} order required.
                             <span className="block mt-1 text-amber-700 font-normal">
-                              Add ₹
-                              {(minOrder - totalPrice).toLocaleString()} more to
-                              proceed.
+                              Add ₹{(minOrder - totalPrice).toLocaleString()}{" "}
+                              more to proceed.
                             </span>
                           </span>
                         </p>
@@ -483,7 +483,7 @@ const ServiceModal = ({
                 {service.duration || "60 min"}
               </p>
             </div>
-            {(service.rating !== undefined && service.rating !== null) && (
+            {service.rating !== undefined && service.rating !== null && (
               <div>
                 <p className="text-xs uppercase tracking-wide text-gray-500">
                   Rating
@@ -499,9 +499,7 @@ const ServiceModal = ({
                 <p className="text-xs uppercase tracking-wide text-gray-500">
                   Reviews
                 </p>
-                <p className="font-medium text-gray-900">
-                  {service.reviews}
-                </p>
+                <p className="font-medium text-gray-900">{service.reviews}</p>
               </div>
             )}
           </div>
@@ -537,10 +535,11 @@ const ServiceModal = ({
           <div className="flex gap-3 pt-4">
             <Button
               onClick={onToggle}
-              className={`flex-1 py-3 rounded-xl font-semibold text-base flex items-center justify-center gap-2 ${isInCart
+              className={`flex-1 py-3 rounded-xl font-semibold text-base flex items-center justify-center gap-2 ${
+                isInCart
                   ? "bg-red-50 text-red-600 hover:bg-red-100"
                   : "bg-black text-white hover:bg-gray-800"
-                }`}
+              }`}
             >
               {isInCart ? (
                 <>
@@ -702,12 +701,7 @@ const ServiceSelectionWithCart = ({
       toggleService(match);
     }
     setHasAppliedServicePreset(true);
-  }, [
-    cartItems,
-    services,
-    preSelectedServiceId,
-    hasAppliedServicePreset,
-  ]);
+  }, [cartItems, services, preSelectedServiceId, hasAppliedServicePreset]);
   const paginationData = servicesData?.data;
 
   // Get subcategories for selected category
@@ -732,9 +726,7 @@ const ServiceSelectionWithCart = ({
     const hasSubcategories = (category.subcategories?.length || 0) > 0;
 
     if (selectedCategory === catId) {
-      setIsCategoryDropdownOpen((prev) =>
-        hasSubcategories ? !prev : false
-      );
+      setIsCategoryDropdownOpen((prev) => (hasSubcategories ? !prev : false));
       return;
     }
 
@@ -834,7 +826,6 @@ const ServiceSelectionWithCart = ({
   return (
     <>
       {/* Season Wise Banner */}
-      <SeasonWiseBanner />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Mobile Header - Sticky Search & Categories */}
@@ -864,10 +855,11 @@ const ServiceSelectionWithCart = ({
             <div className="flex gap-2 min-w-max">
               <button
                 onClick={() => handleCategorySelection()}
-                className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${selectedCategory === "all"
+                className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+                  selectedCategory === "all"
                     ? "bg-black text-white"
                     : "bg-gray-100 text-gray-700"
-                  }`}
+                }`}
               >
                 All
               </button>
@@ -875,10 +867,11 @@ const ServiceSelectionWithCart = ({
                 <button
                   key={category.id}
                   onClick={() => handleCategorySelection(category)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${selectedCategory === category.id.toString()
+                  className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+                    selectedCategory === category.id.toString()
                       ? "bg-black text-white"
                       : "bg-gray-100 text-gray-700"
-                    }`}
+                  }`}
                 >
                   {category.name}
                 </button>
@@ -888,7 +881,7 @@ const ServiceSelectionWithCart = ({
 
           {/* Subcategories - Show BELOW selected category */}
           {subCategories.length > 0 && selectedCategory !== "all" && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
@@ -898,10 +891,11 @@ const ServiceSelectionWithCart = ({
               <div className="flex gap-2 min-w-max">
                 <button
                   onClick={() => setSelectedSubCategory(null)}
-                  className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap border-2 transition-all duration-200 ${!selectedSubCategory
+                  className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap border-2 transition-all duration-200 ${
+                    !selectedSubCategory
                       ? "bg-gradient-to-r from-gray-900 to-gray-700 text-white border-gray-900 shadow-md scale-105"
                       : "bg-white text-gray-700 border-gray-300 hover:border-gray-500 hover:shadow-sm"
-                    }`}
+                  }`}
                 >
                   All
                 </button>
@@ -909,10 +903,11 @@ const ServiceSelectionWithCart = ({
                   <button
                     key={subCat.id}
                     onClick={() => setSelectedSubCategory(subCat.id.toString())}
-                    className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap border-2 transition-all duration-200 flex items-center gap-2 ${selectedSubCategory === subCat.id.toString()
+                    className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap border-2 transition-all duration-200 flex items-center gap-2 ${
+                      selectedSubCategory === subCat.id.toString()
                         ? "bg-gradient-to-r from-gray-900 to-gray-700 text-white border-gray-900 shadow-md scale-105"
                         : "bg-white text-gray-700 border-gray-300 hover:border-gray-500 hover:shadow-sm"
-                      }`}
+                    }`}
                   >
                     {/* {subCat.icon && (
                       <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center">
@@ -939,8 +934,6 @@ const ServiceSelectionWithCart = ({
           {/* Desktop Left Sidebar */}
           <aside className="hidden lg:block lg:col-span-3 lg:sticky lg:top-24 lg:h-[calc(100vh-7rem)] lg:overflow-y-auto lg-overflow-x-hidden">
             <div className="bg-white rounded-2xl p-5 border border-gray-200 space-y-6">
-            
-
               {/* Category Grid */}
               <div className="relative">
                 <div className="flex items-center justify-between mb-3">
@@ -953,9 +946,7 @@ const ServiceSelectionWithCart = ({
                   <button
                     onClick={() => handleCategorySelection()}
                     className={`rounded-2xl p-3 flex flex-col items-center gap-2 transition-all ${
-                      selectedCategory === "all"
-                        ? " "
-                        : " "
+                      selectedCategory === "all" ? " " : " "
                     }`}
                   >
                     <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center text-sm font-semibold">
@@ -974,11 +965,13 @@ const ServiceSelectionWithCart = ({
                           onClick={() => handleCategorySelection(category)}
                           className={`rounded-2xl p-2 flex flex-col items-center gap-2 transition-all text-center w-full`}
                         >
-                          <div className={`w-16 h-16 rounded-2xl bg-gray-50 overflow-hidden flex items-center justify-center border-2 transition-all ${
-                            isActiveCategory
-                              ? "border-black shadow-md"
-                              : "border-transparent"
-                          }`}>
+                          <div
+                            className={`w-16 h-16 rounded-2xl bg-gray-50 overflow-hidden flex items-center justify-center border-2 transition-all ${
+                              isActiveCategory
+                                ? "border-black shadow-md"
+                                : "border-transparent"
+                            }`}
+                          >
                             {category.icon ? (
                               <Image
                                 src={category.icon}
@@ -996,43 +989,49 @@ const ServiceSelectionWithCart = ({
                             {category.name}
                           </span>
                         </button>
-                        {isActiveCategory && category.subcategories?.length > 0 && (
-  <motion.div
-    initial={{ opacity: 0, height: 0 }}
-    animate={{ opacity: 1, height: "auto" }}
-    exit={{ opacity: 0, height: 0 }}
-    transition={{ duration: 0.25 }}
-    className="mt-3 col-span-full absolute left-0 right-0 "
-  >
-    <div className="bg-gray-50 rounded-2xl border border-gray-200 p-2 shadow-lg">
-      <div className="grid grid-cols-2 gap-2">
-        
-        {/* All option */}
-        <button
-          onClick={() => setSelectedSubCategory(null)}
-          className={`rounded-xl p-3 text-sm font-semibold transition ${
-            !selectedSubCategory
-              ? "bg-black text-white"
-              : "bg-white border border-gray-300 hover:border-black"
-          }`}
-        >
-          All {category.name}
-        </button>
+                        {isActiveCategory &&
+                          category.subcategories?.length > 0 && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.25 }}
+                              className="mt-3 col-span-full absolute left-0 right-0 "
+                            >
+                              <div className="bg-gray-50 rounded-2xl border border-gray-200 p-2 shadow-lg">
+                                <div className="grid grid-cols-2 gap-2">
+                                  {/* All option */}
+                                  <button
+                                    onClick={() => setSelectedSubCategory(null)}
+                                    className={`rounded-xl p-3 text-sm font-semibold transition ${
+                                      !selectedSubCategory
+                                        ? "bg-black text-white"
+                                        : "bg-white border border-gray-300 hover:border-black"
+                                    }`}
+                                  >
+                                    All {category.name}
+                                  </button>
 
-        {category.subcategories.map((subCat: any) => {
-          const active = selectedSubCategory === subCat.id.toString();
+                                  {category.subcategories.map((subCat: any) => {
+                                    const active =
+                                      selectedSubCategory ===
+                                      subCat.id.toString();
 
-          return (
-            <button
-              key={subCat.id}
-              onClick={() => setSelectedSubCategory(subCat.id.toString())}
-              className={`rounded-xl p-3 text-sm font-semibold transition items-center gap-1 ${
-                active
-                  ? "bg-black text-white"
-                  : "bg-white border border-gray-300 hover:border-black"
-              }`}
-            >
-              {/* {subCat.icon && (
+                                    return (
+                                      <button
+                                        key={subCat.id}
+                                        onClick={() =>
+                                          setSelectedSubCategory(
+                                            subCat.id.toString()
+                                          )
+                                        }
+                                        className={`rounded-xl p-3 text-sm font-semibold transition items-center gap-1 ${
+                                          active
+                                            ? "bg-black text-white"
+                                            : "bg-white border border-gray-300 hover:border-black"
+                                        }`}
+                                      >
+                                        {/* {subCat.icon && (
                 <Image
                   src={subCat.icon}
                   alt={subCat.name}
@@ -1042,23 +1041,18 @@ const ServiceSelectionWithCart = ({
                   unoptimized
                 />
               )} */}
-              {subCat.name}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  </motion.div>
-)}
-
-
-
+                                        {subCat.name}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
                       </div>
                     );
                   })}
                 </div>
-
-       
               </div>
 
               {/* Subcategory section removed - now shown inline below each category */}
@@ -1104,10 +1098,11 @@ const ServiceSelectionWithCart = ({
                         key={service.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className={`bg-white rounded-2xl border-2 overflow-hidden transition-all hover:shadow-lg flex flex-col sm:flex-row gap-4 p-4 ${isSelected
+                        className={`bg-white rounded-2xl border-2 overflow-hidden transition-all hover:shadow-lg flex flex-col sm:flex-row gap-4 p-4 ${
+                          isSelected
                             ? "border-black shadow-md"
                             : "border-gray-200"
-                          }`}
+                        }`}
                       >
                         {/* Left content */}
                         <div className="flex-1 flex flex-col gap-3">
@@ -1186,7 +1181,9 @@ const ServiceSelectionWithCart = ({
                               onClick={() => setSelectedService(service)}
                               className="inline-flex items-center gap-1 text-sm font-semibold transition-colors pb-1"
                             >
-                            <span className="border-b-2 border-gray-300 hover:border-black">View details</span>
+                              <span className="border-b-2 border-gray-300 hover:border-black">
+                                View details
+                              </span>
                               <HiInformationCircle className="w-4 h-4" />
                             </button>
                           </div>
@@ -1215,10 +1212,11 @@ const ServiceSelectionWithCart = ({
 
                           <button
                             onClick={() => toggleService(service)}
-                            className={`w-full py-2.5 rounded-xl text-sm font-semibold border transition-all ${isSelected
+                            className={`w-full py-2.5 rounded-xl text-sm font-semibold border transition-all ${
+                              isSelected
                                 ? " border-black hover:bg-gray-800 hover:text-white"
                                 : "border-black-200 text-black-700 hover:bg-black-50"
-                              }`}
+                            }`}
                           >
                             {isSelected ? "Remove from Cart" : "Add"}
                           </button>
@@ -1287,7 +1285,8 @@ const ServiceSelectionWithCart = ({
                     </span>
                     {getSetting("phone_number") && (
                       <>
-                        {" "}and if urgent then call{" "}
+                        {" "}
+                        and if urgent then call{" "}
                         <a
                           href={`tel:${getSetting("phone_number")}`}
                           className="text-blue-600 font-semibold hover:underline inline-flex items-center gap-1"
@@ -1402,9 +1401,7 @@ const ServiceSelectionWithCart = ({
                 <>
                   <div className="border-t border-gray-200 pt-3 space-y-2 mb-4">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm text-gray-600">
-                        Duration:
-                      </span>
+                      <span className="text-sm text-gray-600">Duration:</span>
                       <span className="font-medium text-gray-900 text-sm">
                         {formatDuration(getTotalDuration())}
                       </span>
@@ -1420,7 +1417,8 @@ const ServiceSelectionWithCart = ({
                     {specialOfferDiscountAmount > 0 && (
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-sm font-medium text-green-700">
-                          Special Offer ({specialOfferLabel || `${specialOfferPercentage}%`})
+                          Special Offer (
+                          {specialOfferLabel || `${specialOfferPercentage}%`})
                         </span>
                         <span className="text-sm font-semibold text-green-700">
                           -₹{specialOfferDiscountAmount.toLocaleString()}
@@ -1428,9 +1426,7 @@ const ServiceSelectionWithCart = ({
                       </div>
                     )}
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm text-gray-600">
-                        Services:
-                      </span>
+                      <span className="text-sm text-gray-600">Services:</span>
                       <span className="font-medium text-gray-900 text-sm">
                         {cartItems.length}
                       </span>
@@ -1589,7 +1585,7 @@ const ServiceSelectionWithCart = ({
           -ms-overflow-style: none;
           scrollbar-width: none;
         }
-        
+
         /* Custom scrollbar for subcategory dropdown */
         .scrollbar-thin::-webkit-scrollbar {
           width: 6px;
@@ -1616,4 +1612,3 @@ const ServiceSelectionWithCart = ({
 };
 
 export default ServiceSelectionWithCart;
-
