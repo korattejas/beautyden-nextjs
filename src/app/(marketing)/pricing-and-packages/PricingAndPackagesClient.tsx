@@ -138,7 +138,7 @@ const PricingAndPackagesClient = () => {
       {/* Top Section - Description */}
       <section className="relative overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,105,180,0.15),_transparent_55%)]" />
-        <Container className="relative py-16 md:py-24">
+        <Container className="relative py-20 md:py-24">
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/60 px-4 py-2 text-sm font-medium text-primary shadow-sm mb-6">
               <HiSparkles className="h-4 w-4" />
@@ -189,12 +189,6 @@ const PricingAndPackagesClient = () => {
                   </ul>
                 </div>
               </div>
-              
-              <p className="mt-8 text-base text-gray-600 sm:text-lg max-w-3xl mx-auto">
-                At BeautyDen, we believe in delivering premium beauty services with complete hygiene, experienced professionals, and visible results.
-                Choose from our wide range of services and affordable packages, thoughtfully designed to suit your beauty needs and preferences.
-              </p>
-
        
             </div>
           </div>
@@ -224,7 +218,7 @@ const PricingAndPackagesClient = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Full Price List Card */}
               <a 
-                href="/documents/Beautyden-company-combo-package-price-list.pdf" 
+                href="/documents/Beautyden-Company- Brochure-Price-List_compressed.pdf" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className={`block bg-gradient-to-br from-pink-50 to-blue-50 rounded-2xl p-6 border-2 border-pink-100 transition-all cursor-pointer hover:shadow-lg hover:from-pink-100 hover:to-blue-100`}
@@ -247,7 +241,7 @@ const PricingAndPackagesClient = () => {
 
               {/* Combo Packages Card */}
               <a 
-                href="/documents/Beautyden-Company- Brochure-Price-List.pdf" 
+                href="/documents/Beautyden-company-combo-package-price-list_compressed.pdf" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className={`block bg-gradient-to-br from-blue-50 to-pink-50 rounded-2xl p-6 border-2 border-blue-100 transition-all cursor-pointer hover:shadow-lg hover:from-blue-100 hover:to-pink-100`}
@@ -270,7 +264,7 @@ const PricingAndPackagesClient = () => {
 
               {/* Bridal Packages Card */}
               <a 
-                href="/documents/Beautyden-company-bridal-package-price-list.pdf" 
+                href="/documents/Beautyden-company-bridal-package-price-list_compressed.pdf" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className={`block bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl p-6 border-2 border-pink-100 transition-all cursor-pointer hover:shadow-lg hover:from-pink-100 hover:to-purple-100`}
