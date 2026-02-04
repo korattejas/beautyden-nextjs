@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Container from "@/components/ui/Container";
 import { HiSparkles, HiArrowRight } from "react-icons/hi2";
+import { useSettings } from "@/hooks/useApi";
 interface PricingPackage {
   id: string;
   title: string;
@@ -15,6 +16,63 @@ interface PricingPackage {
 const PricingAndPackagesClient = () => {
   const [activeTab, setActiveTab] = useState<'combo' | 'all' | 'bridal'>('all');
 
+  // Fetch settings for discount calculations
+  const { data: settingsData, isLoading: settingsLoading } = useSettings();
+  const settings = settingsData?.data || [];
+
+  // Helper function to get setting value by key
+  const getSetting = (key: string) => {
+    return settings.find((setting: any) => setting.key === key)?.value || "";
+  };
+
+  // Parse number from setting value
+  const parseNumberFromSetting = (
+    value: string | number | undefined,
+    fallback = 0
+  ) => {
+    if (value === undefined || value === null) return fallback;
+    const cleaned = value.toString().replace(/[^[0-9].]/g, "");
+    const parsed = parseFloat(cleaned);
+    return Number.isNaN(parsed) ? fallback : parsed;
+  };
+
+  // Get discount settings
+  const specialOfferPercentageSetting = getSetting("special_offer_percentage");
+  const specialOfferThresholdSetting = getSetting(
+    "special_offer_above_order_discount_amount"
+  );
+  const specialOfferPercentage = parseNumberFromSetting(
+    specialOfferPercentageSetting,
+    0
+  );
+  const specialOfferThreshold = parseNumberFromSetting(
+    specialOfferThresholdSetting,
+    2500 // Default threshold of 2500 if not set
+  );
+
+  // Function to calculate discount for a given price
+  const calculateDiscount = (price: string) => {
+    // Extract numeric value from price string (remove currency symbols, commas, etc.)
+    const numericPrice = parseFloat(price.replace(/[^[0-9].]/g, ""));
+    
+    // Check if price is above threshold and discount percentage exists
+    if (numericPrice >= specialOfferThreshold && specialOfferPercentage > 0) {
+      const discountAmount = (numericPrice * specialOfferPercentage) / 100;
+      return {
+        hasDiscount: true,
+        discountAmount: discountAmount,
+        finalPrice: numericPrice - discountAmount,
+        percentage: specialOfferPercentage
+      };
+    }
+    
+    return {
+      hasDiscount: false,
+      discountAmount: 0,
+      finalPrice: numericPrice,
+      percentage: 0
+    };
+  };
 
 
   // Sample data for combo packages
@@ -92,21 +150,43 @@ const PricingAndPackagesClient = () => {
                 Transparent Pricing, Premium Results
               </h1>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-12">
-                <div className="bg-white/70 p-4 rounded-xl border border-gray-200">
-                  <div className="text-2xl">✨</div>
-                  <div className="font-semibold text-gray-900">Trusted by 1000+ Happy Customers</div>
-                  <div className="text-sm text-gray-600">💖</div>
+        {/* Service Coverage Boxes */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+                {/* Box 1 - Service Coverage */}
+                <div className="bg-white/70 p-6 rounded-xl border border-gray-200">
+                  <div className="text-xl mb-3">🏠</div>
+                  <div className="font-semibold text-gray-900 mb-2">We Come to You</div>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Home Services</li>
+                    <li>• Events</li>
+                    <li>• Functions</li>
+                    <li>• Marriages</li>
+                    <li>• Special Occasions</li>
+                  </ul>
                 </div>
-                <div className="bg-white/70 p-4 rounded-xl border border-gray-200">
-                  <div className="text-2xl">✅</div>
-                  <div className="font-semibold text-gray-900">1000+ Appointments Successfully Completed</div>
-                  <div className="text-sm text-gray-600">Quality Assured</div>
+
+                {/* Box 2 - Experience & Reliability */}
+                <div className="bg-white/70 p-6 rounded-xl border border-gray-200">
+                  <div className="text-xl mb-3">✅</div>
+                  <div className="font-semibold text-gray-900 mb-2">1000+ Appointments Successfully Completed</div>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Quality Assured Services</li>
+                    <li>• On-Time & Hassle-Free Experience</li>
+                    <li>• Trusted by Regular & Event Clients</li>
+                    <li>• Consistent results</li>
+                  </ul>
                 </div>
-                <div className="bg-white/70 p-4 rounded-xl border border-gray-200">
-                  <div className="text-2xl">🌟</div>
-                  <div className="font-semibold text-gray-900">Professional Service | Hygiene Maintained | Best Results Guaranteed</div>
-                  <div className="text-sm text-gray-600">Premium Standards</div>
+
+                {/* Box 3 - Professional Standards */}
+                <div className="bg-white/70 p-6 rounded-xl border border-gray-200">
+                  <div className="text-xl mb-3">🌟</div>
+                  <div className="font-semibold text-gray-900 mb-2">Premium Service Standards</div>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Professional & Trained Staff</li>
+                    <li>• Hygiene Maintained at All Times</li>
+                    <li>• Best Results Guaranteed</li>
+                    <li>• Premium products & sanitized tools</li>
+                  </ul>
                 </div>
               </div>
               
@@ -114,6 +194,8 @@ const PricingAndPackagesClient = () => {
                 At BeautyDen, we believe in delivering premium beauty services with complete hygiene, experienced professionals, and visible results.
                 Choose from our wide range of services and affordable packages, thoughtfully designed to suit your beauty needs and preferences.
               </p>
+
+       
             </div>
           </div>
         </Container>
@@ -126,81 +208,92 @@ const PricingAndPackagesClient = () => {
             <h2 className="text-2xl font-semibold text-gray-900 md:text-3xl text-center mb-12">
               Choose Your Perfect Package
             </h2>
+                  {/* Special Offers Box */}
+      <section className="py-4 md:py-6 bg-red-50 border border-red-200 text-red-800 rounded-xl mb-8">
+        <Container>
+          <div className="max-w-5xl mx-auto text-center px-4">
+            <h2 className="text-xl md:text-2xl font-bold mb-2">🎉 SPECIAL OFFER ALERT! 🎉</h2>
+            <p className="text-base md:text-lg">
+              Get {specialOfferPercentage}% discount on all packages worth ₹{specialOfferThreshold} or more!
+              Limited time offer - Book now to avail the discount.
+            </p>
+          </div>
+        </Container>
+      </section>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Full Price List Card */}
-              <div 
-                className={`bg-white rounded-2xl p-6 border-2 transition-all cursor-pointer hover:shadow-lg ${
-                  activeTab === 'all' ? 'border-primary shadow-lg' : 'border-gray-200'
-                }`}
-                onClick={() => setActiveTab('all')}
+              <a 
+                href="/documents/Beautyden-company-combo-package-price-list.pdf" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className={`block bg-gradient-to-br from-pink-50 to-blue-50 rounded-2xl p-6 border-2 border-pink-100 transition-all cursor-pointer hover:shadow-lg hover:from-pink-100 hover:to-blue-100`}
               >
-                <div className="text-3xl mb-4">📋</div>
+                <div className="text-4xl mb-4 relative">
+                  📋
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    🔥 Most Popular
+                  </span>
+                </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Full Price List</h3>
                 <p className="text-gray-600 text-sm mb-4">
                   Explore our complete range of individual beauty services with transparent and affordable pricing.
                   Perfect for clients who prefer selecting services individually.
                 </p>
-                <a 
-                  href="/documents/Beautyden-company-combo-package-price-list.pdf" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-primary font-medium text-sm"
-                >
-                  View Details <HiArrowRight className="w-4 h-4" />
-                </a>
-              </div>
+                <div className="inline-flex items-center gap-2 text-primary font-medium text-sm">
+                  View Services & Prices <HiArrowRight className="w-4 h-4" />
+                </div>
+              </a>
 
               {/* Combo Packages Card */}
-              <div 
-                className={`bg-white rounded-2xl p-6 border-2 transition-all cursor-pointer hover:shadow-lg ${
-                  activeTab === 'combo' ? 'border-primary shadow-lg' : 'border-gray-200'
-                }`}
-                onClick={() => setActiveTab('combo')}
+              <a 
+                href="/documents/Beautyden-Company- Brochure-Price-List.pdf" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className={`block bg-gradient-to-br from-blue-50 to-pink-50 rounded-2xl p-6 border-2 border-blue-100 transition-all cursor-pointer hover:shadow-lg hover:from-blue-100 hover:to-pink-100`}
               >
-                <div className="text-3xl mb-4">🎁</div>
+                <div className="text-4xl mb-4 relative">
+                  🎁
+                  <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    💎 Best Value
+                  </span>
+                </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Combo Packages</h3>
                 <p className="text-gray-600 text-sm mb-4">
                   Save more with our specially curated combo packages that offer complete beauty care at the best value.
                   Ideal for regular maintenance and special occasions.
                 </p>
-                <a 
-                  href="/documents/Beautyden-company-combo-package-price-list2.pdf" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-primary font-medium text-sm"
-                >
-                  View Details <HiArrowRight className="w-4 h-4" />
-                </a>
-              </div>
+                <div className="inline-flex items-center gap-2 text-primary font-medium text-sm">
+                  View Services & Prices <HiArrowRight className="w-4 h-4" />
+                </div>
+              </a>
 
               {/* Bridal Packages Card */}
-              <div 
-                className={`bg-white rounded-2xl p-6 border-2 transition-all cursor-pointer hover:shadow-lg ${
-                  activeTab === 'bridal' ? 'border-primary shadow-lg' : 'border-gray-200'
-                }`}
-                onClick={() => setActiveTab('bridal')}
+              <a 
+                href="/documents/Beautyden-company-bridal-package-price-list.pdf" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className={`block bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl p-6 border-2 border-pink-100 transition-all cursor-pointer hover:shadow-lg hover:from-pink-100 hover:to-purple-100`}
               >
-                <div className="text-3xl mb-4">👰</div>
+                <div className="text-4xl mb-4 relative">
+                  👰
+                  <span className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    👰 Bridal Special
+                  </span>
+                </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Bridal Packages</h3>
                 <p className="text-gray-600 text-sm mb-4">
                   Our exclusive bridal packages are designed to make you look radiant and confident on your special day.
                   Customized care, premium products, and expert professionals included.
                 </p>
-                <a 
-                  href="/documents/Beautyden-company-bridal-package-price-list.pdf" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-primary font-medium text-sm"
-                >
-                  View Details <HiArrowRight className="w-4 h-4" />
-                </a>
-              </div>
+                <div className="inline-flex items-center gap-2 text-primary font-medium text-sm">
+                  View Services & Prices <HiArrowRight className="w-4 h-4" />
+                </div>
+              </a>
             </div>
           </div>
         </Container>
       </section>
-
 
 
 
