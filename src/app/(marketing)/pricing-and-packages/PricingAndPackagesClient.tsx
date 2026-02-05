@@ -196,24 +196,12 @@ const PricingAndPackagesClient = () => {
       </section>
 
       {/* Main Sections - Grid */}
-      <section className="py-16 md:py-20">
+      <section className="py-16 md:py-10">
         <Container>
           <div className="max-w-5xl mx-auto">
             <h2 className="text-2xl font-semibold text-gray-900 md:text-3xl text-center mb-12">
               Choose Your Perfect Package
             </h2>
-                  {/* Special Offers Box */}
-      <section className="py-4 md:py-6 bg-red-50 border border-red-200 text-red-800 rounded-xl mb-8">
-        <Container>
-          <div className="max-w-5xl mx-auto text-center px-4">
-            <h2 className="text-xl md:text-2xl font-bold mb-2">🎉 SPECIAL OFFER ALERT! 🎉</h2>
-            <p className="text-base md:text-lg">
-              Get {specialOfferPercentage}% discount on all packages worth ₹{specialOfferThreshold} or more!
-              Limited time offer - Book now to avail the discount.
-            </p>
-          </div>
-        </Container>
-      </section>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Full Price List Card */}
@@ -234,9 +222,9 @@ const PricingAndPackagesClient = () => {
                   Explore our complete range of individual beauty services with transparent and affordable pricing.
                   Perfect for clients who prefer selecting services individually.
                 </p>
-                <div className="inline-flex items-center gap-2 text-primary font-medium text-sm">
+                <button className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-medium text-sm px-4 py-2 rounded-lg transition-colors shadow-sm">
                   View Services & Prices <HiArrowRight className="w-4 h-4" />
-                </div>
+                </button>
               </a>
 
               {/* Combo Packages Card */}
@@ -257,9 +245,9 @@ const PricingAndPackagesClient = () => {
                   Save more with our specially curated combo packages that offer complete beauty care at the best value.
                   Ideal for regular maintenance and special occasions.
                 </p>
-                <div className="inline-flex items-center gap-2 text-primary font-medium text-sm">
+                <button className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-medium text-sm px-4 py-2 rounded-lg transition-colors shadow-sm">
                   View Services & Prices <HiArrowRight className="w-4 h-4" />
-                </div>
+                </button>
               </a>
 
               {/* Bridal Packages Card */}
@@ -280,16 +268,27 @@ const PricingAndPackagesClient = () => {
                   Our exclusive bridal packages are designed to make you look radiant and confident on your special day.
                   Customized care, premium products, and expert professionals included.
                 </p>
-                <div className="inline-flex items-center gap-2 text-primary font-medium text-sm">
+                <button className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-medium text-sm px-4 py-2 rounded-lg transition-colors shadow-sm">
                   View Services & Prices <HiArrowRight className="w-4 h-4" />
-                </div>
+                </button>
               </a>
             </div>
           </div>
         </Container>
       </section>
 
-
+ {/* Special Offers Box */}
+      <section className="py-4 md:py-6">
+        <Container>
+          <div className="bg-red-50 border border-red-200 text-red-800 rounded-xl p-6 text-center">
+            <h2 className="text-xl md:text-2xl font-bold mb-2">🎉 SPECIAL OFFER ALERT! 🎉</h2>
+            <p className="text-base md:text-lg max-w-3xl mx-auto">
+              Get {specialOfferPercentage}% discount on all packages worth ₹{specialOfferThreshold} or more!
+              Limited time offer - Book now to avail the discount.
+            </p>
+          </div>
+        </Container>
+      </section>
 
       {/* Bottom CTA Section */}
       <section className="py-16 md:py-20 bg-gradient-to-r from-primary/10 to-purple-50">
