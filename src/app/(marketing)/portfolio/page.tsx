@@ -1,67 +1,76 @@
-import path from "path";
-import fs from "fs/promises";
+"use client";
+
+import { usePortfolio } from "@/hooks/useApi";
 import PortfolioClient from "./PortfolioClient";
+import { PortfolioCategory } from "@/types/portfolio";
+import Container from "@/components/ui/Container";
 
-type PortfolioItem = {
-  src: string;
-};
+export default function PortfolioPage() {
+  const { data, isLoading, error } = usePortfolio();
 
-const getPortfolioItems = async (): Promise<PortfolioItem[]> => {
-  const portfolioDir = path.join(process.cwd(), "public", "images", "portfolio");
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
+        {/* Hero Section Skeleton */}
+        <section className="relative overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-white">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,105,180,0.15),_transparent_55%)]" />
+          <Container className="relative py-20 md:py-28">
+            <div className="max-w-3xl">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/60 px-4 py-2">
+                <div className="w-4 h-4 bg-gray-200 rounded-full animate-pulse" />
+                <div className="h-5 w-32 bg-gray-200 rounded animate-pulse" />
+              </div>
+              <div className="mt-6 space-y-4">
+                <div className="h-12 bg-gray-200 rounded animate-pulse" />
+                <div className="h-12 bg-gray-200 rounded animate-pulse" />
+                <div className="h-6 bg-gray-200 rounded animate-pulse w-3/4 mt-4" />
+                <div className="h-6 bg-gray-200 rounded animate-pulse w-2/3" />
+              </div>
+            </div>
+          </Container>
+        </section>
 
-  try {
-    const entries = await fs.readdir(portfolioDir, { withFileTypes: true });
-
-    const files = entries
-      .filter((entry) => entry.isFile())
-      .map((entry) => entry.name)
-      .filter((name) => /\.(jpe?g|png|webp|gif)$/i.test(name));
-
-    const extractNumber = (filename: string) => {
-      const match = filename.match(/(\d+)/);
-      return match ? parseInt(match[1], 10) : Number.POSITIVE_INFINITY;
-    };
-
-    const getPrefixRank = (filename: string) => {
-      const lower = filename.toLowerCase();
-      if (lower.startsWith("p-")) return 0;
-      if (lower.startsWith("pn-")) return 1;
-      if (lower.startsWith("p")) return 2;
-      return 3;
-    };
-
-    const sorted = files.sort((a, b) => {
-      const aNum = extractNumber(a);
-      const bNum = extractNumber(b);
-
-      if (aNum !== bNum) {
-        return aNum - bNum;
-      }
-
-      const aRank = getPrefixRank(a);
-      const bRank = getPrefixRank(b);
-
-      if (aRank !== bRank) {
-        return aRank - bRank;
-      }
-
-      return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" });
-    });
-
-    return sorted.map((name) => ({
-      src: `/images/portfolio/${name}`,
-    }));
-  } catch (error) {
-    if (process.env.NODE_ENV !== "production") {
-      console.error("Failed to read portfolio directory:", error);
-    }
-    return [];
+        {/* Portfolio Grid Skeleton */}
+        <section className="py-12 md:py-16">
+          <Container>
+            <div className="mb-10 flex flex-col gap-2 text-center">
+              <div className="h-8 bg-gray-200 rounded animate-pulse w-64 mx-auto" />
+              <div className="h-5 bg-gray-200 rounded animate-pulse w-80 mx-auto mt-2" />
+            </div>
+            
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2">
+              {[1, 2].map((index) => (
+                <div key={index} className="rounded-2xl bg-white shadow-sm border border-gray-100 overflow-hidden">
+                  <div className="h-80 bg-gray-200 animate-pulse" />
+                </div>
+              ))}
+            </div>
+          </Container>
+        </section>
+      </div>
+    );
   }
-};
 
-export default async function PortfolioPage() {
-  const portfolioItems = await getPortfolioItems();
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-6">
+          <div className="text-5xl mb-4">😢</div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Oops! Something went wrong</h2>
+          <p className="text-gray-600 mb-6">We couldn't load the portfolio at the moment. Please try again later.</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-primary hover:bg-primary/90 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-  return <PortfolioClient portfolioItems={portfolioItems} />;
+  const portfolioCategories = data?.data || [];
+
+  return <PortfolioClient portfolioCategories={portfolioCategories} />;
 }
 

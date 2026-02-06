@@ -60,4 +60,7 @@ export const endpoints = {
   
   // Product Brands
   PRODUCT_BRANDS: "/V1/productBrand",
+
+  // Portfolio
+  PORTFOLIO: "/V1/portfolio",
 } as const;
