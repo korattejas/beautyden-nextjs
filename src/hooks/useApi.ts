@@ -22,6 +22,7 @@ import { PolicyType } from "@/types/policy";
 import { getSettings } from "@/services/settings.service";
 import { getHomeCounters } from "@/services/homeCounter.service";
 import { getProductBrands } from "@/services/productBrand.service";
+import { getPortfolio } from "@/services/portfolio.service";
 import { useCityContext } from "../contexts/CityContext";
 
 // Services hooks
@@ -139,5 +140,13 @@ export const useProductBrands = () => {
     queryKey: ["productBrands"],
     queryFn: getProductBrands,
     staleTime: 60 * 60 * 1000, // 1 hour
+  });
+};
+
+export const usePortfolio = () => {
+  return useQuery({
+    queryKey: ["portfolio"],
+    queryFn: getPortfolio,
+    staleTime: 30 * 60 * 1000, // 30 minutes
   });
 };
