@@ -131,13 +131,13 @@ const PortfolioClient = ({ portfolioCategories }: PortfolioClientProps) => {
       <section className="py-12 md:py-16 bg-gradient-to-r from-green-50 to-teal-50">
         <Container>
           <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-3 bg-white rounded-full px-6 py-3 shadow-md mb-6">
+            <div className="inline-flex flex-col sm:flex-row items-center gap-4 bg-white rounded-2xl px-6 py-4 shadow-md mb-6">
               <div className="flex items-center justify-center w-12 h-12 bg-green-500 rounded-full">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-6 h-6 text-white">
                   <path fill="currentColor" d="M17.507 14.307l-.007.077c0 2.485-2.847 5.485-2.847 5.485C13.743 20.346 13 20.5 12 20.5s-1.743-.154-2.653-.631c0 0-2.847-3-2.847-5.485v-.077C6.473 14.09 6 13.184 6 12c0-1.184.473-2.09.473-2.09s2.847-2.908 2.847-2.908c.91 0 1.653-.154 2.653-.631 0 0 2.847 3 2.847 5.485v.077c0 .283-.047.554-.047.554l2.354 1.346c.326.185.4.631.185.985l-.007.019c-.215.354-.631.446-.957.261l-2.146-1.231zm-5.507 3.693c.8 0 1.453-.654 1.453-1.453s-.654-1.453-1.453-1.453-1.453.654-1.453 1.453.654 1.453 1.453 1.453zM12 2C6.477 2 2 6.477 2 12c0 1.63.398 3.165 1.09 4.523L2 22l5.477-1.09c1.358.692 2.893 1.09 4.523 1.09 5.523 0 10-4.477 10-10S17.523 2 12 2z"/>
                 </svg>
               </div>
-              <div className="text-left">
+              <div className="text-center sm:text-left">
                 <h3 className="font-semibold text-gray-900">Want to see more photos?</h3>
                 <p className="text-sm text-gray-600">Contact us on WhatsApp for additional portfolio items</p>
               </div>
@@ -147,15 +147,17 @@ const PortfolioClient = ({ portfolioCategories }: PortfolioClientProps) => {
               href={`https://wa.me/91${getSetting("phone_number")}`} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-medium px-8 py-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
+              className="inline-block bg-green-500 hover:bg-green-600 text-white font-medium px-6 py-3 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 text-sm sm:text-base"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5">
-                <path fill="currentColor" d="M17.507 14.307l-.007.077c0 2.485-2.847 5.485-2.847 5.485C13.743 20.346 13 20.5 12 20.5s-1.743-.154-2.653-.631c0 0-2.847-3-2.847-5.485v-.077C6.473 14.09 6 13.184 6 12c0-1.184.473-2.09.473-2.09s2.847-2.908 2.847-2.908c.91 0 1.653-.154 2.653-.631 0 0 2.847 3 2.847 5.485v.077c0 .283-.047.554-.047.554l2.354 1.346c.326.185.4.631.185.985l-.007.019c-.215.354-.631.446-.957.261l-2.146-1.231zm-5.507 3.693c.8 0 1.453-.654 1.453-1.453s-.654-1.453-1.453-1.453-1.453.654-1.453 1.453.654 1.453 1.453 1.453zM12 2C6.477 2 2 6.477 2 12c0 1.63.398 3.165 1.09 4.523L2 22l5.477-1.09c1.358.692 2.893 1.09 4.523 1.09 5.523 0 10-4.477 10-10S17.523 2 12 2z"/>
-              </svg>
-              Message us on WhatsApp
+              <span className="flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0">
+                  <path fill="currentColor" d="M17.507 14.307l-.007.077c0 2.485-2.847 5.485-2.847 5.485C13.743 20.346 13 20.5 12 20.5s-1.743-.154-2.653-.631c0 0-2.847-3-2.847-5.485v-.077C6.473 14.09 6 13.184 6 12c0-1.184.473-2.09.473-2.09s2.847-2.908 2.847-2.908c.91 0 1.653-.154 2.653-.631 0 0 2.847 3 2.847 5.485v.077c0 .283-.047.554-.047.554l2.354 1.346c.326.185.4.631.185.985l-.007.019c-.215.354-.631.446-.957.261l-2.146-1.231zm-5.507 3.693c.8 0 1.453-.654 1.453-1.453s-.654-1.453-1.453-1.453-1.453.654-1.453 1.453.654 1.453 1.453 1.453zM12 2C6.477 2 2 6.477 2 12c0 1.63.398 3.165 1.09 4.523L2 22l5.477-1.09c1.358.692 2.893 1.09 4.523 1.09 5.523 0 10-4.477 10-10S17.523 2 12 2z"/>
+                </svg>
+                <span>Message us on WhatsApp</span>
+              </span>
             </a>
             
-            <p className="mt-4 text-sm text-gray-500">
+            <p className="mt-4 text-xs sm:text-sm text-gray-500">
               We'll share our complete portfolio with you instantly
             </p>
           </div>

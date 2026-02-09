@@ -171,7 +171,7 @@ const EnquiryForm = () => {
                           Years of Experience *
                         </label>
                         <div className="relative">
-                          <HiEnvelope className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40" />
+                          <HiSparkles className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-foreground/40" />
                           <input
                             type="number"
                             name="experience_years"
