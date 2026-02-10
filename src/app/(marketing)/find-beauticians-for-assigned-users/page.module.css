@@ -1,0 +1,129 @@
+/* Styles for the beautician locator page */
+.container {
+  padding: 0 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.mapContainer {
+  height: 80vh;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .mapContainer {
+    height: calc(100vh - 100px); /* Adjust for header and search bar */
+  }
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 640px) {
+  .mapContainer {
+    height: 100% !important; /* Full height on mobile */
+  }
+  
+  /* Ensure proper stacking on mobile */
+  .leaflet-container {
+    min-height: 200px !important;
+  }
+  
+  /* Mobile map specific fixes */
+  .leaflet-map-pane,
+  .leaflet-tile-container {
+    min-height: 200px !important;
+  }
+  
+  /* Ensure full height for listing container */
+  .listing-container {
+    height: 100% !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Mobile side-by-side layout adjustments */
+  .mobile-side-by-side {
+    flex-direction: column !important;
+    height: calc(100vh - 200px) !important; /* Account for header and footer space */
+    margin-bottom: 16px !important;
+  }
+  
+  .mobile-side-by-side > div:first-child {
+    height: auto !important;
+    min-height: 150px !important;
+    max-height: 200px !important; /* Fixed max height for listing */
+    flex: none !important; /* Don't grow/shrink */
+  }
+  
+  .mobile-side-by-side > div:last-child {
+    height: auto !important;
+    flex: 1 !important; /* Take remaining space */
+    min-height: 200px !important;
+  }
+  
+  /* Mobile search input and button layout */
+  .search-container {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+  
+  .search-input-wrapper {
+    flex: 1 !important;
+  }
+  
+  .search-button {
+    min-width: 70px !important;
+  }
+}
+
+/* Desktop adjustments */
+@media (min-width: 641px) {
+  .mobile-side-by-side {
+    height: 100% !important;
+  }
+  
+  .mobile-side-by-side > div:first-child {
+    max-height: none !important;
+    height: 100% !important;
+  }
+  
+  .mobile-side-by-side > div:last-child {
+    height: 100% !important;
+  }
+}
+
+/* Leaflet map fixes */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+}
+
+.leaflet-map-pane,
+.leaflet-tile-container,
+.leaflet-layer {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.custom-marker {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 640px) {
+  .leaflet-popup-content {
+    margin: 0 !important;
+    min-width: 200px;
+  }
+  
+  .custom-popup .leaflet-popup-content-wrapper {
+    padding: 8px;
+    border-radius: 8px;
+  }
+}
