@@ -42,26 +42,6 @@
     overflow-y: auto !important;
   }
   
-  /* Mobile side-by-side layout adjustments */
-  .mobile-side-by-side {
-    flex-direction: column !important;
-    height: calc(100vh - 200px) !important; /* Account for header and footer space */
-    margin-bottom: 16px !important;
-  }
-  
-  .mobile-side-by-side > div:first-child {
-    height: auto !important;
-    min-height: 150px !important;
-    max-height: 200px !important; /* Fixed max height for listing */
-    flex: none !important; /* Don't grow/shrink */
-  }
-  
-  .mobile-side-by-side > div:last-child {
-    height: auto !important;
-    flex: 1 !important; /* Take remaining space */
-    min-height: 200px !important;
-  }
-  
   /* Mobile search input and button layout */
   .search-container {
     display: flex !important;
