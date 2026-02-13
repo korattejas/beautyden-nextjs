@@ -28,6 +28,7 @@ import { BookingFormData, TimeSlot } from "@/types/booking";
 import { useCart } from "@/contexts/CartContext";
 import { useSettings } from "@/hooks/useApi";
 import { bookAppointment } from "@/services/booking.service";
+import { useCityContext } from "@/contexts/CityContext";
 
 const customerSchema = yup.object().shape({
   firstName: yup
@@ -68,6 +69,9 @@ const BookingDetailsWithCart = ({
   const { items: cartItems, clearCart } = useCart();
   const { data: settingsData } = useSettings();
   const settings = settingsData?.data || [];
+
+  // City context
+  const { selectedCity } = useCityContext();
 
   const {
     register,
@@ -321,6 +325,8 @@ const BookingDetailsWithCart = ({
             : undefined,
         service_address: data.address,
         service_sub_category_id: undefined,
+        city_id: selectedCity?.id || "",  // Add city_id from context
+        discount_percentage: specialOfferPercentage,  // Add discount_percentage
       };
 
       const response = await bookAppointment(payload);

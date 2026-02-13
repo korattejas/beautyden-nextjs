@@ -124,7 +124,7 @@ const ServiceAreaSection = () => {
               className="flex flex-col sm:flex-row gap-4"
             >
               <Button
-                href="/services"
+                href="/book"
                 className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105"
               >
                 Book Service Now
