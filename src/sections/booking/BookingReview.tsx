@@ -17,6 +17,7 @@ import { BookingFormData } from "@/types/booking";
 import { bookAppointment } from "@/services/booking.service";
 import { useCart } from "@/contexts/CartContext";
 import { useSettings } from "@/hooks/useApi";
+import { useCityContext } from "@/contexts/CityContext";
 
 interface BookingReviewProps {
   bookingData: BookingFormData;
@@ -35,6 +36,9 @@ const BookingReview = ({
   const { clearCart, items: cartItems } = useCart();
   const { data: settingsData } = useSettings();
   const settings = settingsData?.data || [];
+  
+  // City context
+  const { selectedCity } = useCityContext();
 
   const getSetting = (key: string) => {
     return settings.find((setting: any) => setting.key === key)?.value || "";
@@ -216,6 +220,8 @@ const BookingReview = ({
           specialOfferDiscountValue > 0 ? specialOfferDiscountValue : undefined,
         service_address: bookingData.address,
         service_sub_category_id: undefined,
+        city_id: selectedCity?.id || "",  // Add city_id from context
+        discount_percentage: specialOfferPercentage,  // Add discount_percentage
       };
 
       console.log("Booking payload:", payload);
