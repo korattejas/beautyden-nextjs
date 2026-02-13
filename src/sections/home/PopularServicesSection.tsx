@@ -188,7 +188,7 @@ const PopularServicesSection = () => {
               ))}
 
               <Button
-                href="/services"
+                href="/book"
                 size="sm"
                 className="w-full mt-3 sm:mt-4 bg-gradient-to-r from-primary to-secondary text-white rounded-full py-2 sm:py-2.5"
               >

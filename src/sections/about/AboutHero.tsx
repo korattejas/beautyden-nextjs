@@ -83,7 +83,7 @@ const AboutHero = () => {
               className="flex flex-col sm:flex-row gap-4 mb-12"
             >
               <Button
-                href="/services"
+                href="/book"
                 size="lg"
                 className="bg-gradient-to-r from-primary to-secondary text-white px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
               >
