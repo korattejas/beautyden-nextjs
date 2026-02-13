@@ -42,7 +42,7 @@ export default function ThankYouContent() {
           className="max-w-4xl mx-auto"
         >
           {/* Success Icon */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-8 mt-8">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
