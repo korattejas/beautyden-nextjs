@@ -17,6 +17,8 @@ export interface BookAppointmentPayload {
   discount_price?: number;
   service_address: string;
   service_sub_category_id?: string;
+  city_id: string;
+  discount_percentage?: number;
 }
 
 export interface BookAppointmentResponse {
