@@ -21,15 +21,15 @@ const BeauticianLocator = dynamic(
 
 export default function FindBeauticiansPage() {
     return (
-        <div className="min-h-screen bg-white pb-6">
+        <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 pb-8">
             {/* Header */}
             <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-white border-b border-gray-100 pt-20 md:pt-24">
                 <Container className="py-8 md:py-12">
-                    <div className="text-center max-w-3xl mx-auto px-4">
-                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 md:mb-4">
+                    <div className="text-center max-w-4xl mx-auto px-4">
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 md:mb-6">
                             Find Experts Near You
                         </h1>
-                        <p className="text-sm sm:text-base text-gray-600 px-2 md:px-0">
+                        <p className="text-base sm:text-lg md:text-xl text-gray-600 px-2 md:px-0 max-w-3xl mx-auto leading-relaxed">
                             Locate our top-rated beauticians in your area. Enter your location to see who is available to bring professional beauty services to your doorstep.
                         </p>
                     </div>
@@ -37,8 +37,10 @@ export default function FindBeauticiansPage() {
             </div>
 
             {/* Locator Component */}
-            <div className="flex-1 px-2 sm:px-4">
-                <BeauticianLocator />
+            <div className="px-0 sm:px-0 pt-6">
+                <Container>
+                    <BeauticianLocator />
+                </Container>
             </div>
         </div>
     );
