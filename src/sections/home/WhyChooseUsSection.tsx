@@ -117,7 +117,7 @@ const WhyChooseUsSection = () => {
                 Book Now
               </a>
               <a
-                href="/services"
+                href="/book"
                 className="inline-flex items-center justify-center px-8 py-4 border-2 border-primary/30 text-primary font-semibold rounded-full hover:bg-primary/5 transition-all duration-300"
               >
                 View Services
