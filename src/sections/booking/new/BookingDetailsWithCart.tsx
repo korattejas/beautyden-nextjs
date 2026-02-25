@@ -314,7 +314,7 @@ const BookingDetailsWithCart = ({
         appointment_time: bookingData.selectedTime,
         notes: data.specialNotes || "",
         quantity: cartItems.length,
-        price: totalPrice,
+        price: baseTotalPrice,  // Use original total before discount
         discount_price:
           specialOfferDiscountAmount > 0
             ? specialOfferDiscountAmount

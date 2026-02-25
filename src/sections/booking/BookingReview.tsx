@@ -214,7 +214,7 @@ const BookingReview = ({
         appointment_time: bookingData.selectedTime,
         notes: bookingData.specialNotes || "",
         quantity: servicesToUse.length,
-        price: totalPrice,
+        price: calculatedBaseTotal,  // Use original total before discount
         discount_price: combinedDiscount > 0 ? combinedDiscount : undefined,
         special_offer_discount:
           specialOfferDiscountValue > 0 ? specialOfferDiscountValue : undefined,
