@@ -10,7 +10,6 @@ import TestimonialsSection from "@/sections/home/TestimonialsSection";
 import { HiHeart, HiSparkles } from "react-icons/hi2";
 // import WhyChooseUsSection from "@/sections/home/WhyChooseUsSection";
 // import WhyChooseUsSection from "@/sections/home/WhyChooseUsSection";
-
 // import FeaturedServicesSection from "@/sections/home/FeaturedServicesSection";
 
 export default function HomePage() {
