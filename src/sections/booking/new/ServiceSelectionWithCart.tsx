@@ -48,10 +48,10 @@ const getDiscountInfo = (service: any) => {
 
   const amount = Math.max(original - current, 0);
 
-  // Show the same percentage style as Services page:
-  // what % of original price the customer is paying
+  // Calculate discount percentage correctly:
+  // (discount_amount / original_price) * 100
   const percent =
-    original > 0 && current > 0 ? Math.floor((current / original) * 100) : 0;
+    original > 0 && amount > 0 ? Math.round((amount / original) * 100) : 0;
 
   return { original, current, amount, percent };
 };
@@ -160,7 +160,19 @@ const MobileCartDrawer = ({
                             {service.name}
                           </p>
                           <p className="text-sm text-gray-500">
-                            {service.duration}
+                            {(() => {
+                              const durationMatch = service.duration?.toString().match(/(\d+)/);
+                              const duration = durationMatch ? parseInt(durationMatch[1]) : 60;
+                              const hours = Math.floor(duration / 60);
+                              const minutes = duration % 60;
+                              if (hours >= 1) {
+                                if (minutes === 0) {
+                                  return `${hours}h`;
+                                }
+                                return `${hours}h ${minutes}m`;
+                              }
+                              return `${minutes}m`;
+                            })()}
                           </p>
                           <div className="text-sm font-semibold text-gray-900 mt-1">
                             {service.discount_price ? (
@@ -793,9 +805,16 @@ const ServiceSelectionWithCart = ({
   const formatDuration = (totalMinutes: number) => {
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
-    if (hours && minutes) return `${hours} h ${minutes} min`;
-    if (hours) return `${hours} h`;
-    return `${minutes} min`;
+    
+    // If duration is 60 minutes or more, show in hours and minutes
+    if (hours >= 1) {
+      if (minutes === 0) {
+        return `${hours}h`;
+      }
+      return `${hours}h ${minutes}m`;
+    }
+    // Less than 60 minutes, show only minutes
+    return `${minutes}m`;
   };
 
   // Helper function to get display price (use current price if available, otherwise fallback to discount/original price)
@@ -1137,7 +1156,19 @@ const ServiceSelectionWithCart = ({
                             <span className="text-gray-300">•</span>
                             <span className="inline-flex items-center gap-1">
                               <HiClock className="w-4 h-4" />
-                              {service.duration || "60 min"}
+                              {(() => {
+                                const durationMatch = (service.duration || "60 min").toString().match(/(\d+)/);
+                                const duration = durationMatch ? parseInt(durationMatch[1]) : 60;
+                                const hours = Math.floor(duration / 60);
+                                const minutes = duration % 60;
+                                if (hours >= 1) {
+                                  if (minutes === 0) {
+                                    return `${hours}h`;
+                                  }
+                                  return `${hours}h ${minutes}m`;
+                                }
+                                return `${minutes}m`;
+                              })()}
                             </span>
                             {service.subcategory_name && (
                               <>
@@ -1334,7 +1365,19 @@ const ServiceSelectionWithCart = ({
                           {service.name}
                         </p>
                         <p className="text-xs text-gray-500">
-                          {service.duration}
+                          {(() => {
+                            const durationMatch = service.duration?.toString().match(/(\d+)/);
+                            const duration = durationMatch ? parseInt(durationMatch[1]) : 60;
+                            const hours = Math.floor(duration / 60);
+                            const minutes = duration % 60;
+                            if (hours >= 1) {
+                              if (minutes === 0) {
+                                return `${hours}h`;
+                              }
+                              return `${hours}h ${minutes}m`;
+                            }
+                            return `${minutes}m`;
+                          })()}
                         </p>
                         <div className="text-sm font-semibold text-gray-900 mt-1">
                           {service.discount_price ? (
