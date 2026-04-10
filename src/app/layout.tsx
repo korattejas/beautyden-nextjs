@@ -23,6 +23,9 @@ export const metadata: Metadata = {
     "Experience luxury beauty services in the comfort of your home. Our certified professionals bring salon-quality treatments directly to you.",
   keywords:
     "beauty services, home beauty, professional makeup, skincare, nail care",
+  other: {
+    "facebook-domain-verification": "6llltifwojm2bjqkxgoeb04rm330jk",
+  },
 };
 
 export default function RootLayout({
